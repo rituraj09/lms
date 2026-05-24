@@ -5,5 +5,5 @@ Route::group(['middleware' => 'redirect.auth:admin'], function ($router) {
 });
 
 Route::group(['middleware' => 'redirect.notauth:admin'], function ($router) {
-    //admin pages
+    $router->livewire('home', 'admin.home')->name('home');
 });
