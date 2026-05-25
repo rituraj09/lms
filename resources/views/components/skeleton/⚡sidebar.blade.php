@@ -41,6 +41,33 @@ new class extends Component
                     <div data-i18n="Dashboard">Dashboard</div>
                 </a>
             </li>
+            <li class="menu-header small mt-5">
+                <span class="menu-header-text" data-i18n="Admin Corner">Admin Corner</span>
+            </li>
+
+                <li class="menu-item">
+                    <a href="javascript:void(0);" class="menu-link menu-toggle">
+                        <i class="menu-icon icon-base ri ri-info-card-line"></i>
+                        <div data-i18n="Master">Master</div>
+                    </a>
+                    <ul class="menu-sub">
+                            <li class="menu-item">
+                                <a href="{{ route('admin.organisation') }}" class="menu-link">
+                                    <div data-i18n="Organisation">Organisation</div>
+                                </a>
+                            </li>
+                        <li class="menu-item">
+                            <a href="{{ route('admin.designation') }}" class="menu-link">
+                                <div data-i18n="Designation">Designation</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="{{ route('admin.role') }}" class="menu-link">
+                                <div data-i18n="Role">Role</div>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
         </ul>
     </aside>
 </div>
