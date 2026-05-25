@@ -1,23 +1,26 @@
 <?php
 
+use App\Models\Master\District;
 use App\Models\Master\Organisation;
 use App\Models\Master\State;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager;
+use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
-new #[\Livewire\Attributes\Layout('layouts.backend')]
+new #[Layout('layouts.backend')]
 class extends Component {
 
     use WithFileUploads;
 
     public int $createForm = 0;
-
     public bool $is_edit = false;
-
-    public string $title = "Organisation";
+    public string $title = "New Organisation";
+    public ?int $eventID = null;
 
     // Form Fields
     public ?string $name = null;
@@ -26,6 +29,7 @@ class extends Component {
     public ?string $address = null;
     public ?string $organisation_type = null;
     public ?int $state_id = null;
+    public ?int $district_id = null;
     public ?string $pincode = null;
     public ?string $website = null;
 
@@ -33,6 +37,7 @@ class extends Component {
 
     // Collections
     public $states;
+    public $districts;
     public $organisation_types;
 
     // Photo Upload
@@ -40,7 +45,7 @@ class extends Component {
 
     public ?string $existing_photo = null;
 
-    protected function rules()
+    protected function rules(): array
     {
         return [
 
@@ -54,23 +59,27 @@ class extends Component {
 
             'address' => 'nullable|string|max:500',
 
-            'state_id' => 'required|integer',
+            'state_id' => 'required|integer|exists:states,id',
+
+            'district_id' => 'required|integer|exists:districts,id',
 
             'pincode' => 'nullable|digits:6',
 
             'website' => 'nullable|url|max:255',
 
-            'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:800',
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png,gif,tiff|max:800',
         ];
     }
 
-    protected $messages = [
+    protected array $messages = [
 
         'name.required' => 'Organisation name is required.',
 
         'organisation_type.required' => 'Please select organisation type.',
 
         'state_id.required' => 'Please select a state.',
+
+        'district_id.required' => 'Please select a district.',
 
         'phone.digits' => 'Phone number must be 10 digits.',
 
@@ -85,97 +94,179 @@ class extends Component {
         'photo.max' => 'Logo size must not exceed 800KB.',
     ];
 
-    public function mount()
+    public function mount(): void
     {
         $this->states = State::all();
-
+        $this->districts = collect();
         $this->organisation_types =
             \App\Helper\Globals::ORGANISATION_TYPES;
     }
 
     #[On('new-entry')]
-    public function newEntry()
+    public function newEntry(): void
     {
+        $this->resetForm();
+        $this->title = "New Organisation";
         $this->createForm = 1;
     }
 
-    public function updated($property)
+    #[On('edit')]
+    public function edit($id)
     {
-        $this->validateOnly($property);
+        $this->resetForm();
+
+        $organisation = Organisation::findOrFail($id);
+
+        $this->is_edit = true;
+        $this->eventID = $id;
+        $this->createForm = 1;
+        $this->title = "Edit Organisation";
+
+        $this->name = $organisation->name;
+        $this->phone = $organisation->phone;
+        $this->email = $organisation->email;
+        $this->address = $organisation->address;
+        $this->organisation_type = $organisation->organisation_type;
+        $this->state_id = $organisation->state_id;
+
+        $this->districts = District::byState($this->state_id)->get();
+        $this->district_id = $organisation->district_id;
+
+        $this->pincode = $organisation->pincode;
+        $this->website = $organisation->website;
+
+        $this->social_links = json_decode($organisation->social_links, true) ?? [];
+
+        $this->existing_photo = $organisation->logo_path;
     }
 
-    public function updatedName()
+    #[On('delete')]
+    public function delete($id): void
+    {
+        try {
+            $organisation = Organisation::findOrFail($id);
+
+            // delete logo if exists
+            if ($organisation->logo_path) {
+                Storage::disk('public')->delete($organisation->logo_path);
+            }
+
+            $organisation->delete();
+
+            $this->dispatch(
+                'notify',
+                type: 'success',
+                message: 'Organisation deleted successfully!'
+            );
+
+            $this->dispatch('refresh-table');
+
+        } catch (\Exception $e) {
+
+            $this->dispatch(
+                'notify',
+                type: 'error',
+                message: $e->getMessage()
+            );
+        }
+    }
+
+    public function updatedName(): void
     {
         $this->name = Str::title($this->name);
     }
 
-    public function submit()
+    public function updatedStateId(): void
+    {
+        $this->districts = District::byState($this->state_id)->get();
+    }
+
+    public function submit(): void
     {
         $validated = $this->validate();
 
         DB::beginTransaction();
-
+        $logoPath = null;
         try {
+            if (!is_null($this->photo) && $this->photo->isValid()) {
+                $image = ImageManager::usingDriver(Driver::class)
+                    ->decode($this->photo);
+                $image->cover(200, 200);
 
-            $logoPath = $this->existing_photo;
+                if ($this->existing_photo) {
+                    Storage::disk('public')->delete($this->existing_photo);
+                }
+                $filename = Str::random(8) . '-' . time() . '.' . $this->photo->extension();
+                $logoPath = 'Organisation/' . $filename;
+                $image->save(storage_path('app/public/' . $logoPath));
+            }
+            if ($this->is_edit){
+                $organisation = Organisation::findOrFail($this->eventID);
+                $organisation->update([
+                    'name' => Str::title($this->name),
+                    'phone' => $this->phone,
+                    'email' => $this->email,
+                    'address' => $this->address,
+                    'organisation_type' => $this->organisation_type,
+                    'state_id' => $this->state_id,
+                    'district_id' => $this->district_id,
+                    'pincode' => $this->pincode,
+                    'website' => $this->website,
+                    'social_links' => $this->social_links,
+                    'logo_path' => $logoPath ?? $this->existing_photo,
+                ]);
 
-            // Upload Logo
-            if ($this->photo) {
+            } else {
+                Organisation::create([
 
-                $logoPath = $this->photo->store(
-                    'organisation/logo',
-                    'public'
-                );
+                    'name' => Str::title($this->name),
+
+                    'phone' => $this->phone,
+
+                    'email' => $this->email,
+
+                    'address' => $this->address,
+
+                    'organisation_type' => $this->organisation_type,
+
+                    'state_id' => $this->state_id,
+                    'district_id' => $this->district_id,
+                    'pincode' => $this->pincode,
+
+                    'website' => $this->website,
+
+                    'social_links' => $this->social_links,
+
+                    'logo_path' => $logoPath,
+                ]);
             }
 
-            Organisation::create([
-
-                'name' => Str::title($this->name),
-
-                'phone' => $this->phone,
-
-                'email' => $this->email,
-
-                'address' => $this->address,
-
-                'organisation_type' => $this->organisation_type,
-
-                'state_id' => $this->state_id,
-
-                'pincode' => $this->pincode,
-
-                'website' => $this->website,
-
-                'social_links' => json_encode($this->social_links),
-
-                'logo_path' => $logoPath,
-            ]);
 
             DB::commit();
-
-            session()->flash(
-                'success',
-                'Organisation created successfully.'
+            $this->dispatch(
+                'notify',
+                type: 'success',
+                message: 'Organisation has been created/updated successfully!'
             );
-
             $this->resetForm();
 
             $this->createForm = 0;
 
-            $this->dispatch('refreshDatatable');
+            $this->dispatch('refresh-table');
 
         } catch (\Exception $e) {
 
             DB::rollBack();
 
-            session()->flash(
-                'error',
-                $e->getMessage()
+            $this->dispatch(
+                'notify',
+                type: 'error',
+                message: $e->getMessage()
             );
         }
     }
 
-    public function resetForm()
+    protected function resetForm()
     {
         $this->reset([
             'name',
@@ -184,14 +275,16 @@ class extends Component {
             'address',
             'organisation_type',
             'state_id',
+            'district_id',
             'pincode',
             'website',
             'social_links',
             'photo',
             'existing_photo',
         ]);
-
+        $this->districts = collect();
         $this->social_links = [];
+        $this->is_edit = false;
     }
 };
 ?>
@@ -236,33 +329,35 @@ class extends Component {
                     <div class="card-body">
 
                         <form wire:submit.prevent="submit">
-
-                            {{-- Top Validation Summary --}}
-                            @if ($errors->any())
-
-                                <div class="alert alert-danger">
-
-                                    <h6 class="mb-2">
-                                        Please fix the following errors:
-                                    </h6>
-
-                                    <ul class="mb-0">
-
-                                        @foreach ($errors->all() as $error)
-
-                                            <li>{{ $error }}</li>
-
-                                        @endforeach
-
-                                    </ul>
-
-                                </div>
-
-                            @endif
-
                             <div class="row g-5">
-
-                                {{-- Name --}}
+                                <div class="d-flex align-items-start align-items-sm-center gap-6">
+                                    <img
+                                        src="@if($photo)
+                                                {{ $photo->temporaryUrl() }}
+                                            @elseif(!is_null($existing_photo))
+                                                {{ asset('storage/'.$existing_photo) }}
+                                            @else
+                                                {{ asset('assets/img/avatars/2.png') }}
+                                            @endif"
+                                        alt="photo"
+                                        class="d-block w-px-100 h-px-100 rounded-4" id="uploadedAvatar">
+                                    <div class="button-wrapper">
+                                        <label for="upload"
+                                               class="btn btn-primary me-3 mb-4 waves-effect waves-light"
+                                               tabindex="0">
+                                            <span class="d-none d-sm-block">Upload new logo</span>
+                                            <i class="icon-base ri ri-upload-2-line d-block d-sm-none"></i>
+                                            <input type="file" id="upload" class="account-file-input" hidden=""
+                                                   accept="image/png, image/jpeg" wire:model.live="photo">
+                                        </label>
+                                        <div>Allowed JPG, GIF or PNG. Max size of 800K</div>
+                                    </div>
+                                    @error('photo')
+                                    <div
+                                        class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">{{$message}}</div>
+                                    @enderror
+                                </div>
+                                <hr>
                                 <div class="col-md-6">
 
                                     <div class="form-floating form-floating-outline">
@@ -409,7 +504,7 @@ class extends Component {
                                     <div class="form-floating form-floating-outline">
 
                                         <select id="state_id"
-                                                wire:model="state_id"
+                                                wire:model.live="state_id"
                                                 class="form-select @error('state_id') is-invalid @enderror">
 
                                             <option value="">
@@ -440,7 +535,42 @@ class extends Component {
                                     @enderror
 
                                 </div>
+                                <div class="col-md-4">
 
+                                    <div class="form-floating form-floating-outline">
+
+                                        <select id="district_id"
+                                                wire:model="district_id"
+                                                class="form-select @error('district_id') is-invalid @enderror">
+
+                                            <option value="">
+                                                Select District
+                                            </option>
+
+                                            @foreach($districts as $v)
+
+                                                <option value="{{ $v->id }}">
+                                                    {{ $v->name }}
+                                                </option>
+
+                                            @endforeach
+
+                                        </select>
+
+                                        <label for="district_id">
+                                            District
+                                            <span class="text-danger">*</span>
+                                        </label>
+
+                                    </div>
+
+                                    @error('state_id')
+                                    <div class="invalid-feedback d-block">
+                                        {{ $message }}
+                                    </div>
+                                    @enderror
+
+                                </div>
                                 {{-- Pincode --}}
                                 <div class="col-md-4">
 
@@ -545,65 +675,6 @@ class extends Component {
                                     </div>
 
                                 </div>
-
-                                {{-- Logo Upload --}}
-                                <div class="col-md-12">
-
-                                    <div class="d-flex align-items-start gap-6">
-
-                                        <img
-                                            src="
-                                            @if($photo)
-                                                {{ $photo->temporaryUrl() }}
-                                            @elseif(!is_null($existing_photo))
-                                                {{ asset('storage/'.$existing_photo) }}
-                                            @else
-                                                {{ asset('assets/img/avatars/2.png') }}
-                                            @endif
-                                            "
-                                            alt="logo"
-                                            class="d-block w-px-100 h-px-100 rounded-4 object-fit-cover">
-
-                                        <div>
-
-                                            <label for="upload"
-                                                   class="btn btn-primary mb-3">
-
-                                                Upload Logo
-
-                                                <input type="file"
-                                                       id="upload"
-                                                       hidden
-                                                       accept="image/png,image/jpeg,image/jpg"
-                                                       wire:model="photo">
-
-                                            </label>
-
-                                            <div>
-                                                Allowed JPG, JPEG or PNG.
-                                                Max size 800KB
-                                            </div>
-
-                                            <div wire:loading
-                                                 wire:target="photo"
-                                                 class="text-primary mt-2">
-
-                                                Uploading...
-
-                                            </div>
-
-                                            @error('photo')
-                                            <div class="invalid-feedback d-block">
-                                                {{ $message }}
-                                            </div>
-                                            @enderror
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
                             </div>
 
                             {{-- Buttons --}}

@@ -367,13 +367,8 @@
                                 {{-- Image --}}
                             @elseif(($column['type'] ?? '') === 'image')
 
-                                    <img
-                                        src="{{ data_get($row, $column['key'])
-                                                ? asset('storage/' . data_get($row, $column['key']))
-                                                : asset('assets/img/avatars/2.png') }}"
-                                        alt="image"
-                                        class="rounded-circle border"
-                                        style="width:50px;height:50px;object-fit:cover;">
+                                <img src="{{ Storage::url(data_get($row, $column['key'])) }}" alt="NA" class="rounded-circle"
+                                     style="width:36px;height:36px;object-fit:cover"/>
 
                                 {{-- Custom render --}}
                             @elseif(isset($column['render']))
