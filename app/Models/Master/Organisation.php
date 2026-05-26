@@ -15,18 +15,7 @@ class Organisation extends Model
     public $casts = [
         'social_links' => 'array',
     ];
-    protected $fillable = [
-        'name',
-        'phone',
-        'email',
-        'address',
-        'organisation_type',
-        'state_id',
-        'pincode',
-        'website',
-        'social_links',
-        'logo_path',
-    ];
+
 
     public function state(){
         return $this->belongsTo(State::class,'state_id')->withDefault();
