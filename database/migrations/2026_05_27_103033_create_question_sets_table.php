@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('question_sets', function (Blueprint $table) {
             $table->id();
+            $table->string('code')->unique();  // e.g. "IQ_SET_001"
             $table->string('title');
             $table->string('slug')->unique();
             $table->enum('question_set_type', ['iq', 'eq', 'lq']); // IQ, EQ, Leadership Quotient
