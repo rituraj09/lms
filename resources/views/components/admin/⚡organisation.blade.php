@@ -44,8 +44,7 @@ class extends Component {
     public $photo;
     public ?string $existing_photo = null;
 
-    public bool $showViewModal = false;
-    public $viewOrganisation = null;
+
 
     protected function rules(): array
     {
@@ -111,20 +110,7 @@ class extends Component {
         $this->title = "New Organisation";
         $this->createForm = 1;
     }
-    #[On('view')]
-   public function viewOrganisation($id)
-{
-    $this->viewOrganisation = \App\Models\Master\Organisation::with('state')
-        ->findOrFail($id);
 
-    $this->showViewModal = true;
-}
-    public function closeModal()
-    {
-        $this->showViewModal = false;
-
-        $this->viewOrganisation = null;
-    }
     #[On('edit')]
     public function edit($id)
     {
@@ -315,7 +301,7 @@ class extends Component {
                 ['key' => 'actions', 'label' => 'Actions', 'type' => 'actions'],
             ]"
             :actions="[
-                ['label'=>'View','icon'=>'icon-base ri ri-focus-2-line','event'=>'view','class'=>'btn-outline-success'],
+                ['label'=>'View','icon'=>'icon-base ri ri-focus-2-line','event'=>'viewOrganisation','class'=>'btn-outline-success'],
                 ['label'=>'Edit','icon'=>'icon-base ri ri-edit-line','event'=>'edit','class'=>'btn-outline-primary'],
                 ['label'=>'Delete','icon'=>'icon-base ri ri-delete-bin-4-line','event'=>'delete','class'=>'btn-outline-danger','confirm'=>true],
             ]"
@@ -717,292 +703,9 @@ class extends Component {
         </div>
 
     @endif
-
+    @livewire('modal.form-modal')
     {{-- View Modal --}}
-    @if($showViewModal && $viewOrganisation)
-    <div class="modal fade show d-block"
-        tabindex="-1"
-        style="background-color: rgba(0,0,0,0.55);">
 
-        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-
-            <div class="modal-content border-0 shadow-lg">
-
-                {{-- Header --}}
-                <div class="modal-header border-bottom bg-primary pb-5">
-                    <div class="d-flex align-items-center">
-                        <img
-                            src="{{ $viewOrganisation->logo_path
-                                    ? asset('storage/'.$viewOrganisation->logo_path)
-                                    : asset('assets/img/avatars/2.png') }}"
-                            alt="logo"
-                            class="rounded border border-2 border-white me-3"
-                            style="width:80px;height:80px;object-fit:cover;">
-
-                        <div>
-
-                            <h4 class="modal-title text-white mb-1">
-                                {{ $viewOrganisation->name }}
-                            </h4>
-
-                            <div class="d-flex flex-wrap gap-2">
-
-                                <span class="badge bg-white text-primary">
-                                    {{ $viewOrganisation->organisation_type }}
-                                </span>
-
-                                @if($viewOrganisation->state)
-                                    <span class="badge bg-label-light">
-                                        {{ $viewOrganisation->state->name }}
-                                    </span>
-                                @endif
-
-                                @if($viewOrganisation->district)
-                                    <span class="badge bg-label-light">
-                                        {{ $viewOrganisation->district->name }}
-                                    </span>
-                                @endif
-
-                            </div>
-
-                        </div>
-                    </div>
-                    <button type="button"
-                            class="btn-close btn-close-white"
-                            wire:click="closeModal">
-                    </button>
-                </div>
-
-                {{-- Body --}}
-                <div class="modal-body">
-                    <div class="row g-4">
-                        {{-- Contact Information --}}
-                        <div class="col-md-6">
-                            <div class="card shadow-none border h-100">
-                                <div class="card-header border-bottom">
-                                    <h6 class="mb-0">
-                                        Contact Information
-                                    </h6>
-                                </div>
-                                <div class="card-body ">
-                                    <div class="row mb-4 mt-4">
-
-                                        <label class="col-sm-4 text-muted">
-                                            Phone
-                                        </label>
-
-                                        <div class="col-sm-8 fw-medium">
-                                            {{ $viewOrganisation->phone ?: '-' }}
-                                        </div>
-
-                                    </div>
-                                    <div class="row mb-4">
-
-                                        <label class="col-sm-4 text-muted">
-                                            Email
-                                        </label>
-
-                                        <div class="col-sm-8 fw-medium">
-                                            {{ $viewOrganisation->email ?: '-' }}
-                                        </div>
-
-                                    </div>
-                                    <div class="row">
-                                        <label class="col-sm-4 text-muted">
-                                            Website
-                                        </label>
-                                        <div class="col-sm-8">
-
-                                            @if($viewOrganisation->website)
-
-                                                <a href="{{ $viewOrganisation->website }}"
-                                                target="_blank"
-                                                class="fw-medium">
-
-                                                    {{ $viewOrganisation->website }}
-
-                                                </a>
-
-                                            @else
-                                                -
-                                            @endif
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- Address Information --}}
-                        <div class="col-md-6">
-
-                            <div class="card shadow-none border h-100">
-
-                                <div class="card-header border-bottom">
-                                    <h6 class="mb-0">
-                                        Address Information
-                                    </h6>
-                                </div>
-
-                                <div class="card-body">
-
-                                    <div class="row mb-4 mt-4">
-
-                                        <label class="col-sm-4 text-muted">
-                                            State
-                                        </label>
-
-                                        <div class="col-sm-8 fw-medium">
-                                            {{ $viewOrganisation->state->name ?? '-' }}
-                                        </div>
-
-                                    </div>
-
-                                    <div class="row mb-4">
-
-                                        <label class="col-sm-4 text-muted">
-                                            District
-                                        </label>
-
-                                        <div class="col-sm-8 fw-medium">
-                                            {{ $viewOrganisation->district->name ?? '-' }}
-                                        </div>
-
-                                    </div>
-
-                                    <div class="row mb-4">
-
-                                        <label class="col-sm-4 text-muted">
-                                            Pincode
-                                        </label>
-
-                                        <div class="col-sm-8 fw-medium">
-                                            {{ $viewOrganisation->pincode ?: '-' }}
-                                        </div>
-
-                                    </div>
-
-                                    <div class="row">
-
-                                        <label class="col-sm-4 text-muted">
-                                            Address
-                                        </label>
-
-                                        <div class="col-sm-8 fw-medium">
-                                            {{ $viewOrganisation->address ?: '-' }}
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-                        {{-- Social Links --}}
-                        @if(!empty(array_filter($viewOrganisation->social_links ?? [])))
-
-                            <div class="col-md-12">
-
-                                <div class="card shadow-none border">
-
-                                    <div class="card-header border-bottom">
-                                        <h6 class="mb-0">
-                                            Social Media Links
-                                        </h6>
-                                    </div>
-
-                                    <div class="card-body">
-
-                                        <div class="row g-3">
-
-                                            @foreach($viewOrganisation->social_links as $key => $value)
-
-                                                @if($value)
-
-                                                    <div class="col-md-4">
-
-                                                        <a href="{{ $value }}"
-                                                        target="_blank"
-                                                        class="text-decoration-none">
-
-                                                            <div class="border rounded p-3 h-100">
-
-                                                                <div class="d-flex align-items-center">
-
-                                                                    <div class="avatar avatar-sm me-3">
-
-                                                                        <span class="avatar-initial rounded bg-label-primary">
-
-                                                                            @if($key == 'facebook')
-                                                                                <i class="ri-facebook-fill"></i>
-                                                                            @elseif($key == 'instagram')
-                                                                                <i class="ri-instagram-line"></i>
-                                                                            @elseif($key == 'twitter')
-                                                                                <i class="ri-twitter-x-line"></i>
-                                                                            @else
-                                                                                <i class="ri-global-line"></i>
-                                                                            @endif
-
-                                                                        </span>
-
-                                                                    </div>
-
-                                                                    <div>
-
-                                                                        <small class="text-muted d-block">
-                                                                            {{ ucfirst($key) }}
-                                                                        </small>
-
-                                                                        <span class="fw-medium text-dark">
-                                                                            Visit Link
-                                                                        </span>
-
-                                                                    </div>
-
-                                                                </div>
-
-                                                            </div>
-
-                                                        </a>
-
-                                                    </div>
-
-                                                @endif
-
-                                            @endforeach
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        @endif
-                    </div>
-                </div>
-                {{-- Footer --}}
-                <div class="modal-footer">
-
-                    <button type="button"
-                            class="btn btn-outline-secondary"
-                            wire:click="closeModal">
-
-                        <i class="ri-close-line me-1"></i>
-                        Close
-
-                    </button>
-
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-
-    @endif
     <div wire:loading>
         @include('utilities.backdrop')
     </div>
