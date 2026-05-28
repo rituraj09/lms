@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\PrimarySkillType;
+use App\Models\EvaluationMaster\PrimarySkillType;
 
 class PrimarySkillTypeSeeder extends Seeder
 {

@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\QuestionType;
+use App\Models\EvaluationMaster\QuestionType;
 
 class QuestionTypeSeeder extends Seeder
 {

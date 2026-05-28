@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\EvalutionMaster;
+namespace App\Models\EvaluationMaster;
 
 use Illuminate\Database\Eloquent\Model;
 
