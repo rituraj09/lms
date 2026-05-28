@@ -42,8 +42,9 @@ class extends Component {
 
     // Photo Upload
     public $photo;
-
     public ?string $existing_photo = null;
+
+
 
     protected function rules(): array
     {
@@ -135,7 +136,8 @@ class extends Component {
         $this->pincode = $organisation->pincode;
         $this->website = $organisation->website;
 
-        $this->social_links = json_decode($organisation->social_links, true) ?? [];
+        // $this->social_links = json_decode($organisation->social_links, true) ?? [];
+        $this->social_links = $organisation->social_links ?? [];
 
         $this->existing_photo = $organisation->logo_path;
     }
@@ -218,25 +220,16 @@ class extends Component {
 
             } else {
                 Organisation::create([
-
                     'name' => Str::title($this->name),
-
                     'phone' => $this->phone,
-
                     'email' => $this->email,
-
                     'address' => $this->address,
-
                     'organisation_type' => $this->organisation_type,
-
                     'state_id' => $this->state_id,
                     'district_id' => $this->district_id,
                     'pincode' => $this->pincode,
-
                     'website' => $this->website,
-
                     'social_links' => $this->social_links,
-
                     'logo_path' => $logoPath,
                 ]);
             }
@@ -283,6 +276,8 @@ class extends Component {
             'existing_photo',
         ]);
         $this->districts = collect();
+        $this->resetErrorBag();
+        $this->resetValidation();
         $this->social_links = [];
         $this->is_edit = false;
     }
@@ -292,20 +287,21 @@ class extends Component {
 <div>
 
     @if($createForm == 0)
-
         <livewire:datatable
             model="App\Models\Master\Organisation"
             title="Organisations"
             :new-entry="true"
             :columns="[
-
                 ['key' => 'logo_path', 'label' => 'Logo', 'type' => 'image'],
                 ['key' => 'name', 'label' => 'Name', 'sortable' => true, 'searchable' => true],
                 ['key' => 'organisation_type', 'label' => 'Organisation Type', 'sortable' => true, 'searchable' => true],
+                ['key' => 'phone', 'label' => 'Phone', 'sortable' => true, 'searchable' => true],
                 ['key' => 'state.name', 'label' => 'State', 'sortable' => true, 'searchable' => true],
+                ['key' => 'district.name', 'label' => 'District', 'sortable' => true, 'searchable' => true],
                 ['key' => 'actions', 'label' => 'Actions', 'type' => 'actions'],
             ]"
             :actions="[
+                ['label'=>'View','icon'=>'icon-base ri ri-focus-2-line','event'=>'viewOrganisation','class'=>'btn-outline-success'],
                 ['label'=>'Edit','icon'=>'icon-base ri ri-edit-line','event'=>'edit','class'=>'btn-outline-primary'],
                 ['label'=>'Delete','icon'=>'icon-base ri ri-delete-bin-4-line','event'=>'delete','class'=>'btn-outline-danger','confirm'=>true],
             ]"
@@ -707,6 +703,8 @@ class extends Component {
         </div>
 
     @endif
+    @livewire('modal.form-modal')
+    {{-- View Modal --}}
 
     <div wire:loading>
         @include('utilities.backdrop')
