@@ -69,7 +69,20 @@ new class extends Component {
                 </ul>
             </li>
 
+            <li class="menu-item">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon icon-base ri ri-star-half-fill"></i>
+                    <div data-i18n="Question Master">Question Master</div>
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item">
+                        <a href="{{ route('admin.mcq') }}" class="menu-link">
+                            <div data-i18n="MCQ">MCQ</div>
+                        </a>
+                    </li>
 
+                </ul>
+            </li>
         </ul>
     </aside>
 </div>

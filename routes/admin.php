@@ -10,4 +10,7 @@ Route::group(['middleware' => 'redirect.notauth:admin'], function ($router) {
     $router->livewire('designation', 'admin.designation')->name('designation');
     $router->livewire('organisation', 'admin.organisation')->name('organisation');
     $router->livewire('employee', 'admin.employee')->name('employee');
+
+
+    $router->livewire('mcq', 'admin.questionmaster.mcq')->name('mcq');
 });
