@@ -19,6 +19,7 @@ return new class extends Migration
             $table->decimal('score_override', 6, 2)->nullable(); // override per-question max_score for this set
             $table->timestamps();
             $table->unique(['question_set_id', 'question_id']);
+            $table->softDeletes();
         });
     }
 

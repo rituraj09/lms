@@ -55,6 +55,7 @@ return new class extends Migration
 
             $table->timestamps();
             $table->index(['user_id', 'question_set_id', 'attempt_number']);
+            $table->softDeletes();
         });
     }
 

@@ -12,14 +12,12 @@ use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
-new #[Layout('layouts.backend')]
-class extends Component {
-
+new #[Layout('layouts.backend')] class extends Component {
     use WithFileUploads;
 
     public int $createForm = 0;
     public bool $is_edit = false;
-    public string $title = "New Organisation";
+    public string $title = 'New Organisation';
     public ?int $eventID = null;
 
     // Form Fields
@@ -44,12 +42,9 @@ class extends Component {
     public $photo;
     public ?string $existing_photo = null;
 
-
-
     protected function rules(): array
     {
         return [
-
             'name' => 'required|string|max:100',
 
             'organisation_type' => 'required',
@@ -73,7 +68,6 @@ class extends Component {
     }
 
     protected array $messages = [
-
         'name.required' => 'Organisation name is required.',
 
         'organisation_type.required' => 'Please select organisation type.',
@@ -99,15 +93,14 @@ class extends Component {
     {
         $this->states = State::all();
         $this->districts = collect();
-        $this->organisation_types =
-            \App\Helper\Globals::ORGANISATION_TYPES;
+        $this->organisation_types = \App\Helper\Globals::ORGANISATION_TYPES;
     }
 
     #[On('new-entry')]
     public function newEntry(): void
     {
         $this->resetForm();
-        $this->title = "New Organisation";
+        $this->title = 'New Organisation';
         $this->createForm = 1;
     }
 
@@ -121,7 +114,7 @@ class extends Component {
         $this->is_edit = true;
         $this->eventID = $id;
         $this->createForm = 1;
-        $this->title = "Edit Organisation";
+        $this->title = 'Edit Organisation';
 
         $this->name = $organisation->name;
         $this->phone = $organisation->phone;
@@ -155,21 +148,11 @@ class extends Component {
 
             $organisation->delete();
 
-            $this->dispatch(
-                'notify',
-                type: 'success',
-                message: 'Organisation deleted successfully!'
-            );
+            $this->dispatch('notify', type: 'success', message: 'Organisation deleted successfully!');
 
             $this->dispatch('refresh-table');
-
         } catch (\Exception $e) {
-
-            $this->dispatch(
-                'notify',
-                type: 'error',
-                message: $e->getMessage()
-            );
+            $this->dispatch('notify', type: 'error', message: $e->getMessage());
         }
     }
 
@@ -191,18 +174,20 @@ class extends Component {
         $logoPath = null;
         try {
             if (!is_null($this->photo) && $this->photo->isValid()) {
-                $image = ImageManager::usingDriver(Driver::class)
-                    ->decode($this->photo);
+                $image = ImageManager::usingDriver(Driver::class)->decode($this->photo);
                 $image->cover(200, 200);
-
                 if ($this->existing_photo) {
                     Storage::disk('public')->delete($this->existing_photo);
                 }
+                $directory = storage_path('app/public/Organisation');
+                if (!File::exists($directory)) {
+                    File::makeDirectory($directory, 0777, true, true);
+                }
                 $filename = Str::random(8) . '-' . time() . '.' . $this->photo->extension();
                 $logoPath = 'Organisation/' . $filename;
-                $image->save(storage_path('app/public/' . $logoPath));
+                $image->save($directory . '/' . $filename);
             }
-            if ($this->is_edit){
+            if ($this->is_edit) {
                 $organisation = Organisation::findOrFail($this->eventID);
                 $organisation->update([
                     'name' => Str::title($this->name),
@@ -217,7 +202,6 @@ class extends Component {
                     'social_links' => $this->social_links,
                     'logo_path' => $logoPath ?? $this->existing_photo,
                 ]);
-
             } else {
                 Organisation::create([
                     'name' => Str::title($this->name),
@@ -234,47 +218,23 @@ class extends Component {
                 ]);
             }
 
-
             DB::commit();
-            $this->dispatch(
-                'notify',
-                type: 'success',
-                message: 'Organisation has been created/updated successfully!'
-            );
+            $this->dispatch('notify', type: 'success', message: 'Organisation has been created/updated successfully!');
             $this->resetForm();
 
             $this->createForm = 0;
 
             $this->dispatch('refresh-table');
-
         } catch (\Exception $e) {
-
             DB::rollBack();
 
-            $this->dispatch(
-                'notify',
-                type: 'error',
-                message: $e->getMessage()
-            );
+            $this->dispatch('notify', type: 'error', message: $e->getMessage());
         }
     }
 
     protected function resetForm()
     {
-        $this->reset([
-            'name',
-            'phone',
-            'email',
-            'address',
-            'organisation_type',
-            'state_id',
-            'district_id',
-            'pincode',
-            'website',
-            'social_links',
-            'photo',
-            'existing_photo',
-        ]);
+        $this->reset(['name', 'phone', 'email', 'address', 'organisation_type', 'state_id', 'district_id', 'pincode', 'website', 'social_links', 'photo', 'existing_photo']);
         $this->districts = collect();
         $this->resetErrorBag();
         $this->resetValidation();
@@ -286,29 +246,43 @@ class extends Component {
 
 <div>
 
-    @if($createForm == 0)
-        <livewire:datatable
-            model="App\Models\Master\Organisation"
-            title="Organisations"
-            :new-entry="true"
+    @if ($createForm == 0)
+        <livewire:datatable model="App\Models\Master\Organisation" title="Organisations" :new-entry="true"
             :columns="[
                 ['key' => 'logo_path', 'label' => 'Logo', 'type' => 'image'],
                 ['key' => 'name', 'label' => 'Name', 'sortable' => true, 'searchable' => true],
-                ['key' => 'organisation_type', 'label' => 'Organisation Type', 'sortable' => true, 'searchable' => true],
+                [
+                    'key' => 'organisation_type',
+                    'label' => 'Organisation Type',
+                    'sortable' => true,
+                    'searchable' => true,
+                ],
                 ['key' => 'phone', 'label' => 'Phone', 'sortable' => true, 'searchable' => true],
                 ['key' => 'state.name', 'label' => 'State', 'sortable' => true, 'searchable' => true],
                 ['key' => 'district.name', 'label' => 'District', 'sortable' => true, 'searchable' => true],
                 ['key' => 'actions', 'label' => 'Actions', 'type' => 'actions'],
-            ]"
-            :actions="[
-                ['label'=>'View','icon'=>'icon-base ri ri-focus-2-line','event'=>'viewOrganisation','class'=>'btn-outline-success'],
-                ['label'=>'Edit','icon'=>'icon-base ri ri-edit-line','event'=>'edit','class'=>'btn-outline-primary'],
-                ['label'=>'Delete','icon'=>'icon-base ri ri-delete-bin-4-line','event'=>'delete','class'=>'btn-outline-danger','confirm'=>true],
-            ]"
-        />
-
+            ]" :actions="[
+                [
+                    'label' => 'View',
+                    'icon' => 'icon-base ri ri-focus-2-line',
+                    'event' => 'viewOrganisation',
+                    'class' => 'btn-outline-success',
+                ],
+                [
+                    'label' => 'Edit',
+                    'icon' => 'icon-base ri ri-edit-line',
+                    'event' => 'edit',
+                    'class' => 'btn-outline-primary',
+                ],
+                [
+                    'label' => 'Delete',
+                    'icon' => 'icon-base ri ri-delete-bin-4-line',
+                    'event' => 'delete',
+                    'class' => 'btn-outline-danger',
+                    'confirm' => true,
+                ],
+            ]" />
     @elseif($createForm == 1)
-
         <div class="row">
             <div class="col-md-12">
 
@@ -327,30 +301,26 @@ class extends Component {
                         <form wire:submit.prevent="submit">
                             <div class="row g-5">
                                 <div class="d-flex align-items-start align-items-sm-center gap-6">
-                                    <img
-                                        src="@if($photo)
-                                                {{ $photo->temporaryUrl() }}
+                                    <img src="@if ($photo) {{ $photo->temporaryUrl() }}
                                             @elseif(!is_null($existing_photo))
-                                                {{ asset('storage/'.$existing_photo) }}
+                                                {{ asset('storage/' . $existing_photo) }}
                                             @else
-                                                {{ asset('assets/img/avatars/2.png') }}
-                                            @endif"
-                                        alt="photo"
-                                        class="d-block w-px-100 h-px-100 rounded-4" id="uploadedAvatar">
+                                                {{ asset('assets/img/avatars/2.png') }} @endif"
+                                        alt="photo" class="d-block w-px-100 h-px-100 rounded-4" id="uploadedAvatar">
                                     <div class="button-wrapper">
-                                        <label for="upload"
-                                               class="btn btn-primary me-3 mb-4 waves-effect waves-light"
-                                               tabindex="0">
+                                        <label for="upload" class="btn btn-primary me-3 mb-4 waves-effect waves-light"
+                                            tabindex="0">
                                             <span class="d-none d-sm-block">Upload new logo</span>
                                             <i class="icon-base ri ri-upload-2-line d-block d-sm-none"></i>
-                                            <input type="file" id="upload" class="account-file-input" hidden=""
-                                                   accept="image/png, image/jpeg" wire:model.live="photo">
+                                            <input type="file" id="upload" class="account-file-input"
+                                                hidden="" accept="image/png, image/jpeg" wire:model.live="photo">
                                         </label>
                                         <div>Allowed JPG, GIF or PNG. Max size of 800K</div>
                                     </div>
                                     @error('photo')
-                                    <div
-                                        class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">{{$message}}</div>
+                                        <div
+                                            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                            {{ $message }}</div>
                                     @enderror
                                 </div>
                                 <hr>
@@ -358,12 +328,8 @@ class extends Component {
 
                                     <div class="form-floating form-floating-outline">
 
-                                        <input type="text"
-                                               id="name"
-                                               placeholder=" "
-                                               wire:model.blur="name"
-                                               maxlength="100"
-                                               class="form-control @error('name') is-invalid @enderror">
+                                        <input type="text" id="name" placeholder=" " wire:model.blur="name"
+                                            maxlength="100" class="form-control @error('name') is-invalid @enderror">
 
                                         <label for="name">
                                             Organisation Name
@@ -373,9 +339,9 @@ class extends Component {
                                     </div>
 
                                     @error('name')
-                                    <div class="invalid-feedback d-block">
-                                        {{ $message }}
-                                    </div>
+                                        <div class="invalid-feedback d-block">
+                                            {{ $message }}
+                                        </div>
                                     @enderror
 
                                 </div>
@@ -385,20 +351,17 @@ class extends Component {
 
                                     <div class="form-floating form-floating-outline">
 
-                                        <select id="organisation_type"
-                                                wire:model="organisation_type"
-                                                class="form-select @error('organisation_type') is-invalid @enderror">
+                                        <select id="organisation_type" wire:model="organisation_type"
+                                            class="form-select @error('organisation_type') is-invalid @enderror">
 
                                             <option value="">
                                                 Select Organisation Type
                                             </option>
 
-                                            @foreach($organisation_types as $type)
-
+                                            @foreach ($organisation_types as $type)
                                                 <option value="{{ $type }}">
                                                     {{ $type }}
                                                 </option>
-
                                             @endforeach
 
                                         </select>
@@ -411,9 +374,9 @@ class extends Component {
                                     </div>
 
                                     @error('organisation_type')
-                                    <div class="invalid-feedback d-block">
-                                        {{ $message }}
-                                    </div>
+                                        <div class="invalid-feedback d-block">
+                                            {{ $message }}
+                                        </div>
                                     @enderror
 
                                 </div>
@@ -423,12 +386,8 @@ class extends Component {
 
                                     <div class="form-floating form-floating-outline">
 
-                                        <input type="text"
-                                               id="phone"
-                                               placeholder=" "
-                                               wire:model.blur="phone"
-                                               maxlength="10"
-                                               class="form-control @error('phone') is-invalid @enderror">
+                                        <input type="text" id="phone" placeholder=" " wire:model.blur="phone"
+                                            maxlength="10" class="form-control @error('phone') is-invalid @enderror">
 
                                         <label for="phone">
                                             Phone Number
@@ -437,9 +396,9 @@ class extends Component {
                                     </div>
 
                                     @error('phone')
-                                    <div class="invalid-feedback d-block">
-                                        {{ $message }}
-                                    </div>
+                                        <div class="invalid-feedback d-block">
+                                            {{ $message }}
+                                        </div>
                                     @enderror
 
                                 </div>
@@ -449,11 +408,8 @@ class extends Component {
 
                                     <div class="form-floating form-floating-outline">
 
-                                        <input type="email"
-                                               id="email"
-                                               placeholder=" "
-                                               wire:model.blur="email"
-                                               class="form-control @error('email') is-invalid @enderror">
+                                        <input type="email" id="email" placeholder=" " wire:model.blur="email"
+                                            class="form-control @error('email') is-invalid @enderror">
 
                                         <label for="email">
                                             Email Address
@@ -462,9 +418,9 @@ class extends Component {
                                     </div>
 
                                     @error('email')
-                                    <div class="invalid-feedback d-block">
-                                        {{ $message }}
-                                    </div>
+                                        <div class="invalid-feedback d-block">
+                                            {{ $message }}
+                                        </div>
                                     @enderror
 
                                 </div>
@@ -474,11 +430,8 @@ class extends Component {
 
                                     <div class="form-floating form-floating-outline">
 
-                                        <input type="text"
-                                               id="website"
-                                               placeholder=" "
-                                               wire:model.blur="website"
-                                               class="form-control @error('website') is-invalid @enderror">
+                                        <input type="text" id="website" placeholder=" " wire:model.blur="website"
+                                            class="form-control @error('website') is-invalid @enderror">
 
                                         <label for="website">
                                             Website
@@ -487,9 +440,9 @@ class extends Component {
                                     </div>
 
                                     @error('website')
-                                    <div class="invalid-feedback d-block">
-                                        {{ $message }}
-                                    </div>
+                                        <div class="invalid-feedback d-block">
+                                            {{ $message }}
+                                        </div>
                                     @enderror
 
                                 </div>
@@ -499,20 +452,17 @@ class extends Component {
 
                                     <div class="form-floating form-floating-outline">
 
-                                        <select id="state_id"
-                                                wire:model.live="state_id"
-                                                class="form-select @error('state_id') is-invalid @enderror">
+                                        <select id="state_id" wire:model.live="state_id"
+                                            class="form-select @error('state_id') is-invalid @enderror">
 
                                             <option value="">
                                                 Select State
                                             </option>
 
-                                            @foreach($states as $state)
-
+                                            @foreach ($states as $state)
                                                 <option value="{{ $state->id }}">
                                                     {{ $state->name }}
                                                 </option>
-
                                             @endforeach
 
                                         </select>
@@ -525,9 +475,9 @@ class extends Component {
                                     </div>
 
                                     @error('state_id')
-                                    <div class="invalid-feedback d-block">
-                                        {{ $message }}
-                                    </div>
+                                        <div class="invalid-feedback d-block">
+                                            {{ $message }}
+                                        </div>
                                     @enderror
 
                                 </div>
@@ -535,20 +485,17 @@ class extends Component {
 
                                     <div class="form-floating form-floating-outline">
 
-                                        <select id="district_id"
-                                                wire:model="district_id"
-                                                class="form-select @error('district_id') is-invalid @enderror">
+                                        <select id="district_id" wire:model="district_id"
+                                            class="form-select @error('district_id') is-invalid @enderror">
 
                                             <option value="">
                                                 Select District
                                             </option>
 
-                                            @foreach($districts as $v)
-
+                                            @foreach ($districts as $v)
                                                 <option value="{{ $v->id }}">
                                                     {{ $v->name }}
                                                 </option>
-
                                             @endforeach
 
                                         </select>
@@ -561,9 +508,9 @@ class extends Component {
                                     </div>
 
                                     @error('state_id')
-                                    <div class="invalid-feedback d-block">
-                                        {{ $message }}
-                                    </div>
+                                        <div class="invalid-feedback d-block">
+                                            {{ $message }}
+                                        </div>
                                     @enderror
 
                                 </div>
@@ -572,12 +519,9 @@ class extends Component {
 
                                     <div class="form-floating form-floating-outline">
 
-                                        <input type="text"
-                                               id="pincode"
-                                               placeholder=" "
-                                               wire:model.blur="pincode"
-                                               maxlength="6"
-                                               class="form-control @error('pincode') is-invalid @enderror">
+                                        <input type="text" id="pincode" placeholder=" "
+                                            wire:model.blur="pincode" maxlength="6"
+                                            class="form-control @error('pincode') is-invalid @enderror">
 
                                         <label for="pincode">
                                             Pincode
@@ -586,9 +530,9 @@ class extends Component {
                                     </div>
 
                                     @error('pincode')
-                                    <div class="invalid-feedback d-block">
-                                        {{ $message }}
-                                    </div>
+                                        <div class="invalid-feedback d-block">
+                                            {{ $message }}
+                                        </div>
                                     @enderror
 
                                 </div>
@@ -598,11 +542,8 @@ class extends Component {
 
                                     <div class="form-floating form-floating-outline">
 
-                                        <textarea id="address"
-                                                  placeholder=" "
-                                                  wire:model.blur="address"
-                                                  style="height: 100px"
-                                                  class="form-control @error('address') is-invalid @enderror"></textarea>
+                                        <textarea id="address" placeholder=" " wire:model.blur="address" style="height: 100px"
+                                            class="form-control @error('address') is-invalid @enderror"></textarea>
 
                                         <label for="address">
                                             Address
@@ -611,9 +552,9 @@ class extends Component {
                                     </div>
 
                                     @error('address')
-                                    <div class="invalid-feedback d-block">
-                                        {{ $message }}
-                                    </div>
+                                        <div class="invalid-feedback d-block">
+                                            {{ $message }}
+                                        </div>
                                     @enderror
 
                                 </div>
@@ -623,10 +564,8 @@ class extends Component {
 
                                     <div class="form-floating form-floating-outline">
 
-                                        <input type="text"
-                                               placeholder=" "
-                                               wire:model.blur="social_links.facebook"
-                                               class="form-control">
+                                        <input type="text" placeholder=" " wire:model.blur="social_links.facebook"
+                                            class="form-control">
 
                                         <label>
                                             Facebook Link
@@ -641,10 +580,8 @@ class extends Component {
 
                                     <div class="form-floating form-floating-outline">
 
-                                        <input type="text"
-                                               placeholder=" "
-                                               wire:model.blur="social_links.instagram"
-                                               class="form-control">
+                                        <input type="text" placeholder=" "
+                                            wire:model.blur="social_links.instagram" class="form-control">
 
                                         <label>
                                             Instagram Link
@@ -659,10 +596,8 @@ class extends Component {
 
                                     <div class="form-floating form-floating-outline">
 
-                                        <input type="text"
-                                               placeholder=" "
-                                               wire:model.blur="social_links.twitter"
-                                               class="form-control">
+                                        <input type="text" placeholder=" " wire:model.blur="social_links.twitter"
+                                            class="form-control">
 
                                         <label>
                                             Twitter/X Link
@@ -676,16 +611,14 @@ class extends Component {
                             {{-- Buttons --}}
                             <div class="mt-6 text-end">
 
-                                <button type="submit"
-                                        class="btn btn-primary me-2">
+                                <button type="submit" class="btn btn-primary me-2">
 
                                     Save Changes
 
                                 </button>
 
-                                <button type="button"
-                                        class="btn btn-outline-secondary"
-                                        wire:click="$set('createForm', 0)">
+                                <button type="button" class="btn btn-outline-secondary"
+                                    wire:click="$set('createForm', 0)">
 
                                     Cancel
 

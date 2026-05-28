@@ -18,6 +18,7 @@ return new class extends Migration
             $table->tinyInteger('max_age')->nullable(); // null = no upper bound
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

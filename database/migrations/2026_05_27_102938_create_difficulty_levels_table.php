@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('color_code')->nullable(); // for UI badge coloring
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

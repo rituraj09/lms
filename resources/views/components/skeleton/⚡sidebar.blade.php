@@ -2,8 +2,7 @@
 
 use Livewire\Component;
 
-new class extends Component
-{
+new class extends Component {
     use \App\Traits\WithAdmin;
 };
 ?>
@@ -12,16 +11,17 @@ new class extends Component
     <aside id="layout-menu" class="layout-menu menu-vertical menu mt-2">
         <div class="app-brand demo">
             <a href="#" class="app-brand-link">
-                 <span class="app-brand-logo demo">
+                <span class="app-brand-logo demo">
                     <span class="text-primary">
-                        <img class="w-75 rounded" src="{{ asset('assets/img/favicon/favicon.png') }}" alt=""/>
+                        <img class="w-75 rounded" src="{{ asset('assets/img/favicon/favicon.png') }}" alt="" />
                     </span>
-                 </span>
+                </span>
                 <span class="app-brand-text demo menu-text fw-light ms-2 fs-5">{{ config('app.name') }}</span>
             </a>
 
             <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
+                    xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M8.47365 11.7183C8.11707 12.0749 8.11707 12.6531 8.47365 13.0097L12.071 16.607C12.4615 16.9975 12.4615 17.6305 12.071 18.021C11.6805 18.4115 11.0475 18.4115 10.657 18.021L5.83009 13.1941C5.37164 12.7356 5.37164 11.9924 5.83009 11.5339L10.657 6.707C11.0475 6.31653 11.6805 6.31653 12.071 6.707C12.4615 7.09747 12.4615 7.73053 12.071 8.121L8.47365 11.7183Z"
                         fill-opacity="0.9" />
@@ -36,7 +36,7 @@ new class extends Component
         <ul class="menu-inner pt-2 pb-10 ps ps--active-y">
 
             <li class="menu-item">
-                <a href="{{route('admin.home')}}" class="menu-link">
+                <a href="{{ route('admin.home') }}" class="menu-link">
                     <i class="menu-icon icon-base ri ri-dashboard-line"></i>
                     <div data-i18n="Dashboard">Dashboard</div>
                 </a>
@@ -44,43 +44,76 @@ new class extends Component
             <li class="menu-header small mt-5">
                 <span class="menu-header-text" data-i18n="Admin Corner">Admin Corner</span>
             </li>
+            <li class="menu-item">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon icon-base ri ri-info-card-line"></i>
+                    <div data-i18n="Master">Master</div>
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item">
+                        <a href="{{ route('admin.agegroup') }}" class="menu-link">
+                            <div data-i18n="Age Group">Age Group</div>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="{{ route('admin.difficulty-level') }}" class="menu-link">
+                            <div data-i18n="Difficulty Level">Difficulty Level</div>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="{{ route('admin.primary-skill-type') }}" class="menu-link">
+                            <div data-i18n="Primary Skill Type">Primary Skill Type</div>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="{{ route('admin.sub-skill-type') }}" class="menu-link">
+                            <div data-i18n="Sub Skill Type">Sub Skill Type</div>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="{{ route('admin.question-type') }}" class="menu-link">
+                            <div data-i18n="Question Type">Question Type</div>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="menu-item">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon icon-base ri ri-tools-fill"></i>
+                    <div data-i18n="Setting">Setting</div>
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item">
+                        <a href="{{ route('admin.organisation') }}" class="menu-link">
+                            <div data-i18n="Organisation">Organisation</div>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="{{ route('admin.designation') }}" class="menu-link">
+                            <div data-i18n="Designation">Designation</div>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="{{ route('admin.role') }}" class="menu-link">
+                            <div data-i18n="Role">Role</div>
+                        </a>
+                    </li>
+                </ul>
+            </li>
 
-                <li class="menu-item">
-                    <a href="javascript:void(0);" class="menu-link menu-toggle">
-                        <i class="menu-icon icon-base ri ri-info-card-line"></i>
-                        <div data-i18n="Master">Master</div>
-                    </a>
-                    <ul class="menu-sub">
-                            <li class="menu-item">
-                                <a href="{{ route('admin.organisation') }}" class="menu-link">
-                                    <div data-i18n="Organisation">Organisation</div>
-                                </a>
-                            </li>
-                        <li class="menu-item">
-                            <a href="{{ route('admin.designation') }}" class="menu-link">
-                                <div data-i18n="Designation">Designation</div>
-                            </a>
-                        </li>
-                        <li class="menu-item">
-                            <a href="{{ route('admin.role') }}" class="menu-link">
-                                <div data-i18n="Role">Role</div>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+
         </ul>
     </aside>
 </div>
 
 @push('script')
-
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
 
             let currentUrl = window.location.href;
 
-// Check all sidebar links
-            $('.menu-link').each(function () {
+            // Check all sidebar links
+            $('.menu-link').each(function() {
                 let linkUrl = $(this).attr('href');
 
                 if (
@@ -103,9 +136,5 @@ new class extends Component
             });
 
         });
-
     </script>
-
 @endpush
-
-
