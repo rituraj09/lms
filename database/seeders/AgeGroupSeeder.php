@@ -14,9 +14,9 @@ class AgeGroupSeeder extends Seeder
     public function run(): void
     {
        $groups = [
-            ['name' => '10+', 'min_age' => 10, 'max_age' => null],
-            ['name' => '12+', 'min_age' => 12, 'max_age' => null],
-            ['name' => '14+', 'min_age' => 14, 'max_age' => null],
+            ['name' => '10+', 'min_age' => 10, 'max_age' => 11],
+            ['name' => '12+', 'min_age' => 12, 'max_age' => 13],
+            ['name' => '14+', 'min_age' => 14, 'max_age' => 100],
         ];
 
         foreach ($groups as $group) {

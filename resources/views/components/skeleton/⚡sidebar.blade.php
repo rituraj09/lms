@@ -44,43 +44,11 @@ new class extends Component {
             <li class="menu-header small mt-5">
                 <span class="menu-header-text" data-i18n="Admin Corner">Admin Corner</span>
             </li>
+
             <li class="menu-item">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon icon-base ri ri-info-card-line"></i>
                     <div data-i18n="Master">Master</div>
-                </a>
-                <ul class="menu-sub">
-                    <li class="menu-item">
-                        <a href="{{ route('admin.agegroup') }}" class="menu-link">
-                            <div data-i18n="Age Group">Age Group</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="{{ route('admin.difficulty-level') }}" class="menu-link">
-                            <div data-i18n="Difficulty Level">Difficulty Level</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="{{ route('admin.primary-skill-type') }}" class="menu-link">
-                            <div data-i18n="Primary Skill Type">Primary Skill Type</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="{{ route('admin.sub-skill-type') }}" class="menu-link">
-                            <div data-i18n="Sub Skill Type">Sub Skill Type</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="{{ route('admin.question-type') }}" class="menu-link">
-                            <div data-i18n="Question Type">Question Type</div>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li class="menu-item">
-                <a href="javascript:void(0);" class="menu-link menu-toggle">
-                    <i class="menu-icon icon-base ri ri-tools-fill"></i>
-                    <div data-i18n="Setting">Setting</div>
                 </a>
                 <ul class="menu-sub">
                     <li class="menu-item">
