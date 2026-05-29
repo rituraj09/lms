@@ -10,6 +10,7 @@ use App\Models\EvaluationMaster\QuestionType;
 use App\Models\EvaluationMaster\PrimarySkillType;
 use App\Models\EvaluationMaster\SubSkillType;
 use App\Models\EvaluationMaster\DifficultyLevel;
+use App\Models\EvaluationMaster\AgeGroup;
 
 new #[Layout('layouts.backend')]
 class extends Component {
@@ -24,6 +25,8 @@ class extends Component {
     public ?int   $questionTypeId     = null;
     public ?int   $primarySkillTypeId = null;
     public ?int   $subSkillTypeId     = null;
+    public ?int   $difficultyLevelId  = null;
+    public ?int   $ageGroupId         = null;
     public ?int   $timeLimit          = null;
     public string $maxScore           = '1.00';
     public ?string $adminNotes        = null;
@@ -48,6 +51,8 @@ class extends Component {
     public array  $questionTypes    = [];
     public array  $primarySkillTypes = [];
     public array  $subSkillTypes    = [];
+    public array  $difficultyLevels = [];
+    public array  $ageGroups        = [];
 
     // ─── Validation Rules ────────────────────────────────────
     protected function rules(): array
@@ -57,6 +62,8 @@ class extends Component {
             'questionTypeId'     => 'required|exists:question_types,id',
             'primarySkillTypeId' => 'required|exists:primary_skill_types,id',
             'subSkillTypeId'     => 'required|exists:sub_skill_types,id',
+            'difficultyLevelId'  => 'required|exists:difficulty_levels,id',
+            'ageGroupId'         => 'required|exists:age_groups,id',
             'maxScore'           => 'required|numeric|min:0|max:9999.99',
             'timeLimit'          => 'nullable|integer|min:1|max:65535',
             'status'             => 'required|in:draft,publish,unpublish',
@@ -87,6 +94,8 @@ class extends Component {
         'questionTypeId.required'     => 'Please select a question type.',
         'primarySkillTypeId.required' => 'Please select a primary skill.',
         'subSkillTypeId.required'     => 'Please select a sub skill.',
+        'difficultyLevelId.required'  => 'Please select a difficulty level.',
+        'ageGroupId.required'           => 'Please select an age group.',
         'maxScore.required'           => 'Max score is required.',
         'stem.en'                     => 'English stem is recommended.',
     ];
@@ -98,6 +107,8 @@ class extends Component {
         $this->questionTypes   = QuestionType::select('id', 'name')->get()->toArray();
         $this->primarySkillTypes = PrimarySkillType::select('id', 'name')->get()->toArray();
         $this->subSkillTypes   = SubSkillType::select('id', 'name')->get()->toArray();
+        $this->difficultyLevels = DifficultyLevel::select('id', 'name')->get()->toArray();
+        $this->ageGroups        = AgeGroup::select('id', 'name')->get()->toArray();
 
         // Init multilang arrays
         foreach ($this->languages as $langCode => $lang) {
@@ -407,20 +418,7 @@ class extends Component {
                                 @enderror
                             </div>
 
-                            {{-- Max Score --}}
-                            <div class="col-md-4">
-                                <label class="form-label fw-medium small">
-                                    Max Score <span class="text-danger">*</span>
-                                </label>
-                                <input type="number"
-                                       wire:model.blur="maxScore"
-                                       class="form-control @error('maxScore') is-invalid @enderror"
-                                       step="0.01" min="0" max="9999.99"
-                                       placeholder="1.00" />
-                                @error('maxScore')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+
 
                             {{-- Primary Skill --}}
                             <div class="col-md-4">
@@ -456,21 +454,40 @@ class extends Component {
                                 @enderror
                             </div>
 
-                            {{-- Time Limit --}}
+                             {{-- Difficulty Level --}}
                             <div class="col-md-4">
                                 <label class="form-label fw-medium small">
-                                    Time Limit
-                                    <span class="text-muted">(seconds)</span>
+                                    Difficulty Level <span class="text-danger">*</span>
                                 </label>
-                                <input type="number"
-                                       wire:model.blur="timeLimit"
-                                       class="form-control @error('timeLimit') is-invalid @enderror"
-                                       min="1" max="65535"
-                                       placeholder="e.g. 60" />
-                                @error('timeLimit')
+                                <select wire:model="difficultyLevelId"
+                                        class="form-select @error('difficultyLevelId') is-invalid @enderror">
+                                    <option value="">— Select Difficulty Level —</option>
+                                    @foreach ($difficultyLevels as $level)
+                                        <option value="{{ $level['id'] }}">{{ $level['name'] }}</option>
+                                    @endforeach
+                                </select>
+                                @error('difficultyLevelId')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+
+                             {{-- Age Group --}}
+                            <div class="col-md-4">
+                                <label class="form-label fw-medium small">
+                                    Age Group <span class="text-danger">*</span>
+                                </label>
+                                <select wire:model="ageGroupId"
+                                        class="form-select @error('ageGroupId') is-invalid @enderror">
+                                    <option value="">— Select Age Group —</option>
+                                    @foreach ($ageGroups as $group)
+                                        <option value="{{ $group['id'] }}">{{ $group['name'] }}</option>
+                                    @endforeach
+                                </select>
+                                @error('ageGroupId')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
 
                         </div>
                     </div>
@@ -709,6 +726,37 @@ class extends Component {
                         </h6>
                     </div>
                     <div class="card-body p-4">
+
+                        {{-- Time Limit --}}
+                            <div class="  mb-3">
+                                <label class="form-label fw-medium small">
+                                    Time Limit
+                                    <span class="text-muted">(seconds)</span>
+                                </label>
+                                <input type="number"
+                                       wire:model.blur="timeLimit"
+                                       class="form-control @error('timeLimit') is-invalid @enderror"
+                                       min="1" max="65535"
+                                       placeholder="e.g. 60" />
+                                @error('timeLimit')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                        {{-- Max Score --}}
+                            <div class="mb-3">
+                                <label class="form-label fw-medium small">
+                                    Max Score <span class="text-danger">*</span>
+                                </label>
+                                <input type="number"
+                                       wire:model.blur="maxScore"
+                                       class="form-control @error('maxScore') is-invalid @enderror"
+                                       step="0.01" min="0" max="9999.99"
+                                       placeholder="1.00" />
+                                @error('maxScore')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
 
                         {{-- Negative Mark --}}
                         <div class="mb-3">
