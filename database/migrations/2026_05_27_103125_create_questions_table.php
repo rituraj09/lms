@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('primary_skill_type_id')->constrained();
             $table->foreignId('sub_skill_type_id')->constrained();
             $table->foreignId('difficulty_level_id')->constrained();
+            $table->foreignId('age_group_id')->constrained();
             $table->json('question_contents');
                 // Question content stored as structured JSON per type (Multi-language supported)
 
