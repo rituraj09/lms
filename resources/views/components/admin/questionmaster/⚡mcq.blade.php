@@ -309,7 +309,7 @@ new #[Layout('layouts.backend')] class extends Component {
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <div>
                     <h4 class="fw-bold mb-1 text-dark">
-                        <i class="bi bi-patch-question-fill text-primary me-2"></i>
+                        <i class="ri ri-questionnaire-fill text-primary me-2"></i>
                         {{ $questionId ? 'Edit Question' : 'Create New Question' }}
                     </h4>
                     <nav aria-label="breadcrumb">
@@ -322,10 +322,10 @@ new #[Layout('layouts.backend')] class extends Component {
                 </div>
                 <div class="d-flex gap-2">
                     <button type="button" class="btn btn-outline-info btn-sm" wire:click="openPreview">
-                        <i class="bi bi-eye me-1"></i> Preview
+                        <i class="ri ri-eye-fill me-1"></i> Preview
                     </button>
                     <a href="#" class="btn btn-outline-secondary btn-sm">
-                        <i class="bi bi-arrow-left me-1"></i> Back
+                        <i class="ri ri-arrow-left-line me-1"></i> Back
                     </a>
                 </div>
             </div>
@@ -333,7 +333,7 @@ new #[Layout('layouts.backend')] class extends Component {
             {{-- Flash Message --}}
             @if (session()->has('success'))
                 <div class="alert alert-success alert-dismissible fade show d-flex align-items-center" role="alert">
-                    <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+                    <i class="ri ri-checkbox-circle-line me-2 fs-5"></i>
                     <div>{{ session('success') }}</div>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
@@ -342,7 +342,7 @@ new #[Layout('layouts.backend')] class extends Component {
             {{-- Global Errors --}}
             @if ($errors->any())
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <i class="ri ri-error-warning-fill me-2"></i>
                     <strong>Please fix the following errors:</strong>
                     <ul class="mb-0 mt-1 small">
                         @foreach ($errors->all() as $error)
@@ -367,7 +367,7 @@ new #[Layout('layouts.backend')] class extends Component {
                         <div class="card shadow-sm border-0 mb-4">
                             <div class="card-header bg-white border-bottom py-3">
                                 <h6 class="mb-0 fw-semibold text-dark">
-                                    <i class="bi bi-info-circle text-primary me-2"></i>Basic Information
+                                    <i class="ri ri-information-line text-primary me-2"></i>Basic Information
                                 </h6>
                             </div>
                             <div class="card-body p-4">
@@ -385,7 +385,7 @@ new #[Layout('layouts.backend')] class extends Component {
                                             <button class="btn btn-outline-secondary" type="button"
                                                 wire:click="$set('code', 'Q-' + Math.random().toString(36).substr(2,8).toUpperCase())"
                                                 title="Regenerate">
-                                                <i class="bi bi-arrow-clockwise"></i>
+                                                <i class="ri ri-reset-right-fill"></i>
                                             </button>
                                             @error('code')
                                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -490,7 +490,7 @@ new #[Layout('layouts.backend')] class extends Component {
                             <div
                                 class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between">
                                 <h6 class="mb-0 fw-semibold text-dark">
-                                    <i class="bi bi-translate text-primary me-2"></i>Question Stem
+                                    <i class="ri ri-translate-2 me-2"></i>Question Stem
                                 </h6>
                                 {{-- Language Tabs --}}
                                 <ul class="nav nav-pills nav-sm mb-0">
@@ -524,7 +524,7 @@ new #[Layout('layouts.backend')] class extends Component {
                             <div class="card-header bg-white border-bottom py-3">
                                 <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
                                     <h6 class="mb-0 fw-semibold text-dark">
-                                        <i class="bi bi-list-check text-primary me-2"></i>
+                                        <i class="ri ri-list-check-3 text-primary me-2"></i>
                                         Answer Options
                                         <span class="badge bg-primary ms-1">{{ count($options) }}</span>
                                     </h6>
@@ -534,18 +534,18 @@ new #[Layout('layouts.backend')] class extends Component {
                                         <div class="d-flex align-items-center gap-2 bg-light rounded p-1">
                                             <button type="button" wire:click="$set('selectionType', 'single')"
                                                 class="btn btn-sm {{ $selectionType === 'single' ? 'btn-primary' : 'btn-light' }}">
-                                                <i class="bi bi-record-circle me-1"></i>Single
+                                                <i class="ri ri-record-circle-line me-1"> </i>Single
                                             </button>
                                             <button type="button" wire:click="$set('selectionType', 'multiple')"
                                                 class="btn btn-sm {{ $selectionType === 'multiple' ? 'btn-primary' : 'btn-light' }}">
-                                                <i class="bi bi-check2-square me-1"></i>Multiple
+                                                <i class="ri ri-checkbox-circle-line me-1"></i>Multiple
                                             </button>
                                         </div>
 
                                         <button type="button" wire:click="addOption"
                                             class="btn btn-outline-primary btn-sm"
                                             @if (count($options) >= 8) disabled @endif>
-                                            <i class="bi bi-plus-lg me-1"></i>Add Option
+                                            <i class="ri ri-add-large-line me-1"></i>Add Option
                                         </button>
                                     </div>
                                 </div>
@@ -553,7 +553,7 @@ new #[Layout('layouts.backend')] class extends Component {
                                 @if ($selectionType === 'multiple')
                                     <div class="mt-2">
                                         <span class="badge bg-info-subtle text-info border border-info-subtle small">
-                                            <i class="bi bi-info-circle me-1"></i>
+                                            <i class="ri ri-information-line me-1"></i>
                                             Multi-select: Students can choose multiple answers. Set weightage per
                                             correct option.
                                         </span>
@@ -564,7 +564,7 @@ new #[Layout('layouts.backend')] class extends Component {
                             <div class="card-body p-4">
                                 @error('options')
                                     <div class="alert alert-warning py-2 small mb-3">
-                                        <i class="bi bi-exclamation-triangle me-1"></i>{{ $message }}
+                                        <i class="ri ri-error-warning-fill me-1"></i>{{ $message }}
                                     </div>
                                 @enderror
 
@@ -587,10 +587,10 @@ new #[Layout('layouts.backend')] class extends Component {
                                                     title="{{ $option['is_correct'] ? 'Mark as Incorrect' : 'Mark as Correct' }}">
                                                     @if ($selectionType === 'single')
                                                         <i
-                                                            class="bi {{ $option['is_correct'] ? 'bi-record-circle-fill' : 'bi-circle' }}"></i>
+                                                            class="ri {{ $option['is_correct'] ? 'ri-record-circle-fill' : 'ri-circle-line' }}"></i>
                                                     @else
                                                         <i
-                                                            class="bi {{ $option['is_correct'] ? 'bi-check-square-fill' : 'bi-square' }}"></i>
+                                                            class="ri {{ $option['is_correct'] ? 'ri-checkbox-circle-fill' : 'ri-checkbox-circle-line' }}"></i>
                                                     @endif
                                                 </button>
 
@@ -602,7 +602,7 @@ new #[Layout('layouts.backend')] class extends Component {
 
                                                 @if ($option['is_correct'])
                                                     <span class="badge bg-success">
-                                                        <i class="bi bi-check-lg me-1"></i>Correct
+                                                        <i class="ri ri-check-fill me-1"></i>Correct
                                                     </span>
                                                 @endif
 
@@ -622,7 +622,7 @@ new #[Layout('layouts.backend')] class extends Component {
                                                     <button type="button"
                                                         wire:click="removeOption({{ $index }})"
                                                         class="btn btn-sm btn-outline-danger" title="Remove Option">
-                                                        <i class="bi bi-trash3"></i>
+                                                        <i class="ri ri-delete-bin-fill"></i>
                                                     </button>
                                                 </div>
                                             </div>
@@ -639,7 +639,7 @@ new #[Layout('layouts.backend')] class extends Component {
                                                                 wire:click="setActiveTab('{{ $langCode }}')">
                                                                 {{ $lang['flag'] }} {{ $lang['label'] }}
                                                                 @if (!empty($option['text'][$langCode]))
-                                                                    <i class="bi bi-check-circle-fill text-success ms-1"
+                                                                    <i class="ri ri-check-circle-fill text-success ms-1"
                                                                         style="font-size:10px;"></i>
                                                                 @endif
                                                             </button>
@@ -663,11 +663,11 @@ new #[Layout('layouts.backend')] class extends Component {
                                 {{-- Options Summary --}}
                                 <div class="d-flex gap-3 mt-2 pt-2 border-top">
                                     <small class="text-muted">
-                                        <i class="bi bi-check-circle text-success me-1"></i>
+                                        <i class="ri ri-check-circle-fill text-success me-1"></i>
                                         Correct: <strong>{{ $this->getCorrectOptionsCount() }}</strong>
                                     </small>
                                     <small class="text-muted">
-                                        <i class="bi bi-list-ol me-1"></i>
+                                        <i class="ri ri-list-ordered-2 me-1"></i>
                                         Total: <strong>{{ count($options) }}</strong>
                                     </small>
                                 </div>
@@ -679,7 +679,7 @@ new #[Layout('layouts.backend')] class extends Component {
                             <div
                                 class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between">
                                 <h6 class="mb-0 fw-semibold text-dark">
-                                    <i class="bi bi-lightbulb text-warning me-2"></i>Explanation
+                                    <i class="ri ri-lightbulb-fill text-warning me-2"></i>Explanation
                                     <span class="text-muted fw-normal small ms-1">(Optional)</span>
                                 </h6>
                                 <ul class="nav nav-pills nav-sm mb-0">
@@ -713,7 +713,7 @@ new #[Layout('layouts.backend')] class extends Component {
                         <div class="card shadow-sm border-0 mb-4">
                             <div class="card-header bg-white border-bottom py-3">
                                 <h6 class="mb-0 fw-semibold text-dark">
-                                    <i class="bi bi-trophy text-warning me-2"></i>Scoring Settings
+                                    <i class="ri ri-trophy-fill text-warning me-2"></i>Scoring Settings
                                 </h6>
                             </div>
                             <div class="card-body p-4">
@@ -750,7 +750,8 @@ new #[Layout('layouts.backend')] class extends Component {
                                     <label class="form-label fw-medium small">Negative Mark</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-danger-subtle text-danger">
-                                            <i class="bi bi-dash-circle"></i>
+
+                                            <i class="ri ri-indeterminate-circle-fill"></i>
                                         </span>
                                         <input type="number" wire:model.blur="negativeMark" class="form-control"
                                             step="0.01" min="0" placeholder="0.00" />
@@ -795,7 +796,7 @@ new #[Layout('layouts.backend')] class extends Component {
                         <div class="card shadow-sm border-0 mb-4">
                             <div class="card-header bg-white border-bottom py-3">
                                 <h6 class="mb-0 fw-semibold text-dark">
-                                    <i class="bi bi-toggle-on text-primary me-2"></i>Status & Publishing
+                                    <i class="ri ri-toggle-fill text-primary me-2"></i>Status & Publishing
                                 </h6>
                             </div>
                             <div class="card-body p-4">
@@ -884,13 +885,13 @@ new #[Layout('layouts.backend')] class extends Component {
                                             Validating...
                                         </span>
                                         <span wire:loading.remove wire:target="initiateSubmit">
-                                            <i class="bi bi-save me-1"></i>
+                                            <i class="ri ri-save-fill me-1"></i>
                                             Save as {{ ucfirst($status) }}
                                         </span>
                                     </button>
 
                                     <button type="button" wire:click="openPreview" class="btn btn-outline-info">
-                                        <i class="bi bi-eye me-1"></i>Preview Question
+                                        <i class="ri ri-eye-fill me-1"></i>Preview Question
                                     </button>
                                 </div>
                             </div>
@@ -900,7 +901,7 @@ new #[Layout('layouts.backend')] class extends Component {
                         <div class="card shadow-sm border-0 mb-4">
                             <div class="card-header bg-white border-bottom py-3">
                                 <h6 class="mb-0 fw-semibold text-dark">
-                                    <i class="bi bi-journal-text text-secondary me-2"></i>Admin Notes
+                                    <i class="ri ri-newspaper-fill text-secondary me-2"></i>Admin Notes
                                     <span class="text-muted fw-normal small ms-1">(Internal)</span>
                                 </h6>
                             </div>
