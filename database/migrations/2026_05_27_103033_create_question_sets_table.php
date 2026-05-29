@@ -19,7 +19,6 @@ return new class extends Migration
             $table->enum('question_set_type', ['iq', 'eq', 'lq']); // IQ, EQ, Leadership Quotient
             $table->text('description')->nullable();
             $table->foreignId('age_group_id')->constrained();
-            $table->foreignId('difficulty_level_id')->constrained();
             $table->string('image_path')->nullable();
             $table->unsignedSmallInteger('timer')->nullable();  // total set timer in seconds
             $table->unsignedSmallInteger('total_questions')->default(0); // denormalized count
