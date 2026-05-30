@@ -339,30 +339,30 @@ new #[Layout('layouts.backend')] class extends Component {
 
 
             {{-- ══════════════════════════════════════════════════════════
-         PAGE HEADER  ══════════════════════════════════════════════════════════ --}}
-            <div class="d-flex align-items-center justify-content-between mb-4">
-                <div>
-                    <h4 class="fw-bold mb-1 text-dark">
-                        <i class="ri ri-questionnaire-fill text-primary me-2"></i>
-                        {{ $questionId ? 'Edit Question' : 'Create New Question' }}
-                    </h4>
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb mb-0 small">
-                            <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="#">Questions</a></li>
-                            <li class="breadcrumb-item active">{{ $questionId ? 'Edit' : 'Create' }}</li>
-                        </ol>
-                    </nav>
+                PAGE HEADER  ══════════════════════════════════════════════════════════ --}}
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1 text-dark">
+                            <i class="ri ri-questionnaire-fill text-primary me-2"></i>
+                            {{ $questionId ? 'Edit Question' : 'Create New Question' }}
+                        </h4>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0 small">
+                                <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a href="#">Questions</a></li>
+                                <li class="breadcrumb-item active">{{ $questionId ? 'Edit' : 'Create' }}</li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-info btn-sm" wire:click="openPreview">
+                            <i class="ri ri-eye-fill me-1"></i> Preview
+                        </button>
+                        <a href="#" class="btn btn-outline-secondary btn-sm">
+                            <i class="ri ri-arrow-left-line me-1"></i> Back
+                        </a>
+                    </div>
                 </div>
-                <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-outline-info btn-sm" wire:click="openPreview">
-                        <i class="ri ri-eye-fill me-1"></i> Preview
-                    </button>
-                    <a href="#" class="btn btn-outline-secondary btn-sm">
-                        <i class="ri ri-arrow-left-line me-1"></i> Back
-                    </a>
-                </div>
-            </div>
 
             {{-- Flash Message --}}
             @if (session()->has('success'))
@@ -388,12 +388,9 @@ new #[Layout('layouts.backend')] class extends Component {
             @endif
             <div x-data="{ activeTab: 'en' }">
                 <form wire:submit.prevent>
-
                     {{-- ══════════════════════════════════════════════════════
-                ROW 1: Two Column Layout
-            ══════════════════════════════════════════════════════ --}}
+                        ROW 1: Two Column Layout ══════════════════════════════════════════════════════ --}}
                     <div class="row g-4">
-
                         {{-- LEFT COLUMN ─────────────────────────────────── --}}
                         <div class="col-lg-8">
 
@@ -968,11 +965,9 @@ new #[Layout('layouts.backend')] class extends Component {
 
                         </div>{{-- /RIGHT COLUMN --}}
                     </div>
-
                 </form>
             </div>
         </div>
-
         {{-- ── Styles ──────────────────────────────────────────────────── --}}
         @push('styles')
             <style>
