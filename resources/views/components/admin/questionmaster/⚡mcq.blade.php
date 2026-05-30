@@ -182,6 +182,7 @@ new #[Layout('layouts.backend')] class extends Component {
         }
         array_splice($this->options, $index, 1);
         $this->reIndexOptions();
+        $this->updateScoreSummary();
     }
 
     private function reIndexOptions(): void
@@ -195,13 +196,33 @@ new #[Layout('layouts.backend')] class extends Component {
     public function toggleCorrect(int $index): void
     {
         if ($this->selectionType === 'single') {
-            // Deselect all others
-            foreach ($this->options as $i => &$opt) {
-                $opt['is_correct'] = $i === $index;
-                $opt['weightage'] = $i === $index ? 1 : 0;
+
+        foreach ($this->options as $i => &$opt) {
+            $opt['is_correct'] = $i === $index;
             }
         } else {
-            $this->options[$index]['is_correct'] = !$this->options[$index]['is_correct'];
+
+            $this->options[$index]['is_correct']
+                = !$this->options[$index]['is_correct'];
+        }
+        $this->updateScoreSummary();
+    }
+
+
+    private function updateScoreSummary(): void
+    {
+        $this->maxScore = collect($this->options)
+            ->filter(fn ($option) => !empty($option['is_correct']))
+            ->sum(fn ($option) => (float) ($option['weightage'] ?? 0));
+    }
+    public function updatedOptions(): void
+    {
+        $this->updateScoreSummary();
+    }
+    public function updated($property): void
+    {
+         if (str_starts_with($property, 'options.')) {
+            $this->updateScoreSummary();
         }
     }
 
@@ -214,12 +235,20 @@ new #[Layout('layouts.backend')] class extends Component {
         }
     }
 
-    // ─── Language Tab ────────────────────────────────────────
-    public function setActiveTab(string $lang): void
+// Count Score based on options
+    public function getCalculatedMaxScoreProperty(): float
     {
-        $this->activeTab = $lang;
+        return collect($this->options)
+            ->where('is_correct', true)
+            ->sum(function ($option) {
+                return (float) ($option['weightage'] ?? 0);
+            });
     }
 
+    public function getCalculatedNegativeMarkProperty(): float
+    {
+        return 0; // change logic later if needed
+    }
     // ─── Preview ─────────────────────────────────────────────
     public function openPreview(): void
     {
@@ -303,12 +332,14 @@ new #[Layout('layouts.backend')] class extends Component {
             ]" />
     @elseif($createForm == 1)
         {{-- resources/views/livewire/questions/question-form.blade.php --}}
+        <div
+            class="question-form-wrapper"
+            x-data="questionForm()"
+            x-init="init()">
 
-        <div class="question-form-wrapper">
 
             {{-- ══════════════════════════════════════════════════════════
-         PAGE HEADER
-    ══════════════════════════════════════════════════════════ --}}
+         PAGE HEADER  ══════════════════════════════════════════════════════════ --}}
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <div>
                     <h4 class="fw-bold mb-1 text-dark">
@@ -355,572 +386,591 @@ new #[Layout('layouts.backend')] class extends Component {
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
+            <div x-data="{ activeTab: 'en' }">
+                <form wire:submit.prevent>
 
-            <form wire:submit.prevent>
+                    {{-- ══════════════════════════════════════════════════════
+                ROW 1: Two Column Layout
+            ══════════════════════════════════════════════════════ --}}
+                    <div class="row g-4">
 
-                {{-- ══════════════════════════════════════════════════════
-             ROW 1: Two Column Layout
-        ══════════════════════════════════════════════════════ --}}
-                <div class="row g-4">
+                        {{-- LEFT COLUMN ─────────────────────────────────── --}}
+                        <div class="col-lg-8">
 
-                    {{-- LEFT COLUMN ─────────────────────────────────── --}}
-                    <div class="col-lg-8">
+                            {{-- ── Card: Basic Information ──────────────── --}}
+                            <div class="card shadow-sm border-0 mb-4">
+                                <div class="card-header bg-white border-bottom py-3">
+                                    <h6 class="mb-0 fw-semibold text-dark">
+                                        <i class="ri ri-information-line text-primary me-2"></i>Basic Information
+                                    </h6>
+                                </div>
+                                <div class="card-body p-4">
+                                    <div class="row g-3">
 
-                        {{-- ── Card: Basic Information ──────────────── --}}
-                        <div class="card shadow-sm border-0 mb-4">
-                            <div class="card-header bg-white border-bottom py-3">
-                                <h6 class="mb-0 fw-semibold text-dark">
-                                    <i class="ri ri-information-line text-primary me-2"></i>Basic Information
-                                </h6>
-                            </div>
-                            <div class="card-body p-4">
-                                <div class="row g-3">
+                                        {{-- Code --}}
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-medium small">
+                                                Question Code <span class="text-danger">*</span>
+                                            </label>
+                                            <div class="input-group">
+                                                <input type="text" wire:model.blur="code"
+                                                    class="form-control @error('code') is-invalid @enderror"
+                                                    placeholder="Q-XXXXXXXX" />
+                                                <button class="btn btn-outline-secondary" type="button"
+                                                    wire:click="$set('code', 'Q-' + Math.random().toString(36).substr(2,8).toUpperCase())"
+                                                    title="Regenerate">
+                                                    <i class="ri ri-reset-right-fill"></i>
+                                                </button>
+                                                @error('code')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
 
-                                    {{-- Code --}}
-                                    <div class="col-md-4">
-                                        <label class="form-label fw-medium small">
-                                            Question Code <span class="text-danger">*</span>
-                                        </label>
-                                        <div class="input-group">
-                                            <input type="text" wire:model.blur="code"
-                                                class="form-control @error('code') is-invalid @enderror"
-                                                placeholder="Q-XXXXXXXX" />
-                                            <button class="btn btn-outline-secondary" type="button"
-                                                wire:click="$set('code', 'Q-' + Math.random().toString(36).substr(2,8).toUpperCase())"
-                                                title="Regenerate">
-                                                <i class="ri ri-reset-right-fill"></i>
-                                            </button>
-                                            @error('code')
+                                        {{-- Question Type --}}
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-medium small">
+                                                Question Type <span class="text-danger">*</span>
+                                            </label>
+                                            <select wire:model="questionTypeId"
+                                                class="form-select @error('questionTypeId') is-invalid @enderror">
+                                                <option value="">— Select Type —</option>
+                                                @foreach ($questionTypes as $type)
+                                                    <option value="{{ $type['id'] }}">{{ $type['name'] }}</option>
+                                                @endforeach
+                                            </select>
+                                            @error('questionTypeId')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
-                                    </div>
-
-                                    {{-- Question Type --}}
-                                    <div class="col-md-4">
-                                        <label class="form-label fw-medium small">
-                                            Question Type <span class="text-danger">*</span>
-                                        </label>
-                                        <select wire:model="questionTypeId"
-                                            class="form-select @error('questionTypeId') is-invalid @enderror">
-                                            <option value="">— Select Type —</option>
-                                            @foreach ($questionTypes as $type)
-                                                <option value="{{ $type['id'] }}">{{ $type['name'] }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('questionTypeId')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
 
 
 
-                                    {{-- Primary Skill --}}
-                                    <div class="col-md-4">
-                                        <label class="form-label fw-medium small">
-                                            Primary Skill <span class="text-danger">*</span>
-                                        </label>
-                                        <select wire:model="primarySkillTypeId"
-                                            class="form-select @error('primarySkillTypeId') is-invalid @enderror">
-                                            <option value="">— Select Skill —</option>
-                                            @foreach ($primarySkillTypes as $skill)
-                                                <option value="{{ $skill['id'] }}">{{ $skill['name'] }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('primarySkillTypeId')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-
-                                    {{-- Sub Skill --}}
-                                    <div class="col-md-4">
-                                        <label class="form-label fw-medium small">
-                                            Sub Skill <span class="text-danger">*</span>
-                                        </label>
-                                        <select wire:model="subSkillTypeId"
-                                            class="form-select @error('subSkillTypeId') is-invalid @enderror">
-                                            <option value="">— Select Sub Skill —</option>
-                                            @foreach ($subSkillTypes as $skill)
-                                                <option value="{{ $skill['id'] }}">{{ $skill['name'] }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('subSkillTypeId')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-
-                                    {{-- Difficulty Level --}}
-                                    <div class="col-md-4">
-                                        <label class="form-label fw-medium small">
-                                            Difficulty Level <span class="text-danger">*</span>
-                                        </label>
-                                        <select wire:model="difficultyLevelId"
-                                            class="form-select @error('difficultyLevelId') is-invalid @enderror">
-                                            <option value="">— Select Difficulty Level —</option>
-                                            @foreach ($difficultyLevels as $level)
-                                                <option value="{{ $level['id'] }}">{{ $level['name'] }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('difficultyLevelId')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-
-                                    {{-- Age Group --}}
-                                    <div class="col-md-4">
-                                        <label class="form-label fw-medium small">
-                                            Age Group <span class="text-danger">*</span>
-                                        </label>
-                                        <select wire:model="ageGroupId"
-                                            class="form-select @error('ageGroupId') is-invalid @enderror">
-                                            <option value="">— Select Age Group —</option>
-                                            @foreach ($ageGroups as $group)
-                                                <option value="{{ $group['id'] }}">{{ $group['name'] }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('ageGroupId')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-
-
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- ── Card: Question Stem (Multilingual) ────── --}}
-                        <div class="card shadow-sm border-0 mb-4">
-                            <div
-                                class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between">
-                                <h6 class="mb-0 fw-semibold text-dark">
-                                    <i class="ri ri-translate-2 me-2"></i>Question Stem
-                                </h6>
-                                {{-- Language Tabs --}}
-                                <ul class="nav nav-pills nav-sm mb-0">
-                                    @foreach ($languages as $langCode => $lang)
-                                        <li class="nav-item">
-                                            <button type="button" wire:click="setActiveTab('{{ $langCode }}')"
-                                                class="nav-link py-1 px-3 small
-                                                   {{ $activeTab === $langCode ? 'active' : '' }}">
-                                                <span class="me-1">{{ $lang['flag'] }}</span>
-                                                {{ $lang['label'] }}
-                                            </button>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                            <div class="card-body p-4">
-                                @foreach ($languages as $langCode => $lang)
-                                    <div class="{{ $activeTab === $langCode ? '' : 'd-none' }}">
-                                        <label class="form-label fw-medium small">
-                                            {{ $lang['flag'] }} {{ $lang['label'] }} — Question Stem
-                                        </label>
-                                        <textarea wire:model="stem.{{ $langCode }}" class="form-control" rows="4"
-                                            placeholder="Enter question stem in {{ $lang['label'] }}..."></textarea>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        {{-- ── Card: MCQ Options ─────────────────────── --}}
-                        <div class="card shadow-sm border-0 mb-4">
-                            <div class="card-header bg-white border-bottom py-3">
-                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                                    <h6 class="mb-0 fw-semibold text-dark">
-                                        <i class="ri ri-list-check-3 text-primary me-2"></i>
-                                        Answer Options
-                                        <span class="badge bg-primary ms-1">{{ count($options) }}</span>
-                                    </h6>
-
-                                    <div class="d-flex align-items-center gap-3">
-                                        {{-- Selection Type Toggle --}}
-                                        <div class="d-flex align-items-center gap-2 bg-light rounded p-1">
-                                            <button type="button" wire:click="$set('selectionType', 'single')"
-                                                class="btn btn-sm {{ $selectionType === 'single' ? 'btn-primary' : 'btn-light' }}">
-                                                <i class="ri ri-record-circle-line me-1"> </i>Single
-                                            </button>
-                                            <button type="button" wire:click="$set('selectionType', 'multiple')"
-                                                class="btn btn-sm {{ $selectionType === 'multiple' ? 'btn-primary' : 'btn-light' }}">
-                                                <i class="ri ri-checkbox-circle-line me-1"></i>Multiple
-                                            </button>
+                                        {{-- Primary Skill --}}
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-medium small">
+                                                Primary Skill <span class="text-danger">*</span>
+                                            </label>
+                                            <select wire:model="primarySkillTypeId"
+                                                class="form-select @error('primarySkillTypeId') is-invalid @enderror">
+                                                <option value="">— Select Skill —</option>
+                                                @foreach ($primarySkillTypes as $skill)
+                                                    <option value="{{ $skill['id'] }}">{{ $skill['name'] }}</option>
+                                                @endforeach
+                                            </select>
+                                            @error('primarySkillTypeId')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
 
-                                        <button type="button" wire:click="addOption"
-                                            class="btn btn-outline-primary btn-sm"
-                                            @if (count($options) >= 8) disabled @endif>
-                                            <i class="ri ri-add-large-line me-1"></i>Add Option
+                                        {{-- Sub Skill --}}
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-medium small">
+                                                Sub Skill <span class="text-danger">*</span>
+                                            </label>
+                                            <select wire:model="subSkillTypeId"
+                                                class="form-select @error('subSkillTypeId') is-invalid @enderror">
+                                                <option value="">— Select Sub Skill —</option>
+                                                @foreach ($subSkillTypes as $skill)
+                                                    <option value="{{ $skill['id'] }}">{{ $skill['name'] }}</option>
+                                                @endforeach
+                                            </select>
+                                            @error('subSkillTypeId')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+
+                                        {{-- Difficulty Level --}}
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-medium small">
+                                                Difficulty Level <span class="text-danger">*</span>
+                                            </label>
+                                            <select wire:model="difficultyLevelId"
+                                                class="form-select @error('difficultyLevelId') is-invalid @enderror">
+                                                <option value="">— Select Difficulty Level —</option>
+                                                @foreach ($difficultyLevels as $level)
+                                                    <option value="{{ $level['id'] }}">{{ $level['name'] }}</option>
+                                                @endforeach
+                                            </select>
+                                            @error('difficultyLevelId')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+
+                                        {{-- Age Group --}}
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-medium small">
+                                                Age Group <span class="text-danger">*</span>
+                                            </label>
+                                            <select wire:model="ageGroupId"
+                                                class="form-select @error('ageGroupId') is-invalid @enderror">
+                                                <option value="">— Select Age Group —</option>
+                                                @foreach ($ageGroups as $group)
+                                                    <option value="{{ $group['id'] }}">{{ $group['name'] }}</option>
+                                                @endforeach
+                                            </select>
+                                            @error('ageGroupId')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- ── Card: Question Stem (Multilingual) ────── --}}
+                            <div class="card shadow-sm border-0 mb-4">
+                                <div
+                                    class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between">
+                                    <h6 class="mb-0 fw-semibold text-dark">
+                                        <i class="ri ri-translate-2 me-2"></i>Question Stem
+                                    </h6>
+                                    {{-- Language Tabs --}}
+                                    <ul class="nav nav-pills nav-sm mb-0">
+                                        @foreach ($languages as $langCode => $lang)
+                                            <li class="nav-item">
+                                               <button
+                                                    type="button"
+                                                    @click="activeTab='{{ $langCode }}'"
+                                                    class="nav-link"
+                                                    :class="{ 'active': activeTab === '{{ $langCode }}' }">
+                                                    {{ $lang['flag'] }} {{ $lang['label'] }}
+                                                </button>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                                <div class="card-body p-4">
+                                    @foreach ($languages as $langCode => $lang)
+                                        <div class="{{ $activeTab === $langCode ? '' : 'd-none' }}">
+                                            <label class="form-label fw-medium small">
+                                                {{ $lang['flag'] }} {{ $lang['label'] }} — Question Stem
+                                            </label>
+                                        </div>
+                                        <div x-show="activeTab==='{{ $langCode }}'">
+                                            <textarea
+                                                wire:model="stem.{{ $langCode }}"
+                                                class="form-control"
+                                                rows="4"  placeholder="Enter question stem in {{ $lang['label'] }}...">
+                                            </textarea>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            {{-- ── Card: MCQ Options ─────────────────────── --}}
+                            <div class="card shadow-sm border-0 mb-4">
+                                <div class="card-header bg-white border-bottom py-3">
+                                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                        <h6 class="mb-0 fw-semibold text-dark">
+                                            <i class="ri ri-list-check-3 text-primary me-2"></i>
+                                            Answer Options
+                                            <span class="badge bg-primary ms-1">{{ count($options) }}</span>
+                                        </h6>
+
+                                        <div class="d-flex align-items-center gap-3">
+                                            {{-- Selection Type Toggle --}}
+                                            <div class="d-flex align-items-center gap-2 bg-light rounded p-1">
+                                                <button type="button" wire:click="$set('selectionType', 'single')"
+                                                    class="btn btn-sm {{ $selectionType === 'single' ? 'btn-primary' : 'btn-light' }}">
+                                                    <i class="ri ri-record-circle-line me-1"> </i>Single
+                                                </button>
+                                                <button type="button" wire:click="$set('selectionType', 'multiple')"
+                                                    class="btn btn-sm {{ $selectionType === 'multiple' ? 'btn-primary' : 'btn-light' }}">
+                                                    <i class="ri ri-checkbox-circle-line me-1"></i>Multiple
+                                                </button>
+                                            </div>
+
+                                            <button type="button" wire:click="addOption"
+                                                class="btn btn-outline-primary btn-sm"
+                                                @if (count($options) >= 8) disabled @endif>
+                                                <i class="ri ri-add-large-line me-1"></i>Add Option
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    @if ($selectionType === 'multiple')
+                                        <div class="mt-2">
+                                            <span class="badge bg-info-subtle text-info border border-info-subtle small">
+                                                <i class="ri ri-information-line me-1"></i>
+                                                Multi-select: Students can choose multiple answers. Set weightage per
+                                                correct option.
+                                            </span>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <div class="card-body p-4">
+                                    @error('options')
+                                        <div class="alert alert-warning py-2 small mb-3">
+                                            <i class="ri ri-error-warning-fill me-1"></i>{{ $message }}
+                                        </div>
+                                    @enderror
+
+                                    <div class="options-list">
+                                        @foreach ($options as $index => $option)
+                                            <div class="option-card rounded-3 border mb-3 overflow-hidden
+                                                {{ $option['is_correct'] ? 'border-success' : 'border-light' }}"
+                                                wire:key="option-{{ $index }}">
+
+                                                {{-- Option Header --}}
+                                                <div
+                                                    class="option-header d-flex align-items-center gap-3 px-3 py-2
+                                                    {{ $option['is_correct'] ? 'bg-success-subtle' : 'bg-light' }}">
+
+                                                    {{-- Correct Toggle --}}
+                                                    <button type="button"
+                                                        wire:click="toggleCorrect({{ $index }})"
+                                                        class="btn btn-sm {{ $option['is_correct'] ? 'btn-success' : 'btn-outline-secondary' }} rounded-circle p-0"
+                                                        style="width:32px;height:32px;"
+                                                        title="{{ $option['is_correct'] ? 'Mark as Incorrect' : 'Mark as Correct' }}">
+                                                        @if ($selectionType === 'single')
+                                                            <i
+                                                                class="ri {{ $option['is_correct'] ? 'ri-record-circle-fill' : 'ri-circle-line' }}"></i>
+                                                        @else
+                                                            <i
+                                                                class="ri {{ $option['is_correct'] ? 'ri-checkbox-circle-fill' : 'ri-checkbox-circle-line' }}"></i>
+                                                        @endif
+                                                    </button>
+
+                                                    {{-- Option Label --}}
+                                                    <span class="badge bg-secondary fs-6 fw-bold"
+                                                        style="width:30px;height:30px;line-height:18px;">
+                                                        {{ $option['id'] }}
+                                                    </span>
+
+                                                    @if ($option['is_correct'])
+                                                        <span class="badge bg-success">
+                                                            <i class="ri ri-check-fill me-1"></i>Correct
+                                                        </span>
+                                                    @endif
+
+                                                    <div class="ms-auto d-flex align-items-center gap-2">
+                                                        {{-- Weightage --}}
+                                                        <div class="d-flex align-items-center gap-1">
+                                                            <label
+                                                                class="small text-muted mb-0 text-nowrap">Weightage:</label>
+
+                                                            <input type="number"
+                                                                wire:model.live="options.{{ $index }}.weightage"
+                                                                class="form-control form-control-sm text-center"
+                                                                style="width:70px;"
+                                                                step="0.1"
+                                                                min="0"
+                                                                max="100"
+                                                                placeholder="0" />
+                                                        </div>
+
+                                                        {{-- Remove --}}
+                                                        <button type="button"
+                                                            wire:click="removeOption({{ $index }})"
+                                                            class="btn btn-sm btn-outline-danger" title="Remove Option">
+                                                            <i class="ri ri-delete-bin-fill"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                {{-- Option Body: Multilingual Text --}}
+                                                <div class="option-body p-3">
+
+
+                                                    @foreach ($languages as $langCode => $lang)
+
+                                                        <div x-show="activeTab==='{{ $langCode }}'">
+                                                           <input type="text"
+                                                                wire:model="options.{{ $index }}.text.{{ $langCode }}"
+                                                                class="form-control form-control-sm"
+                                                                placeholder="Option {{ $option['id'] }} text in {{ $lang['label'] }}..." />
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+
+                                    {{-- Options Summary --}}
+                                    <div class="d-flex gap-3 mt-2 pt-2 border-top">
+                                        <small class="text-muted">
+                                            <i class="ri ri-check-circle-fill text-success me-1"></i>
+                                            Correct: <strong>{{ $this->getCorrectOptionsCount() }}</strong>
+                                        </small>
+                                        <small class="text-muted">
+                                            <i class="ri ri-list-ordered-2 me-1"></i>
+                                            Total: <strong>{{ count($options) }}</strong>
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- ── Card: Explanation ─────────────────────── --}}
+                            <div class="card shadow-sm border-0 mb-4">
+                                <div
+                                    class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between">
+                                    <h6 class="mb-0 fw-semibold text-dark">
+                                        <i class="ri ri-lightbulb-fill text-warning me-2"></i>Explanation
+                                        <span class="text-muted fw-normal small ms-1">(Optional)</span>
+                                    </h6>
+
+                                </div>
+                                <div class="card-body p-4">
+                                    @foreach ($languages as $langCode => $lang)
+                                        <div x-show="activeTab==='{{ $langCode }}'">
+                                            <textarea wire:model="explanation.{{ $langCode }}" class="form-control" rows="3"
+                                                placeholder="Explain the correct answer in {{ $lang['label'] }}..."></textarea>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                        </div>{{-- /LEFT COLUMN --}}
+
+                        {{-- RIGHT COLUMN ────────────────────────────────── --}}
+                        <div class="col-lg-4">
+
+                            {{-- ── Card: Scoring Settings ────────────────── --}}
+                            <div class="card shadow-sm border-0 mb-4">
+                                <div class="card-header bg-white border-bottom py-3">
+                                    <h6 class="mb-0 fw-semibold text-dark">
+                                        <i class="ri ri-trophy-fill text-warning me-2"></i>Scoring Settings
+                                    </h6>
+                                </div>
+                                <div class="card-body p-4">
+
+                                    {{-- Time Limit --}}
+                                    <div class="  mb-3">
+                                        <label class="form-label fw-medium small">
+                                            Time Limit
+                                            <span class="text-muted">(seconds)</span>
+                                        </label>
+                                        <input type="number" wire:model.blur="timeLimit"
+                                            class="form-control @error('timeLimit') is-invalid @enderror" min="1"
+                                            max="65535" placeholder="e.g. 60" />
+                                        @error('timeLimit')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    {{-- Max Score --}}
+                                    <div class="mb-3">
+                                        <label class="form-label fw-medium small">
+                                            Max Score <span class="text-danger">*</span>
+                                        </label>
+                                        <input  type="number"
+                                            class="form-control"
+                                            value="{{ $maxScore }}"
+                                            readonly/>
+                                        @error('maxScore')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    {{-- Negative Mark --}}
+                                    <div class="mb-3">
+                                        <label class="form-label fw-medium small">Negative Mark</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-danger-subtle text-danger">
+
+                                                <i class="ri ri-indeterminate-circle-fill"></i>
+                                            </span>
+                                           <input type="number"
+                                                wire:model.live="negativeMark"
+                                                class="form-control"
+                                                step="0.01"
+                                                min="0"
+                                                placeholder="0.00" />
+
+                                        </div>
+                                        <div class="form-text small">Marks deducted for wrong answer</div>
+                                    </div>
+
+                                    {{-- Shuffle Options --}}
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" wire:model="isOptionsShuffle"
+                                                id="shuffleCheck" />
+                                            <label class="form-check-label fw-medium small" for="shuffleCheck">
+                                                Shuffle Options
+                                            </label>
+                                        </div>
+                                        <div class="form-text small">Randomize option order for each student</div>
+                                    </div>
+
+                                    {{-- Score Summary --}}
+                                    <div class="bg-light rounded p-3 mt-3">
+                                        <div class="small fw-semibold mb-2 text-dark">Score Summary</div>
+                                        <div class="d-flex justify-content-between small">
+                                            <span class="text-muted">Max Score</span>
+                                            <span class="fw-bold text-success">
+                                                +{{ number_format((float) $maxScore, 2) }}
+                                            </span>
+
+                                        </div>
+                                        <div class="d-flex justify-content-between small">
+                                            <span class="text-muted">Negative Mark</span>
+                                            <span class="fw-bold text-danger">
+                                                -{{ number_format((float)$negativeMark, 2) }}
+                                            </span>
+                                        </div>
+                                        <hr class="my-2">
+                                        <div class="d-flex justify-content-between small">
+                                            <span class="fw-semibold">Correct Options</span>
+                                            <span
+                                                class="fw-bold text-primary">{{ $this->getCorrectOptionsCount() }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- ── Card: Status & Publish ─────────────────── --}}
+                            <div class="card shadow-sm border-0 mb-4">
+                                <div class="card-header bg-white border-bottom py-3">
+                                    <h6 class="mb-0 fw-semibold text-dark">
+                                        <i class="ri ri-toggle-fill text-primary me-2"></i>Status & Publishing
+                                    </h6>
+                                </div>
+                              <div class="card-body p-4" x-data="{ status: @entangle('status') }">
+                                    {{-- Status Indicator --}}
+                                    <div class="text-center mb-4">
+                                        <div class="text-center mb-4">
+                                            <div class="status-indicator mx-auto mb-2 rounded-circle d-flex align-items-center justify-content-center"
+                                                style="width:64px;height:64px;"
+
+                                                :class="{
+                                                    'bg-warning-subtle border border-warning': status == 'draft',
+                                                    'bg-success-subtle border border-success': status == 'publish',
+                                                    'bg-secondary-subtle border border-secondary': status == 'unpublish'
+                                                }">
+
+                                                <i class="fs-4"
+                                                    :class="{
+                                                        'bi bi-pencil-square text-warning': status == 'draft',
+                                                        'bi bi-cloud-check text-success': status == 'publish',
+                                                        'bi bi-cloud-slash text-secondary': status == 'unpublish'
+                                                    }">
+                                                </i>
+
+                                            </div>
+
+                                            <div class="fw-bold">Current Status</div>
+
+                                            <span class="mt-1 px-3 badge"
+                                                :class="{
+                                                    'bg-warning text-dark': status == 'draft',
+                                                    'bg-success': status == 'publish',
+                                                    'bg-secondary': status == 'unpublish'
+                                                }"
+                                                x-text="
+                                                    status == 'draft'
+                                                        ? 'Draft'
+                                                        : (status == 'publish'
+                                                            ? 'Published'
+                                                            : 'Unpublished')
+                                                ">
+                                            </span>
+
+                                        </div>
+                                    </div>
+
+                                    <hr>
+
+                                    {{-- Status Radio Buttons --}}
+                                    <div class="mb-3">
+                                        <label class="form-label fw-medium small">Change Status</label>
+
+                                        <div class="status-options d-flex flex-column gap-2">
+
+                                            <label
+                                                class="status-option d-flex align-items-center gap-2 p-2 rounded border cursor-pointer"
+                                                :class="status == 'draft'
+                                                    ? 'border-warning bg-warning-subtle'
+                                                    : ''">
+
+                                                <input type="radio"
+                                                    x-model="status"
+                                                    value="draft"
+                                                    class="form-check-input mt-0">
+
+                                                <span class="badge bg-warning text-dark">Draft</span>
+                                            </label>
+                                            <label
+                                                class="status-option d-flex align-items-center gap-2 p-2 rounded border cursor-pointer"
+                                                :class="status == 'publish'
+                                                    ? 'border-success bg-success-subtle'
+                                                    : ''">
+
+                                                <input type="radio"
+                                                    x-model="status"
+                                                    value="publish"
+                                                    class="form-check-input mt-0">
+
+                                                <span class="badge bg-success">Publish</span>
+                                            </label>
+
+                                            <label
+                                                class="status-option d-flex align-items-center gap-2 p-2 rounded border cursor-pointer"
+                                                :class="status == 'unpublish'
+                                                    ? 'border-secondary bg-secondary-subtle'
+                                                    : ''">
+
+                                                <input type="radio"
+                                                    x-model="status"
+                                                    value="unpublish"
+                                                    class="form-check-input mt-0">
+
+                                                <span class="badge bg-secondary">Unpublish</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    {{-- Action Buttons --}}
+                                    <div class="d-grid gap-2 mt-4">
+                                        <button type="button"  x-on:click="$wire.initiateSubmit(status)"
+                                            wire:loading.attr="disabled" class="btn btn-primary">
+                                            <span wire:loading wire:target="initiateSubmit">
+                                                <span class="spinner-border spinner-border-sm me-1"></span>
+                                                Validating...
+                                            </span>
+
+                                                <span wire:loading.remove wire:target="initiateSubmit">
+                                                        <i class="ri ri-save-fill me-1"></i>
+                                                        Save as
+                                                        <span x-text="
+                                                            status == 'draft'
+                                                                ? 'Draft'
+                                                                : (status == 'publish'
+                                                                    ? 'Publish'
+                                                                    : 'Unpublish')
+                                                        "></span>
+                                                    </span>
+                                        </button>
+
+                                        <button type="button" wire:click="openPreview" class="btn btn-outline-info">
+                                            <i class="ri ri-eye-fill me-1"></i>Preview Question
                                         </button>
                                     </div>
                                 </div>
-
-                                @if ($selectionType === 'multiple')
-                                    <div class="mt-2">
-                                        <span class="badge bg-info-subtle text-info border border-info-subtle small">
-                                            <i class="ri ri-information-line me-1"></i>
-                                            Multi-select: Students can choose multiple answers. Set weightage per
-                                            correct option.
-                                        </span>
-                                    </div>
-                                @endif
                             </div>
 
-                            <div class="card-body p-4">
-                                @error('options')
-                                    <div class="alert alert-warning py-2 small mb-3">
-                                        <i class="ri ri-error-warning-fill me-1"></i>{{ $message }}
-                                    </div>
-                                @enderror
-
-                                <div class="options-list">
-                                    @foreach ($options as $index => $option)
-                                        <div class="option-card rounded-3 border mb-3 overflow-hidden
-                                            {{ $option['is_correct'] ? 'border-success' : 'border-light' }}"
-                                            wire:key="option-{{ $index }}">
-
-                                            {{-- Option Header --}}
-                                            <div
-                                                class="option-header d-flex align-items-center gap-3 px-3 py-2
-                                                {{ $option['is_correct'] ? 'bg-success-subtle' : 'bg-light' }}">
-
-                                                {{-- Correct Toggle --}}
-                                                <button type="button"
-                                                    wire:click="toggleCorrect({{ $index }})"
-                                                    class="btn btn-sm {{ $option['is_correct'] ? 'btn-success' : 'btn-outline-secondary' }} rounded-circle p-0"
-                                                    style="width:32px;height:32px;"
-                                                    title="{{ $option['is_correct'] ? 'Mark as Incorrect' : 'Mark as Correct' }}">
-                                                    @if ($selectionType === 'single')
-                                                        <i
-                                                            class="ri {{ $option['is_correct'] ? 'ri-record-circle-fill' : 'ri-circle-line' }}"></i>
-                                                    @else
-                                                        <i
-                                                            class="ri {{ $option['is_correct'] ? 'ri-checkbox-circle-fill' : 'ri-checkbox-circle-line' }}"></i>
-                                                    @endif
-                                                </button>
-
-                                                {{-- Option Label --}}
-                                                <span class="badge bg-secondary fs-6 fw-bold"
-                                                    style="width:30px;height:30px;line-height:18px;">
-                                                    {{ $option['id'] }}
-                                                </span>
-
-                                                @if ($option['is_correct'])
-                                                    <span class="badge bg-success">
-                                                        <i class="ri ri-check-fill me-1"></i>Correct
-                                                    </span>
-                                                @endif
-
-                                                <div class="ms-auto d-flex align-items-center gap-2">
-                                                    {{-- Weightage --}}
-                                                    <div class="d-flex align-items-center gap-1">
-                                                        <label
-                                                            class="small text-muted mb-0 text-nowrap">Weightage:</label>
-                                                        <input type="number"
-                                                            wire:model="options.{{ $index }}.weightage"
-                                                            class="form-control form-control-sm text-center"
-                                                            style="width:70px;" step="0.1" min="0"
-                                                            max="100" placeholder="0" />
-                                                    </div>
-
-                                                    {{-- Remove --}}
-                                                    <button type="button"
-                                                        wire:click="removeOption({{ $index }})"
-                                                        class="btn btn-sm btn-outline-danger" title="Remove Option">
-                                                        <i class="ri ri-delete-bin-fill"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            {{-- Option Body: Multilingual Text --}}
-                                            <div class="option-body p-3">
-                                                <ul class="nav nav-tabs nav-sm mb-2 border-bottom-0" role="tablist">
-                                                    @foreach ($languages as $langCode => $lang)
-                                                        <li class="nav-item" role="presentation">
-                                                            <button
-                                                                class="nav-link py-1 px-2 small
-                                                                   {{ $activeTab === $langCode ? 'active' : '' }}"
-                                                                type="button"
-                                                                wire:click="setActiveTab('{{ $langCode }}')">
-                                                                {{ $lang['flag'] }} {{ $lang['label'] }}
-                                                                @if (!empty($option['text'][$langCode]))
-                                                                    <i class="ri ri-check-circle-fill text-success ms-1"
-                                                                        style="font-size:10px;"></i>
-                                                                @endif
-                                                            </button>
-                                                        </li>
-                                                    @endforeach
-                                                </ul>
-
-                                                @foreach ($languages as $langCode => $lang)
-                                                    <div class="{{ $activeTab === $langCode ? '' : 'd-none' }}">
-                                                        <input type="text"
-                                                            wire:model="options.{{ $index }}.text.{{ $langCode }}"
-                                                            class="form-control form-control-sm"
-                                                            placeholder="Option {{ $option['id'] }} text in {{ $lang['label'] }}..." />
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                    @endforeach
+                            {{-- ── Card: Admin Notes ──────────────────────── --}}
+                            <div class="card shadow-sm border-0 mb-4">
+                                <div class="card-header bg-white border-bottom py-3">
+                                    <h6 class="mb-0 fw-semibold text-dark">
+                                        <i class="ri ri-newspaper-fill text-secondary me-2"></i>Admin Notes
+                                        <span class="text-muted fw-normal small ms-1">(Internal)</span>
+                                    </h6>
                                 </div>
-
-                                {{-- Options Summary --}}
-                                <div class="d-flex gap-3 mt-2 pt-2 border-top">
-                                    <small class="text-muted">
-                                        <i class="ri ri-check-circle-fill text-success me-1"></i>
-                                        Correct: <strong>{{ $this->getCorrectOptionsCount() }}</strong>
-                                    </small>
-                                    <small class="text-muted">
-                                        <i class="ri ri-list-ordered-2 me-1"></i>
-                                        Total: <strong>{{ count($options) }}</strong>
-                                    </small>
+                                <div class="card-body p-3">
+                                    <textarea wire:model="adminNotes" class="form-control border-0 bg-light" rows="4"
+                                        placeholder="Internal notes, not visible to students..."></textarea>
                                 </div>
                             </div>
-                        </div>
 
-                        {{-- ── Card: Explanation ─────────────────────── --}}
-                        <div class="card shadow-sm border-0 mb-4">
-                            <div
-                                class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between">
-                                <h6 class="mb-0 fw-semibold text-dark">
-                                    <i class="ri ri-lightbulb-fill text-warning me-2"></i>Explanation
-                                    <span class="text-muted fw-normal small ms-1">(Optional)</span>
-                                </h6>
-                                <ul class="nav nav-pills nav-sm mb-0">
-                                    @foreach ($languages as $langCode => $lang)
-                                        <li class="nav-item">
-                                            <button type="button" wire:click="setActiveTab('{{ $langCode }}')"
-                                                class="nav-link py-1 px-3 small
-                                                   {{ $activeTab === $langCode ? 'active' : '' }}">
-                                                {{ $lang['flag'] }} {{ $lang['label'] }}
-                                            </button>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                            <div class="card-body p-4">
-                                @foreach ($languages as $langCode => $lang)
-                                    <div class="{{ $activeTab === $langCode ? '' : 'd-none' }}">
-                                        <textarea wire:model="explanation.{{ $langCode }}" class="form-control" rows="3"
-                                            placeholder="Explain the correct answer in {{ $lang['label'] }}..."></textarea>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
+                        </div>{{-- /RIGHT COLUMN --}}
+                    </div>
 
-                    </div>{{-- /LEFT COLUMN --}}
-
-                    {{-- RIGHT COLUMN ────────────────────────────────── --}}
-                    <div class="col-lg-4">
-
-                        {{-- ── Card: Scoring Settings ────────────────── --}}
-                        <div class="card shadow-sm border-0 mb-4">
-                            <div class="card-header bg-white border-bottom py-3">
-                                <h6 class="mb-0 fw-semibold text-dark">
-                                    <i class="ri ri-trophy-fill text-warning me-2"></i>Scoring Settings
-                                </h6>
-                            </div>
-                            <div class="card-body p-4">
-
-                                {{-- Time Limit --}}
-                                <div class="  mb-3">
-                                    <label class="form-label fw-medium small">
-                                        Time Limit
-                                        <span class="text-muted">(seconds)</span>
-                                    </label>
-                                    <input type="number" wire:model.blur="timeLimit"
-                                        class="form-control @error('timeLimit') is-invalid @enderror" min="1"
-                                        max="65535" placeholder="e.g. 60" />
-                                    @error('timeLimit')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                {{-- Max Score --}}
-                                <div class="mb-3">
-                                    <label class="form-label fw-medium small">
-                                        Max Score <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="number" wire:model.blur="maxScore"
-                                        class="form-control @error('maxScore') is-invalid @enderror" step="0.01"
-                                        min="0" max="9999.99" placeholder="1.00" />
-                                    @error('maxScore')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                {{-- Negative Mark --}}
-                                <div class="mb-3">
-                                    <label class="form-label fw-medium small">Negative Mark</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-danger-subtle text-danger">
-
-                                            <i class="ri ri-indeterminate-circle-fill"></i>
-                                        </span>
-                                        <input type="number" wire:model.blur="negativeMark" class="form-control"
-                                            step="0.01" min="0" placeholder="0.00" />
-                                    </div>
-                                    <div class="form-text small">Marks deducted for wrong answer</div>
-                                </div>
-
-                                {{-- Shuffle Options --}}
-                                <div class="mb-3">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" wire:model="isOptionsShuffle"
-                                            id="shuffleCheck" />
-                                        <label class="form-check-label fw-medium small" for="shuffleCheck">
-                                            Shuffle Options
-                                        </label>
-                                    </div>
-                                    <div class="form-text small">Randomize option order for each student</div>
-                                </div>
-
-                                {{-- Score Summary --}}
-                                <div class="bg-light rounded p-3 mt-3">
-                                    <div class="small fw-semibold mb-2 text-dark">Score Summary</div>
-                                    <div class="d-flex justify-content-between small">
-                                        <span class="text-muted">Max Score</span>
-                                        <span class="fw-bold text-success">+{{ $maxScore }}</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between small">
-                                        <span class="text-muted">Negative Mark</span>
-                                        <span class="fw-bold text-danger">-{{ $negativeMark }}</span>
-                                    </div>
-                                    <hr class="my-2">
-                                    <div class="d-flex justify-content-between small">
-                                        <span class="fw-semibold">Correct Options</span>
-                                        <span
-                                            class="fw-bold text-primary">{{ $this->getCorrectOptionsCount() }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- ── Card: Status & Publish ─────────────────── --}}
-                        <div class="card shadow-sm border-0 mb-4">
-                            <div class="card-header bg-white border-bottom py-3">
-                                <h6 class="mb-0 fw-semibold text-dark">
-                                    <i class="ri ri-toggle-fill text-primary me-2"></i>Status & Publishing
-                                </h6>
-                            </div>
-                            <div class="card-body p-4">
-
-                                {{-- Status Indicator --}}
-                                <div class="text-center mb-4">
-                                    @php
-                                        $statusConfig = [
-                                            'draft' => [
-                                                'color' => 'warning',
-                                                'icon' => 'bi-pencil-square',
-                                                'label' => 'Draft',
-                                            ],
-                                            'publish' => [
-                                                'color' => 'success',
-                                                'icon' => 'bi-cloud-check',
-                                                'label' => 'Published',
-                                            ],
-                                            'unpublish' => [
-                                                'color' => 'secondary',
-                                                'icon' => 'bi-cloud-slash',
-                                                'label' => 'Unpublished',
-                                            ],
-                                        ];
-                                        $current = $statusConfig[$status] ?? $statusConfig['draft'];
-                                    @endphp
-                                    <div class="status-indicator mx-auto mb-2
-                                        bg-{{ $current['color'] }}-subtle border border-{{ $current['color'] }}
-                                        rounded-circle d-flex align-items-center justify-content-center"
-                                        style="width:64px;height:64px;">
-                                        <i class="bi {{ $current['icon'] }} text-{{ $current['color'] }} fs-4"></i>
-                                    </div>
-                                    <div class="fw-bold">Current Status</div>
-                                    <span class="badge bg-{{ $current['color'] }} mt-1 px-3">
-                                        {{ $current['label'] }}
-                                    </span>
-                                </div>
-
-                                <hr>
-
-                                {{-- Status Radio Buttons --}}
-                                <div class="mb-3">
-                                    <label class="form-label fw-medium small">Change Status</label>
-
-                                    <div class="status-options d-flex flex-column gap-2">
-
-                                        <label
-                                            class="status-option d-flex align-items-center gap-2 p-2 rounded border
-                                              {{ $status === 'draft' ? 'border-warning bg-warning-subtle' : '' }}
-                                              cursor-pointer">
-                                            <input type="radio" wire:model="status" value="draft"
-                                                class="form-check-input mt-0" />
-                                            <span class="badge bg-warning text-dark">Draft</span>
-                                            <span class="small text-muted">Save without publishing</span>
-                                        </label>
-
-                                        <label
-                                            class="status-option d-flex align-items-center gap-2 p-2 rounded border
-                                              {{ $status === 'publish' ? 'border-success bg-success-subtle' : '' }}
-                                              cursor-pointer">
-                                            <input type="radio" wire:model="status" value="publish"
-                                                class="form-check-input mt-0" />
-                                            <span class="badge bg-success">Publish</span>
-                                            <span class="small text-muted">Make visible to students</span>
-                                        </label>
-
-                                        <label
-                                            class="status-option d-flex align-items-center gap-2 p-2 rounded border
-                                              {{ $status === 'unpublish' ? 'border-secondary bg-secondary-subtle' : '' }}
-                                              cursor-pointer">
-                                            <input type="radio" wire:model="status" value="unpublish"
-                                                class="form-check-input mt-0" />
-                                            <span class="badge bg-secondary">Unpublish</span>
-                                            <span class="small text-muted">Hide from students</span>
-                                        </label>
-
-                                    </div>
-                                </div>
-
-                                {{-- Action Buttons --}}
-                                <div class="d-grid gap-2 mt-4">
-                                    <button type="button" wire:click="initiateSubmit('{{ $status }}')"
-                                        wire:loading.attr="disabled" class="btn btn-primary">
-                                        <span wire:loading wire:target="initiateSubmit">
-                                            <span class="spinner-border spinner-border-sm me-1"></span>
-                                            Validating...
-                                        </span>
-                                        <span wire:loading.remove wire:target="initiateSubmit">
-                                            <i class="ri ri-save-fill me-1"></i>
-                                            Save as {{ ucfirst($status) }}
-                                        </span>
-                                    </button>
-
-                                    <button type="button" wire:click="openPreview" class="btn btn-outline-info">
-                                        <i class="ri ri-eye-fill me-1"></i>Preview Question
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- ── Card: Admin Notes ──────────────────────── --}}
-                        <div class="card shadow-sm border-0 mb-4">
-                            <div class="card-header bg-white border-bottom py-3">
-                                <h6 class="mb-0 fw-semibold text-dark">
-                                    <i class="ri ri-newspaper-fill text-secondary me-2"></i>Admin Notes
-                                    <span class="text-muted fw-normal small ms-1">(Internal)</span>
-                                </h6>
-                            </div>
-                            <div class="card-body p-3">
-                                <textarea wire:model="adminNotes" class="form-control border-0 bg-light" rows="4"
-                                    placeholder="Internal notes, not visible to students..."></textarea>
-                            </div>
-                        </div>
-
-                    </div>{{-- /RIGHT COLUMN --}}
-                </div>
-
-            </form>
-
-
-
+                </form>
+            </div>
         </div>
 
         {{-- ── Styles ──────────────────────────────────────────────────── --}}
@@ -1021,6 +1071,7 @@ new #[Layout('layouts.backend')] class extends Component {
                 }
             </style>
         @endpush
+
     @endif
     <div wire:loading>
         @include('utilities.backdrop')
