@@ -57,7 +57,7 @@ new #[Layout('layouts.backend')] class extends Component {
     protected function rules(): array
     {
         $rules = [
-            'code' => 'required|string|max:100|unique:questions,code,' . ($this->questionId ?? 'NULL'),
+            'code' => 'required|string|max:100|unique:questions,code,' . ($this->questionId ?? 'OT-001'),
             'questionTypeId' => 'required|exists:question_types,id',
             'primarySkillTypeId' => 'required|exists:primary_skill_types,id',
             'subSkillTypeId' => 'required|exists:sub_skill_types,id',
@@ -109,18 +109,7 @@ new #[Layout('layouts.backend')] class extends Component {
         $this->difficultyLevels = DifficultyLevel::select('id', 'name')->get()->toArray();
         $this->ageGroups = AgeGroup::select('id', 'name')->get()->toArray();
 
-        // Init multilang arrays
-        foreach ($this->languages as $langCode => $lang) {
-            $this->stem[$langCode] = '';
-            $this->explanation[$langCode] = '';
-        }
-
-        // Auto-generate code
-        $this->code = strtoupper('Q-' . Str::random(8));
-
-        // Seed default options
-        $this->addOption();
-        $this->addOption();
+        $this->initializeForm();
 
         // // Load existing question
         // if ($questionId) {
@@ -128,7 +117,20 @@ new #[Layout('layouts.backend')] class extends Component {
         //     $this->loadQuestion($questionId);
         // }
     }
+    private function initializeForm(): void
+    {
+        $this->code = 'Q-' . strtoupper(Str::random(8));
 
+        foreach ($this->languages as $langCode => $lang) {
+            $this->stem[$langCode] = '';
+            $this->explanation[$langCode] = '';
+        }
+
+        $this->options = [];
+
+        $this->addOption();
+        $this->addOption();
+    }
     private function loadQuestion(int $id): void
     {
         $question = Question::findOrFail($id);
@@ -255,6 +257,7 @@ new #[Layout('layouts.backend')] class extends Component {
     public function newEntry(): void
     {
         $this->resetForm();
+        $this->initializeForm();
         $this->title = 'New Question';
         $this->createForm = 1;
     }
