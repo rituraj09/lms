@@ -40,11 +40,8 @@ new #[Layout('layouts.backend')] class extends Component {
     public string $selectionType = 'single'; // single | multiple
 
     // ─── UI State ────────────────────────────────────────────
-    public bool $showPreview = false;
-    public bool $showConfirmation = false;
     public string $activeTab = 'en';
     public string $pendingStatus = '';
-
     // ─── Computed / Static ───────────────────────────────────
     public array $languages = [];
     public array $questionTypes = [];
@@ -108,14 +105,7 @@ new #[Layout('layouts.backend')] class extends Component {
         $this->subSkillTypes = SubSkillType::select('id', 'name')->get()->toArray();
         $this->difficultyLevels = DifficultyLevel::select('id', 'name')->get()->toArray();
         $this->ageGroups = AgeGroup::select('id', 'name')->get()->toArray();
-
         $this->initializeForm();
-
-        // // Load existing question
-        // if ($questionId) {
-        //     $this->questionId = $questionId;
-        //     $this->loadQuestion($questionId);
-        // }
     }
     private function initializeForm(): void
     {
@@ -130,28 +120,6 @@ new #[Layout('layouts.backend')] class extends Component {
 
         $this->addOption();
         $this->addOption();
-    }
-    private function loadQuestion(int $id): void
-    {
-        $question = Question::findOrFail($id);
-
-        $this->code = $question->code;
-        $this->questionTypeId = $question->question_type_id;
-        $this->primarySkillTypeId = $question->primary_skill_type_id;
-        $this->subSkillTypeId = $question->sub_skill_type_id;
-        $this->timeLimit = $question->time_limit;
-        $this->maxScore = $question->max_score;
-        $this->adminNotes = $question->admin_notes;
-        $this->status = $question->status;
-
-        $content = $question->question_contents;
-
-        $this->stem = $content['stem'] ?? array_fill_keys(array_keys($this->languages), '');
-        $this->explanation = $content['explanation'] ?? array_fill_keys(array_keys($this->languages), '');
-        $this->options = $content['options'] ?? [];
-        $this->negativeMark = $content['negative_mark'] ?? 0;
-        $this->isOptionsShuffle = $content['is_options_shuffle'] ?? false;
-        $this->selectionType = $content['selection_type'] ?? 'single';
     }
 
     // ─── Option Management ───────────────────────────────────
@@ -196,24 +164,18 @@ new #[Layout('layouts.backend')] class extends Component {
     public function toggleCorrect(int $index): void
     {
         if ($this->selectionType === 'single') {
-
-        foreach ($this->options as $i => &$opt) {
-            $opt['is_correct'] = $i === $index;
+            foreach ($this->options as $i => &$opt) {
+                $opt['is_correct'] = $i === $index;
             }
         } else {
-
-            $this->options[$index]['is_correct']
-                = !$this->options[$index]['is_correct'];
+            $this->options[$index]['is_correct'] = !$this->options[$index]['is_correct'];
         }
         $this->updateScoreSummary();
     }
 
-
     private function updateScoreSummary(): void
     {
-        $this->maxScore = collect($this->options)
-            ->filter(fn ($option) => !empty($option['is_correct']))
-            ->sum(fn ($option) => (float) ($option['weightage'] ?? 0));
+        $this->maxScore = collect($this->options)->filter(fn($option) => !empty($option['is_correct']))->sum(fn($option) => (float) ($option['weightage'] ?? 0));
     }
     public function updatedOptions(): void
     {
@@ -221,7 +183,7 @@ new #[Layout('layouts.backend')] class extends Component {
     }
     public function updated($property): void
     {
-         if (str_starts_with($property, 'options.')) {
+        if (str_starts_with($property, 'options.')) {
             $this->updateScoreSummary();
         }
     }
@@ -235,7 +197,7 @@ new #[Layout('layouts.backend')] class extends Component {
         }
     }
 
-// Count Score based on options
+    // Count Score based on options
     public function getCalculatedMaxScoreProperty(): float
     {
         return collect($this->options)
@@ -252,28 +214,22 @@ new #[Layout('layouts.backend')] class extends Component {
     // ─── Preview ─────────────────────────────────────────────
     public function openPreview(): void
     {
-        $this->showPreview = true;
+        $this->validate();
+        $this->createForm = 3;
     }
 
     public function closePreview(): void
     {
-        $this->showPreview = false;
+        $this->createForm = 1;
     }
 
     // ─── Submit Flow ─────────────────────────────────────────
     public function initiateSubmit(string $status): void
     {
-        $this->validate();
         $this->pendingStatus = $status;
-        $this->showConfirmation = true;
-        $this->showPreview = false;
+        $this->submitQuestion();
     }
 
-    public function cancelConfirmation(): void
-    {
-        $this->showConfirmation = false;
-        $this->pendingStatus = '';
-    }
     //Submit and save function
 
     // ─── Helpers for View ────────────────────────────────────
@@ -297,6 +253,72 @@ new #[Layout('layouts.backend')] class extends Component {
         $this->resetValidation();
         $this->is_edit = false;
         $this->eventID = null;
+    }
+
+    public function submitQuestion(): void
+    {
+        $this->validate();
+
+        DB::beginTransaction();
+
+        try {
+            $questionContents = [
+                'stem' => $this->stem,
+                'explanation' => $this->explanation,
+                'options' => $this->options,
+                'negative_mark' => $this->negativeMark,
+                'is_options_shuffle' => $this->isOptionsShuffle,
+                'selection_type' => $this->selectionType,
+            ];
+
+            // Convert the array to JSON string
+            $questionContentsJson = json_encode($questionContents);
+
+            // Check if JSON encoding was successful
+            if ($questionContentsJson === false) {
+                throw new \Exception('Failed to encode question contents to JSON');
+            }
+
+            // Prepare data for updateOrCreate
+            $data = [
+                'code' => $this->code,
+                'question_type_id' => $this->questionTypeId,
+                'primary_skill_type_id' => $this->primarySkillTypeId,
+                'sub_skill_type_id' => $this->subSkillTypeId,
+                'difficulty_level_id' => $this->difficultyLevelId,
+                'age_group_id' => $this->ageGroupId,
+                'question_contents' => $questionContentsJson, // Store as JSON string
+                'time_limit' => $this->timeLimit,
+                'max_score' => $this->maxScore,
+                'admin_notes' => $this->adminNotes,
+                'status' => $this->pendingStatus ?: $this->status,
+            ];
+
+            // If this is an update, include the ID
+            if ($this->questionId) {
+                $data['id'] = $this->questionId;
+            }
+
+            Question::updateOrCreate(['id' => $this->questionId], $data);
+
+            DB::commit();
+
+            $this->createForm = 1;
+
+            session()->flash('success', 'Question saved successfully.');
+
+            $this->resetForm();
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            // Log the error for debugging
+            \Log::error('Failed to save question: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'data' => $questionContents ?? null,
+            ]);
+
+            $this->addError('save', 'Failed to save question. ' . $e->getMessage());
+        }
     }
 };
 ?>
@@ -331,38 +353,32 @@ new #[Layout('layouts.backend')] class extends Component {
                 ],
             ]" />
     @elseif($createForm == 1)
-        {{-- resources/views/livewire/questions/question-form.blade.php --}}
-        <div
-            class="question-form-wrapper"
-            x-data="questionForm()"
-            x-init="init()">
+        <div class="question-form-wrapper">
 
 
             {{-- ══════════════════════════════════════════════════════════
                 PAGE HEADER  ══════════════════════════════════════════════════════════ --}}
-                <div class="d-flex align-items-center justify-content-between mb-4">
-                    <div>
-                        <h4 class="fw-bold mb-1 text-dark">
-                            <i class="ri ri-questionnaire-fill text-primary me-2"></i>
-                            {{ $questionId ? 'Edit Question' : 'Create New Question' }}
-                        </h4>
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb mb-0 small">
-                                <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="#">Questions</a></li>
-                                <li class="breadcrumb-item active">{{ $questionId ? 'Edit' : 'Create' }}</li>
-                            </ol>
-                        </nav>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-outline-info btn-sm" wire:click="openPreview">
-                            <i class="ri ri-eye-fill me-1"></i> Preview
-                        </button>
-                        <a href="#" class="btn btn-outline-secondary btn-sm">
-                            <i class="ri ri-arrow-left-line me-1"></i> Back
-                        </a>
-                    </div>
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h4 class="fw-bold mb-1 text-dark">
+                        <i class="ri ri-questionnaire-fill text-primary me-2"></i>
+                        {{ $questionId ? 'Edit Question' : 'Create New Question' }}
+                    </h4>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 small">
+                            <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="#">Questions</a></li>
+                            <li class="breadcrumb-item active">{{ $questionId ? 'Edit' : 'Create' }}</li>
+                        </ol>
+                    </nav>
                 </div>
+                <div class="d-flex gap-2">
+
+                    <a href="#" class="btn btn-outline-secondary btn-sm">
+                        <i class="ri ri-arrow-left-line me-1"></i> Back
+                    </a>
+                </div>
+            </div>
 
             {{-- Flash Message --}}
             @if (session()->has('success'))
@@ -527,9 +543,7 @@ new #[Layout('layouts.backend')] class extends Component {
                                     <ul class="nav nav-pills nav-sm mb-0">
                                         @foreach ($languages as $langCode => $lang)
                                             <li class="nav-item">
-                                               <button
-                                                    type="button"
-                                                    @click="activeTab='{{ $langCode }}'"
+                                                <button type="button" @click="activeTab='{{ $langCode }}'"
                                                     class="nav-link"
                                                     :class="{ 'active': activeTab === '{{ $langCode }}' }">
                                                     {{ $lang['flag'] }} {{ $lang['label'] }}
@@ -540,16 +554,14 @@ new #[Layout('layouts.backend')] class extends Component {
                                 </div>
                                 <div class="card-body p-4">
                                     @foreach ($languages as $langCode => $lang)
-                                        <div class="{{ $activeTab === $langCode ? '' : 'd-none' }}">
+                                        <div x-show="activeTab === '{{ $langCode }}'" x-cloak>
                                             <label class="form-label fw-medium small">
                                                 {{ $lang['flag'] }} {{ $lang['label'] }} — Question Stem
                                             </label>
                                         </div>
                                         <div x-show="activeTab==='{{ $langCode }}'">
-                                            <textarea
-                                                wire:model="stem.{{ $langCode }}"
-                                                class="form-control"
-                                                rows="4"  placeholder="Enter question stem in {{ $lang['label'] }}...">
+                                            <textarea wire:model="stem.{{ $langCode }}" class="form-control" rows="4"
+                                                placeholder="Enter question stem in {{ $lang['label'] }}...">
                                             </textarea>
                                         </div>
                                     @endforeach
@@ -589,7 +601,8 @@ new #[Layout('layouts.backend')] class extends Component {
 
                                     @if ($selectionType === 'multiple')
                                         <div class="mt-2">
-                                            <span class="badge bg-info-subtle text-info border border-info-subtle small">
+                                            <span
+                                                class="badge bg-info-subtle text-info border border-info-subtle small">
                                                 <i class="ri ri-information-line me-1"></i>
                                                 Multi-select: Students can choose multiple answers. Set weightage per
                                                 correct option.
@@ -652,17 +665,15 @@ new #[Layout('layouts.backend')] class extends Component {
                                                             <input type="number"
                                                                 wire:model.live="options.{{ $index }}.weightage"
                                                                 class="form-control form-control-sm text-center"
-                                                                style="width:70px;"
-                                                                step="0.1"
-                                                                min="0"
-                                                                max="100"
-                                                                placeholder="0" />
+                                                                style="width:70px;" step="0.1" min="0"
+                                                                max="100" placeholder="0" />
                                                         </div>
 
                                                         {{-- Remove --}}
                                                         <button type="button"
                                                             wire:click="removeOption({{ $index }})"
-                                                            class="btn btn-sm btn-outline-danger" title="Remove Option">
+                                                            class="btn btn-sm btn-outline-danger"
+                                                            title="Remove Option">
                                                             <i class="ri ri-delete-bin-fill"></i>
                                                         </button>
                                                     </div>
@@ -673,9 +684,8 @@ new #[Layout('layouts.backend')] class extends Component {
 
 
                                                     @foreach ($languages as $langCode => $lang)
-
                                                         <div x-show="activeTab==='{{ $langCode }}'">
-                                                           <input type="text"
+                                                            <input type="text"
                                                                 wire:model="options.{{ $index }}.text.{{ $langCode }}"
                                                                 class="form-control form-control-sm"
                                                                 placeholder="Option {{ $option['id'] }} text in {{ $lang['label'] }}..." />
@@ -741,8 +751,8 @@ new #[Layout('layouts.backend')] class extends Component {
                                             <span class="text-muted">(seconds)</span>
                                         </label>
                                         <input type="number" wire:model.blur="timeLimit"
-                                            class="form-control @error('timeLimit') is-invalid @enderror" min="1"
-                                            max="65535" placeholder="e.g. 60" />
+                                            class="form-control @error('timeLimit') is-invalid @enderror"
+                                            min="1" max="65535" placeholder="e.g. 60" />
                                         @error('timeLimit')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -753,10 +763,8 @@ new #[Layout('layouts.backend')] class extends Component {
                                         <label class="form-label fw-medium small">
                                             Max Score <span class="text-danger">*</span>
                                         </label>
-                                        <input  type="number"
-                                            class="form-control"
-                                            value="{{ $maxScore }}"
-                                            readonly/>
+                                        <input type="number" class="form-control" value="{{ $maxScore }}"
+                                            readonly />
                                         @error('maxScore')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -770,12 +778,8 @@ new #[Layout('layouts.backend')] class extends Component {
 
                                                 <i class="ri ri-indeterminate-circle-fill"></i>
                                             </span>
-                                           <input type="number"
-                                                wire:model.live="negativeMark"
-                                                class="form-control"
-                                                step="0.01"
-                                                min="0"
-                                                placeholder="0.00" />
+                                            <input type="number" wire:model.live="negativeMark" class="form-control"
+                                                step="0.01" min="0" placeholder="0.00" />
 
                                         </div>
                                         <div class="form-text small">Marks deducted for wrong answer</div>
@@ -784,8 +788,8 @@ new #[Layout('layouts.backend')] class extends Component {
                                     {{-- Shuffle Options --}}
                                     <div class="mb-3">
                                         <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" wire:model="isOptionsShuffle"
-                                                id="shuffleCheck" />
+                                            <input class="form-check-input" type="checkbox"
+                                                wire:model="isOptionsShuffle" id="shuffleCheck" />
                                             <label class="form-check-label fw-medium small" for="shuffleCheck">
                                                 Shuffle Options
                                             </label>
@@ -806,7 +810,7 @@ new #[Layout('layouts.backend')] class extends Component {
                                         <div class="d-flex justify-content-between small">
                                             <span class="text-muted">Negative Mark</span>
                                             <span class="fw-bold text-danger">
-                                                -{{ number_format((float)$negativeMark, 2) }}
+                                                -{{ number_format((float) $negativeMark, 2) }}
                                             </span>
                                         </div>
                                         <hr class="my-2">
@@ -819,135 +823,7 @@ new #[Layout('layouts.backend')] class extends Component {
                                 </div>
                             </div>
 
-                            {{-- ── Card: Status & Publish ─────────────────── --}}
-                            <div class="card shadow-sm border-0 mb-4">
-                                <div class="card-header bg-white border-bottom py-3">
-                                    <h6 class="mb-0 fw-semibold text-dark">
-                                        <i class="ri ri-toggle-fill text-primary me-2"></i>Status & Publishing
-                                    </h6>
-                                </div>
-                              <div class="card-body p-4" x-data="{ status: @entangle('status') }">
-                                    {{-- Status Indicator --}}
-                                    <div class="text-center mb-4">
-                                        <div class="text-center mb-4">
-                                            <div class="status-indicator mx-auto mb-2 rounded-circle d-flex align-items-center justify-content-center"
-                                                style="width:64px;height:64px;"
 
-                                                :class="{
-                                                    'bg-warning-subtle border border-warning': status == 'draft',
-                                                    'bg-success-subtle border border-success': status == 'publish',
-                                                    'bg-secondary-subtle border border-secondary': status == 'unpublish'
-                                                }">
-
-                                                <i class="fs-4"
-                                                    :class="{
-                                                        'bi bi-pencil-square text-warning': status == 'draft',
-                                                        'bi bi-cloud-check text-success': status == 'publish',
-                                                        'bi bi-cloud-slash text-secondary': status == 'unpublish'
-                                                    }">
-                                                </i>
-
-                                            </div>
-
-                                            <div class="fw-bold">Current Status</div>
-
-                                            <span class="mt-1 px-3 badge"
-                                                :class="{
-                                                    'bg-warning text-dark': status == 'draft',
-                                                    'bg-success': status == 'publish',
-                                                    'bg-secondary': status == 'unpublish'
-                                                }"
-                                                x-text="
-                                                    status == 'draft'
-                                                        ? 'Draft'
-                                                        : (status == 'publish'
-                                                            ? 'Published'
-                                                            : 'Unpublished')
-                                                ">
-                                            </span>
-
-                                        </div>
-                                    </div>
-
-                                    <hr>
-
-                                    {{-- Status Radio Buttons --}}
-                                    <div class="mb-3">
-                                        <label class="form-label fw-medium small">Change Status</label>
-
-                                        <div class="status-options d-flex flex-column gap-2">
-
-                                            <label
-                                                class="status-option d-flex align-items-center gap-2 p-2 rounded border cursor-pointer"
-                                                :class="status == 'draft'
-                                                    ? 'border-warning bg-warning-subtle'
-                                                    : ''">
-
-                                                <input type="radio"
-                                                    x-model="status"
-                                                    value="draft"
-                                                    class="form-check-input mt-0">
-
-                                                <span class="badge bg-warning text-dark">Draft</span>
-                                            </label>
-                                            <label
-                                                class="status-option d-flex align-items-center gap-2 p-2 rounded border cursor-pointer"
-                                                :class="status == 'publish'
-                                                    ? 'border-success bg-success-subtle'
-                                                    : ''">
-
-                                                <input type="radio"
-                                                    x-model="status"
-                                                    value="publish"
-                                                    class="form-check-input mt-0">
-
-                                                <span class="badge bg-success">Publish</span>
-                                            </label>
-
-                                            <label
-                                                class="status-option d-flex align-items-center gap-2 p-2 rounded border cursor-pointer"
-                                                :class="status == 'unpublish'
-                                                    ? 'border-secondary bg-secondary-subtle'
-                                                    : ''">
-
-                                                <input type="radio"
-                                                    x-model="status"
-                                                    value="unpublish"
-                                                    class="form-check-input mt-0">
-
-                                                <span class="badge bg-secondary">Unpublish</span>
-                                            </label>
-                                        </div>
-                                    </div>
-
-                                    {{-- Action Buttons --}}
-                                    <div class="d-grid gap-2 mt-4">
-                                        <button type="button"  x-on:click="$wire.initiateSubmit(status)"
-                                            wire:loading.attr="disabled" class="btn btn-primary">
-                                            <span wire:loading wire:target="initiateSubmit">
-                                                <span class="spinner-border spinner-border-sm me-1"></span>
-                                                Validating...
-                                            </span>
-
-                                                <span wire:loading.remove wire:target="initiateSubmit">
-                                                        <i class="ri ri-save-fill me-1"></i>
-                                                        Save as
-                                                        <span x-text="
-                                                            status == 'draft'
-                                                                ? 'Draft'
-                                                                : (status == 'publish'
-                                                                    ? 'Publish'
-                                                                    : 'Unpublish')
-                                                        "></span>
-                                                    </span>
-                                        </button>
-
-                                        <button type="button" wire:click="openPreview" class="btn btn-outline-info">
-                                            <i class="ri ri-eye-fill me-1"></i>Preview Question
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
 
                             {{-- ── Card: Admin Notes ──────────────────────── --}}
                             <div class="card shadow-sm border-0 mb-4">
@@ -961,6 +837,18 @@ new #[Layout('layouts.backend')] class extends Component {
                                     <textarea wire:model="adminNotes" class="form-control border-0 bg-light" rows="4"
                                         placeholder="Internal notes, not visible to students..."></textarea>
                                 </div>
+                                <div class="card-footer p-3">
+
+                                    <button type="button" class="btn btn-outline-info" wire:loading.attr="disabled">
+                                        <span wire:loading wire:target="openPreview">
+                                            <span class="spinner-border spinner-border-sm me-1"></span>
+                                            Validating...
+                                        </span>
+                                        <span wire:loading.remove wire:click="openPreview">
+                                            <i class="ri ri-eye-fill me-1"></i>Preview Question
+                                        </span>
+                                    </button>
+                                </div>
                             </div>
 
                         </div>{{-- /RIGHT COLUMN --}}
@@ -968,107 +856,417 @@ new #[Layout('layouts.backend')] class extends Component {
                 </form>
             </div>
         </div>
-        {{-- ── Styles ──────────────────────────────────────────────────── --}}
+    @elseif ($createForm == 3)
+        {{-- Professional Preview Panel --}}
+        <div class="container-fluid px-0">
+            {{-- Header with breadcrumb --}}
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h4 class="fw-bold mb-1 text-dark">
+                        <i class="ri ri-eye-fill text-primary me-2"></i>
+                        Question Preview
+                    </h4>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 small">
+                            <li class="breadcrumb-item"><a href="#" wire:click="closePreview">Question Form</a>
+                            </li>
+                            <li class="breadcrumb-item active">Preview & Publish</li>
+                        </ol>
+                    </nav>
+                </div>
+                <button type="button" class="btn btn-outline-secondary" wire:click="closePreview">
+                    <i class="ri ri-arrow-left-line me-1"></i> Back to Edit
+                </button>
+            </div>
+
+            <div class="row g-4">
+                {{-- LEFT COLUMN: Question Preview --}}
+                <div class="col-lg-8">
+                    <div class="card shadow-sm border-0" x-data="{ previewTab: '{{ array_key_first($languages) }}' }">
+                        {{-- Card Header with Language Tabs --}}
+                        <div class="card-header bg-white border-bottom py-3">
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                                <h6 class="mb-0 fw-semibold text-dark">
+                                    <i class="ri ri-file-copy-line text-primary me-2"></i>
+                                    Question Content
+                                </h6>
+                                @if (count($languages) > 1)
+                                    <ul class="nav nav-pills nav-sm mb-0">
+                                        @foreach ($languages as $langCode => $lang)
+                                            <li class="nav-item">
+                                                <button type="button" @click="previewTab = '{{ $langCode }}'"
+                                                    class="nav-link"
+                                                    :class="{ 'active': previewTab === '{{ $langCode }}' }">
+                                                    {{ $lang['flag'] }} {{ $lang['label'] }}
+                                                </button>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="card-body p-4">
+                            {{-- Question Stem --}}
+                            <div class="preview-section mb-4">
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    <div class="bg-primary bg-opacity-10 p-2 rounded">
+                                        <i class="ri ri-question-line text-primary"></i>
+                                    </div>
+                                    <h6 class="mb-0 fw-semibold">Question Stem</h6>
+                                </div>
+                                <div class="bg-light rounded p-4">
+                                    @foreach ($languages as $langCode => $lang)
+                                        <div x-show="previewTab === '{{ $langCode }}'" x-cloak>
+                                            <p class="mb-0 fs-5 fw-medium">
+                                                {{ $stem[$langCode] ?: $stem[array_key_first($languages)] ?? 'No question stem available' }}
+                                            </p>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            {{-- Answer Options --}}
+                            <div class="preview-section mb-4">
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    <div class="bg-success bg-opacity-10 p-2 rounded">
+                                        <i class="ri ri-list-check-3 text-success"></i>
+                                    </div>
+                                    <h6 class="mb-0 fw-semibold">Answer Options</h6>
+                                    <span class="badge bg-info ms-2">
+                                        <i
+                                            class="ri ri-{{ $selectionType === 'single' ? 'record-circle' : 'checkbox-circle' }}-line me-1"></i>
+                                        {{ $selectionType === 'single' ? 'Single Select' : 'Multiple Select' }}
+                                    </span>
+                                    @if ($isOptionsShuffle)
+                                        <span class="badge bg-secondary">
+                                            <i class="ri ri-shuffle-line me-1"></i>Shuffle
+                                        </span>
+                                    @endif
+                                </div>
+
+                                <div class="options-list">
+                                    @foreach ($options as $index => $option)
+                                        <div
+                                            class="option-preview-item mb-3 p-3 rounded border
+                                        {{ $option['is_correct'] ? 'border-success bg-success bg-opacity-10' : 'border-secondary' }}">
+                                            <div class="d-flex align-items-start gap-3">
+                                                <div class="option-badge rounded-circle bg-white shadow-sm d-flex align-items-center justify-content-center flex-shrink-0"
+                                                    style="width: 40px; height: 40px;">
+                                                    <span class="fw-bold fs-5">{{ $option['id'] }}</span>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    @foreach ($languages as $langCode => $lang)
+                                                        <div x-show="previewTab === '{{ $langCode }}'" x-cloak>
+                                                            <p class="mb-0">
+                                                                {{ $option['text'][$langCode] ?: ($option['text'][array_key_first($languages)] ?: 'No text available') }}
+                                                            </p>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                                @if ($option['is_correct'])
+                                                    <div class="flex-shrink-0">
+                                                        <span class="badge bg-success px-3 py-2">
+                                                            <i class="ri ri-check-fill me-1"></i> Correct
+                                                            @if ($selectionType === 'multiple' && $option['weightage'] > 0)
+                                                                ({{ number_format($option['weightage'], 1) }} pts)
+                                                            @endif
+                                                        </span>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            {{-- Explanation --}}
+                            @php
+                                $hasExplanation = false;
+                                foreach ($languages as $langCode => $lang) {
+                                    if (!empty($explanation[$langCode])) {
+                                        $hasExplanation = true;
+                                        break;
+                                    }
+                                }
+                            @endphp
+                            @if ($hasExplanation)
+                                <div class="preview-section">
+                                    <div class="d-flex align-items-center gap-2 mb-3">
+                                        <div class="bg-warning bg-opacity-10 p-2 rounded">
+                                            <i class="ri ri-lightbulb-fill text-warning"></i>
+                                        </div>
+                                        <h6 class="mb-0 fw-semibold">Explanation</h6>
+                                    </div>
+                                    <div class="alert alert-info border-0">
+                                        @foreach ($languages as $langCode => $lang)
+                                            <div x-show="previewTab === '{{ $langCode }}'" x-cloak>
+                                                {!! nl2br(e($explanation[$langCode] ?? ($explanation[array_key_first($languages)] ?? ''))) !!}
+                                                @if (empty($explanation[$langCode]) && $loop->first)
+                                                    <em class="text-muted">No explanation available in
+                                                        {{ $lang['label'] }}</em>
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                {{-- RIGHT COLUMN: Status & Actions --}}
+                <div class="col-lg-4">
+                    {{-- Score Summary Card --}}
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-header bg-white border-bottom py-3">
+                            <h6 class="mb-0 fw-semibold text-dark">
+                                <i class="ri ri-trophy-fill text-warning me-2"></i>Score Summary
+                            </h6>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <div class="text-center p-3 bg-light rounded">
+                                        <div class="small text-muted mb-1">Max Score</div>
+                                        <div class="fs-3 fw-bold text-success">
+                                            {{ number_format((float) $maxScore, 2) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-center p-3 bg-light rounded">
+                                        <div class="small text-muted mb-1">Negative Mark</div>
+                                        <div class="fs-3 fw-bold text-danger">
+                                            {{ number_format((float) $negativeMark, 2) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="text-center p-3 bg-light rounded">
+                                        <div class="small text-muted mb-1">Correct Options</div>
+                                        <div class="fs-2 fw-bold text-primary">
+                                            {{ $this->getCorrectOptionsCount() }} / {{ count($options) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if ($timeLimit || $adminNotes)
+                                <hr class="my-3">
+                                <div class="mt-2">
+                                    @if ($timeLimit)
+                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                            <i class="ri ri-timer-line text-muted"></i>
+                                            <span class="small text-muted">Time Limit:</span>
+                                            <strong>{{ $timeLimit }} seconds</strong>
+                                        </div>
+                                    @endif
+                                    @if ($adminNotes)
+                                        <div class="d-flex align-items-start gap-2">
+                                            <i class="ri ri-newspaper-line text-muted mt-1"></i>
+                                            <div>
+                                                <span class="small text-muted d-block">Admin Notes:</span>
+                                                <small class="text-muted">{{ Str::limit($adminNotes, 100) }}</small>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                    {{-- Quick Info Card --}}
+                    <div class="card shadow-sm border-0 mb-3">
+                        <div class="card-header bg-white border-bottom py-3">
+                            <h6 class="mb-0 fw-semibold text-dark">
+                                <i class="ri ri-information-line text-info me-2"></i>Quick Information
+                            </h6>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="mb-2">
+                                <small class="text-muted d-block">Question Code</small>
+                                <strong>{{ $code }}</strong>
+                            </div>
+                            @if ($questionTypeId)
+                                <div class="mb-2">
+                                    <small class="text-muted d-block">Question Type</small>
+                                    <strong>{{ collect($questionTypes)->firstWhere('id', $questionTypeId)['name'] ?? 'N/A' }}</strong>
+                                </div>
+                            @endif
+                            @if ($difficultyLevelId)
+                                <div class="mb-2">
+                                    <small class="text-muted d-block">Difficulty Level</small>
+                                    <strong>{{ collect($difficultyLevels)->firstWhere('id', $difficultyLevelId)['name'] ?? 'N/A' }}</strong>
+                                </div>
+                            @endif
+                            @if ($ageGroupId)
+                                <div>
+                                    <small class="text-muted d-block">Age Group</small>
+                                    <strong>{{ collect($ageGroups)->firstWhere('id', $ageGroupId)['name'] ?? 'N/A' }}</strong>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                    {{-- Status & Publishing Card --}}
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-header bg-white border-bottom py-3">
+                            <h6 class="mb-0 fw-semibold text-dark">
+                                <i class="ri ri-toggle-fill text-primary me-2"></i>Status & Publishing
+                            </h6>
+                        </div>
+                        <div class="card-body p-4" x-data="{
+                            selectedStatus: @entangle('pendingStatus'),
+                            init() {
+                                if (!this.selectedStatus) this.selectedStatus = 'draft';
+                            }
+                        }">
+                            {{-- Status Preview --}}
+                            <div class="text-center mb-4">
+                                <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                                    style="width: 80px; height: 80px;"
+                                    :class="{
+                                        'bg-warning bg-opacity-10': selectedStatus == 'draft',
+                                        'bg-success bg-opacity-10': selectedStatus == 'publish',
+                                        'bg-secondary bg-opacity-10': selectedStatus == 'unpublish'
+                                    }">
+                                    <i class="fs-1"
+                                        :class="{
+                                            'ri-edit-box-line text-warning': selectedStatus == 'draft',
+                                            'ri-cloud-line text-success': selectedStatus == 'publish',
+                                            'ri-cloud-off-line text-secondary': selectedStatus == 'unpublish'
+                                        }">
+                                    </i>
+                                </div>
+                                <div class="fw-semibold mb-1">Status to be saved as</div>
+                                <span class="badge px-3 py-2 fs-6"
+                                    :class="{
+                                        'bg-warning text-dark': selectedStatus == 'draft',
+                                        'bg-success': selectedStatus == 'publish',
+                                        'bg-secondary': selectedStatus == 'unpublish'
+                                    }"
+                                    x-text="selectedStatus == 'draft' ? 'Draft' : (selectedStatus == 'publish' ? 'Published' : 'Unpublished')">
+                                </span>
+                            </div>
+
+                            <hr>
+
+                            {{-- Status Selection --}}
+                            <div class="mb-3">
+                                <label class="form-label fw-medium small mb-2">Change Status</label>
+                                <div class="d-flex flex-column gap-2">
+                                    <label
+                                        class="status-option d-flex align-items-center gap-3 p-3 rounded border cursor-pointer transition"
+                                        :class="selectedStatus == 'draft' ? 'border-warning bg-warning bg-opacity-10' :
+                                            'border-secondary'">
+                                        <input type="radio" x-model="selectedStatus" value="draft"
+                                            class="form-check-input">
+                                        <div class="flex-grow-1">
+                                            <div class="fw-semibold">Draft</div>
+                                            <div class="small text-muted">Question is not visible to students</div>
+                                        </div>
+                                        <i class="ri-edit-box-line text-warning fs-4"></i>
+                                    </label>
+
+                                    <label
+                                        class="status-option d-flex align-items-center gap-3 p-3 rounded border cursor-pointer transition"
+                                        :class="selectedStatus == 'publish' ? 'border-success bg-success bg-opacity-10' :
+                                            'border-secondary'">
+                                        <input type="radio" x-model="selectedStatus" value="publish"
+                                            class="form-check-input">
+                                        <div class="flex-grow-1">
+                                            <div class="fw-semibold">Publish</div>
+                                            <div class="small text-muted">Question is visible to students</div>
+                                        </div>
+                                        <i class="ri-cloud-line text-success fs-4"></i>
+                                    </label>
+
+                                    <label
+                                        class="status-option d-flex align-items-center gap-3 p-3 rounded border cursor-pointer transition"
+                                        :class="selectedStatus == 'unpublish' ? 'border-secondary bg-secondary bg-opacity-10' :
+                                            'border-secondary'">
+                                        <input type="radio" x-model="selectedStatus" value="unpublish"
+                                            class="form-check-input">
+                                        <div class="flex-grow-1">
+                                            <div class="fw-semibold">Unpublish</div>
+                                            <div class="small text-muted">Question is hidden from students</div>
+                                        </div>
+                                        <i class="ri-cloud-off-line text-secondary fs-4"></i>
+                                    </label>
+                                </div>
+                            </div>
+
+                            {{-- Action Buttons --}}
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="button" class="btn btn-primary btn-lg" wire:click="submitQuestion">
+                                    <i class="ri ri-save-fill me-2"></i>
+                                    Save as <span
+                                        x-text="selectedStatus == 'draft' ? 'Draft' : (selectedStatus == 'publish' ? 'Published' : 'Unpublished')"></span>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" wire:click="closePreview">
+                                    <i class="ri ri-arrow-go-back-line me-1"></i>
+                                    Back to Edit
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+        {{-- Custom Styles --}}
         @push('styles')
             <style>
-                /* Option cards */
-                .option-card {
-                    transition: all .2s ease;
+                .preview-section {
+                    animation: fadeIn 0.3s ease;
                 }
 
-                .option-card:hover {
-                    box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+                .option-preview-item {
+                    transition: all 0.2s ease;
                 }
 
-                /* Status options */
+                .option-preview-item:hover {
+                    transform: translateX(5px);
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                }
+
                 .status-option {
+                    transition: all 0.2s ease;
                     cursor: pointer;
-                    transition: all .15s ease;
                 }
 
                 .status-option:hover {
-                    background-color: #f8f9fa;
+                    transform: translateX(5px);
                 }
 
-                /* Nav pills sm */
-                .nav-sm .nav-link {
-                    font-size: .8rem;
-                    padding: .25rem .6rem;
-                }
-
-                /* Modal overlay */
-                .modal-overlay {
-                    position: fixed;
-                    inset: 0;
-                    background: rgba(0, 0, 0, .55);
-                    z-index: 1055;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    padding: 1rem;
-                    animation: fadeIn .2s ease;
-                }
-
-                .modal-box {
-                    background: #fff;
-                    border-radius: 1rem;
-                    box-shadow: 0 20px 60px rgba(0, 0, 0, .2);
-                    max-height: 90vh;
-                    overflow-y: auto;
-                    animation: slideUp .25s ease;
+                .transition {
+                    transition: all 0.2s ease;
                 }
 
                 @keyframes fadeIn {
                     from {
-                        opacity: 0
+                        opacity: 0;
+                        transform: translateY(10px);
                     }
 
                     to {
-                        opacity: 1
-                    }
-                }
-
-                @keyframes slideUp {
-                    from {
-                        transform: translateY(30px);
-                        opacity: 0
-                    }
-
-                    to {
+                        opacity: 1;
                         transform: translateY(0);
-                        opacity: 1
                     }
                 }
 
-                /* Preview question styles */
-                .preview-stem {
-                    font-size: 1.05rem;
-                    line-height: 1.7;
-                }
-
-                .preview-option {
-                    border: 2px solid #e9ecef;
-                    border-radius: .5rem;
-                    padding: .75rem 1rem;
-                    margin-bottom: .5rem;
-                    cursor: default;
-                    transition: all .15s;
-                }
-
-                .preview-option.correct {
-                    border-color: #198754;
-                    background: #d1e7dd;
-                }
-
-                .preview-option.incorrect {
-                    border-color: #e9ecef;
-                    background: #f8f9fa;
+                [x-cloak] {
+                    display: none !important;
                 }
             </style>
         @endpush
-
     @endif
+
+
+
     <div wire:loading>
         @include('utilities.backdrop')
     </div>
+
 </div>
