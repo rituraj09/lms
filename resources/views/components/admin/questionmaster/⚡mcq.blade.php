@@ -12,8 +12,7 @@ use App\Models\EvaluationMaster\SubSkillType;
 use App\Models\EvaluationMaster\DifficultyLevel;
 use App\Models\EvaluationMaster\AgeGroup;
 
-new #[Layout('layouts.backend')] 
-class extends Component {
+new #[Layout('layouts.backend')] class extends Component {
     public int $createForm = 0;
     public bool $is_edit = false;
     public string $title = 'New Question';
