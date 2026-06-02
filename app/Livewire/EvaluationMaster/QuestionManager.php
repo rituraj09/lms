@@ -3,6 +3,7 @@
 namespace App\Livewire\EvaluationMaster;
 
 use App\Helper\Globals;
+use App\Helper\Code;
 use App\Models\EvaluationMaster\AgeGroup;
 use App\Models\EvaluationMaster\DifficultyLevel;
 use App\Models\EvaluationMaster\PrimarySkillType;
@@ -16,6 +17,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use Illuminate\Support\Facades\Auth;
 
 #[Layout('layouts.backend')]
 class QuestionManager extends Component
@@ -106,7 +108,7 @@ class QuestionManager extends Component
         ];
 
         foreach (array_keys($this->languages) as $lang) {
-            $rules["stem.{$lang}"] = 'nullable|string';
+            $rules["stem.{$lang}"] = 'nullable|string|max:99999';
         }
 
         foreach ($this->options as $i => $option) {
@@ -129,6 +131,7 @@ class QuestionManager extends Component
         'difficultyLevelId.required'  => 'Please select a difficulty level.',
         'ageGroupId.required'         => 'Please select an age group.',
         'maxScore.required'           => 'Max score is required.',
+        'stem.required'               => 'Question stem cannot be blank.',
     ];
 
     // =========================================================
@@ -318,7 +321,7 @@ class QuestionManager extends Component
 
     private function initializeBlankForm(): void
     {
-        $this->code   = 'Q-' . strtoupper(Str::random(8));
+        $this->code   = Code::generateQuestionCode(Auth::guard('admin')->id());
         $this->status = 'draft';
         $this->pendingStatus = 'draft';
 

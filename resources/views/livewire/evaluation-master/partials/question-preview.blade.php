@@ -3,8 +3,14 @@
     Preview & Publish view.
     Included by question-manager.blade.php when $view === 3.
 --}}
+@php
+    $firstLanguage = collect(array_keys($languages))
+        ->first(fn($lang) => !empty(trim($stem[$lang] ?? '')))
+        ?? array_key_first($languages);
+@endphp
+
 <div class="container-fluid px-0"
-    x-data="{ previewTab: '{{ array_key_first($languages) }}' }">
+    x-data="{ previewTab: '{{ $firstLanguage }}' }">
 
     {{-- ══ Page Header ══════════════════════════════════════ --}}
     <div class="d-flex align-items-center justify-content-between mb-4">
@@ -43,15 +49,17 @@
                         </h6>
                         @if (count($languages) > 1)
                             <ul class="nav nav-pills nav-sm mb-0">
-                                @foreach ($languages as $langCode => $lang)
-                                    <li class="nav-item">
-                                        <button type="button"
-                                            @click="previewTab = '{{ $langCode }}'"
-                                            class="nav-link"
-                                            :class="{ 'active': previewTab === '{{ $langCode }}' }">
-                                            {{ $lang['flag'] }} {{ $lang['label'] }}
-                                        </button>
-                                    </li>
+                               @foreach ($languages as $langCode => $lang)
+                                    @if(!empty(trim($stem[$langCode] ?? '')))
+                                        <li class="nav-item">
+                                            <button type="button"
+                                                @click="previewTab = '{{ $langCode }}'"
+                                                class="nav-link"
+                                                :class="{ 'active': previewTab === '{{ $langCode }}' }">
+                                                {{ $lang['flag'] }} {{ $lang['label'] }}
+                                            </button>
+                                        </li>
+                                    @endif
                                 @endforeach
                             </ul>
                         @endif

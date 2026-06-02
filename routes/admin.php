@@ -13,6 +13,6 @@ Route::group(['middleware' => 'redirect.notauth:admin'], function ($router) {
 
 
 
-    Route::get('/questions', QuestionManager::class)->name('questions.index');
+    Route::get('/questions', QuestionManager::class)->name('questions');
     Route::get('/questions/{questionId}', QuestionManager::class)->name('questions.edit');
 });

@@ -32,7 +32,7 @@
                 </label>
                 <textarea wire:model="stem.{{ $langCode }}"
                     class="form-control"
-                    rows="4"
+                    rows="4"    class="form-control @error('stem') is-invalid @enderror"
                     placeholder="Enter question stem in {{ $lang['label'] }}..."></textarea>
             </div>
         @endforeach

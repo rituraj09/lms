@@ -13,11 +13,13 @@
 
     <div class="bg-light rounded p-4">
         @foreach ($languages as $langCode => $lang)
-            <div x-show="previewTab === '{{ $langCode }}'" x-cloak>
-                <p class="mb-0 fs-5 fw-medium">
-                    {{ $stem[$langCode] ?: ($stem[array_key_first($languages)] ?? 'No question stem available.') }}
-                </p>
-            </div>
+            @if(!empty(trim($stem[$langCode] ?? '')))
+                <div x-show="previewTab === '{{ $langCode }}'" x-cloak>
+                    <p class="mb-0 fs-5 fw-medium">
+                        {!! $stem[$langCode] !!}
+                    </p>
+                </div>
+            @endif
         @endforeach
     </div>
 </div>

@@ -18,20 +18,11 @@
                 <label class="form-label fw-medium small">
                     Question Code <span class="text-danger">*</span>
                 </label>
-                <div class="input-group">
-                    <input type="text"
-                        wire:model.blur="code"
-                        class="form-control @error('code') is-invalid @enderror"
-                        placeholder="Q-XXXXXXXX" />
-                    <button class="btn btn-outline-secondary" type="button"
-                        wire:click="$set('code', 'Q-' + Math.random().toString(36).substr(2,8).toUpperCase())"
-                        title="Regenerate code">
-                        <i class="ri ri-reset-right-fill"></i>
-                    </button>
-                    @error('code')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+               <div class="form-control bg-light">
+                    {{ $code }}
                 </div>
+
+                <input type="hidden" wire:model="code">
             </div>
 
             {{-- Question Type --}}
