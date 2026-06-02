@@ -13,6 +13,7 @@
             :columns="[
                 ['key' => 'code',               'label' => 'Code',          'sortable' => true, 'searchable' => true],
                 ['key' => 'question_type.name', 'label' => 'Question Type', 'sortable' => true, 'searchable' => true],
+                ['key' => 'stem_text', 'label' => 'Question Stem', 'searchable' => true],
                 ['key' => 'admin_notes',        'label' => 'Admin Notes',   'sortable' => true, 'searchable' => true],
                 ['key' => 'actions',            'label' => 'Actions',       'type'     => 'actions'],
             ]"

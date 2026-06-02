@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 #[Unguarded]
 class Question extends Model
@@ -14,6 +15,20 @@ class Question extends Model
     protected $casts = [
         'question_contents' => 'array',
     ];
+    protected $appends = [
+        'stem_text',
+    ];
+
+    public function getStemTextAttribute(): string
+    {
+        $content = $this->question_contents;
+
+        if (is_string($content)) {
+            $content = json_decode($content, true);
+        }
+
+        return $content['stem']['en'] ?? '';
+    }
     // Automatically set created_by and updated_by
     protected static function booted()
     {
