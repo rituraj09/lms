@@ -12,7 +12,7 @@ Route::group(['middleware' => 'redirect.notauth:admin'], function ($router) {
     $router->livewire('employee', 'admin.employee')->name('employee');
 
 
-    $router->livewire('mcq', 'admin.questionmaster.mcq')->name('mcq');
+
     Route::get('/questions', QuestionManager::class)->name('questions.index');
     Route::get('/questions/{questionId}', QuestionManager::class)->name('questions.edit');
 });
