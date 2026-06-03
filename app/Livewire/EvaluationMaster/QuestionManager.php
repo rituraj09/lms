@@ -3,7 +3,6 @@
 namespace App\Livewire\EvaluationMaster;
 
 use App\Helper\Globals;
-use App\Helper\Code;
 use App\Models\EvaluationMaster\AgeGroup;
 use App\Models\EvaluationMaster\DifficultyLevel;
 use App\Models\EvaluationMaster\PrimarySkillType;
@@ -12,16 +11,18 @@ use App\Models\EvaluationMaster\QuestionType;
 use App\Models\EvaluationMaster\SubSkillType;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
 use Livewire\Component;
-use Illuminate\Support\Facades\Auth;
+use Livewire\WithFileUploads;
 
 #[Layout('layouts.backend')]
 class QuestionManager extends Component
 {
+    use WithFileUploads;
     // ─── View State ──────────────────────────────────────────
     // 0 = datatable list, 1 = create/edit form, 3 = preview
     public int $view = 0;
@@ -51,6 +52,16 @@ class QuestionManager extends Component
     public array  $options        = [];
     public bool   $isOptionsShuffle = false;
     public string $selectionType  = 'single'; // 'single' | 'multiple'
+
+    // ─── Form: Media ─────────────────────────────────────────
+    // Livewire temporary upload object (while editing)
+    public mixed $stemImageUpload = null;
+    // Persisted path stored in DB (relative to storage/app/public)
+    public ?string $stemImagePath = null;
+    // Per-option image uploads  [ index => TemporaryUploadedFile|null ]
+    public array $optionImageUploads = [];
+    // Per-option persisted paths [ index => string|null ]
+    public array $optionImagePaths   = [];
 
     // ─── Form: Admin ─────────────────────────────────────────
     public ?string $adminNotes = null;
@@ -108,16 +119,22 @@ class QuestionManager extends Component
         ];
 
         foreach (array_keys($this->languages) as $lang) {
-            $rules["stem.{$lang}"] = 'nullable|string|max:99999';
+            $rules["stem.{$lang}"] = 'nullable|string';
         }
+
+        // Stem image — optional, only validated when a new file is staged
+        $rules['stemImageUpload'] = 'nullable|image|mimes:jpeg,png,gif|max:2048';
 
         foreach ($this->options as $i => $option) {
             $rules["options.{$i}.id"]         = 'required|string';
             $rules["options.{$i}.is_correct"]  = 'boolean';
             $rules["options.{$i}.weightage"]   = 'required|numeric|min:0|max:100';
+            $rules["options.{$i}.option_type"] = 'required|in:text,image';
             foreach (array_keys($this->languages) as $lang) {
                 $rules["options.{$i}.text.{$lang}"] = 'nullable|string';
             }
+            // Per-option image — only validated when present
+            $rules["optionImageUploads.{$i}"] = 'nullable|image|mimes:jpeg,png,gif|max:2048';
         }
 
         return $rules;
@@ -131,7 +148,6 @@ class QuestionManager extends Component
         'difficultyLevelId.required'  => 'Please select a difficulty level.',
         'ageGroupId.required'         => 'Please select an age group.',
         'maxScore.required'           => 'Max score is required.',
-        'stem.required'               => 'Question stem cannot be blank.',
     ];
 
     // =========================================================
@@ -178,10 +194,12 @@ class QuestionManager extends Component
         $label = self::OPTION_LABELS[$index] ?? chr(65 + $index);
 
         $this->options[] = [
-            'id'         => $label,
-            'text'       => array_fill_keys(array_keys($this->languages), ''),
-            'weightage'  => 0,
-            'is_correct' => false,
+            'id'          => $label,
+            'option_type' => 'text',           // 'text' | 'image'
+            'text'        => array_fill_keys(array_keys($this->languages), ''),
+            'weightage'   => 0,
+            'is_correct'  => false,
+            'image_path'  => null,             // persisted storage path
         ];
     }
 
@@ -191,6 +209,11 @@ class QuestionManager extends Component
             $this->addError('options', 'Minimum ' . self::MIN_OPTIONS . ' options are required.');
             return;
         }
+
+        // Clean up any staged upload for this slot
+        unset($this->optionImageUploads[$index], $this->optionImagePaths[$index]);
+        $this->optionImageUploads = array_values($this->optionImageUploads);
+        $this->optionImagePaths   = array_values($this->optionImagePaths);
 
         array_splice($this->options, $index, 1);
         $this->reindexOptionLabels();
@@ -208,6 +231,73 @@ class QuestionManager extends Component
         }
 
         $this->recalculateMaxScore();
+    }
+
+    // =========================================================
+    // MEDIA MANAGEMENT
+    // =========================================================
+
+    /** Called by wire:model on the stem image input. */
+    public function updatedStemImageUpload(): void
+    {
+        $this->validateOnly('stemImageUpload');
+    }
+
+    /** Remove the staged stem image (before save). */
+    public function removeStemImageUpload(): void
+    {
+        $this->stemImageUpload = null;
+        $this->resetErrorBag('stemImageUpload');
+    }
+
+    /** Remove the already-persisted stem image (on edit). */
+    public function removeStemImagePath(): void
+    {
+        if ($this->stemImagePath) {
+            Storage::disk('public')->delete($this->stemImagePath);
+        }
+        $this->stemImagePath = null;
+    }
+
+    /** Called by wire:model on a per-option image input. */
+    public function updatedOptionImageUploads(mixed $value, string $index): void
+    {
+        $this->validateOnly("optionImageUploads.{$index}");
+    }
+
+    /** Remove a staged option image (before save). */
+    public function removeOptionImageUpload(int $index): void
+    {
+        unset($this->optionImageUploads[$index]);
+        $this->resetErrorBag("optionImageUploads.{$index}");
+    }
+
+    /** Remove a persisted option image (on edit). */
+    public function removeOptionImagePath(int $index): void
+    {
+        $path = $this->options[$index]['image_path'] ?? null;
+        if ($path) {
+            Storage::disk('public')->delete($path);
+        }
+        $this->options[$index]['image_path'] = null;
+        unset($this->optionImagePaths[$index]);
+    }
+
+    /** Toggle option_type between text and image; clear the other side. */
+    public function setOptionType(int $index, string $type): void
+    {
+        $this->options[$index]['option_type'] = $type;
+
+        if ($type === 'text') {
+            // Clear any staged or persisted image for this option
+            unset($this->optionImageUploads[$index]);
+            $this->options[$index]['image_path'] = null;
+        } else {
+            // Clear text when switching to image
+            foreach (array_keys($this->languages) as $lang) {
+                $this->options[$index]['text'][$lang] = '';
+            }
+        }
     }
 
     // =========================================================
@@ -243,6 +333,8 @@ class QuestionManager extends Component
             'stem', 'explanation', 'options',
             'isOptionsShuffle', 'selectionType',
             'adminNotes', 'activeLanguageTab',
+            'stemImageUpload', 'stemImagePath',
+            'optionImageUploads', 'optionImagePaths',
         ]);
 
         $this->isEditing = false;
@@ -261,6 +353,32 @@ class QuestionManager extends Component
         DB::beginTransaction();
 
         try {
+            // ── Stem image ────────────────────────────────────
+            if ($this->stemImageUpload) {
+                // Delete old file if replacing
+                if ($this->stemImagePath) {
+                    Storage::disk('public')->delete($this->stemImagePath);
+                }
+                $this->stemImagePath = $this->stemImageUpload
+                    ->store('questions/stems', 'public');
+                $this->stemImageUpload = null;
+            }
+
+            // ── Option images ─────────────────────────────────
+            foreach ($this->optionImageUploads as $i => $upload) {
+                if (! $upload) continue;
+
+                // Delete old option image if replacing
+                $oldPath = $this->options[$i]['image_path'] ?? null;
+                if ($oldPath) {
+                    Storage::disk('public')->delete($oldPath);
+                }
+
+                $this->options[$i]['image_path'] = $upload
+                    ->store('questions/options', 'public');
+            }
+            $this->optionImageUploads = [];
+
             $contents = $this->buildQuestionContents();
 
             Question::updateOrCreate(
@@ -321,7 +439,7 @@ class QuestionManager extends Component
 
     private function initializeBlankForm(): void
     {
-        $this->code   = Code::generateQuestionCode(Auth::guard('admin')->id());
+        $this->code   = 'Q-' . strtoupper(Str::random(8));
         $this->status = 'draft';
         $this->pendingStatus = 'draft';
 
@@ -354,20 +472,28 @@ class QuestionManager extends Component
 
         $contents = json_decode($question->question_contents, true) ?? [];
 
-        $this->stem             = $contents['stem']             ?? array_fill_keys(array_keys($this->languages), '');
-        $this->explanation      = $contents['explanation']      ?? array_fill_keys(array_keys($this->languages), '');
-        $this->options          = $contents['options']          ?? [];
-        $this->negativeMark     = (float) ($contents['negative_mark']    ?? 0);
+        $this->stem             = $contents['stem']               ?? array_fill_keys(array_keys($this->languages), '');
+        $this->stemImagePath    = $contents['stem_image_path']    ?? null;
+        $this->explanation      = $contents['explanation']         ?? array_fill_keys(array_keys($this->languages), '');
+        $this->options          = $contents['options']             ?? [];
+        $this->negativeMark     = (float) ($contents['negative_mark']      ?? 0);
         $this->isOptionsShuffle = (bool)  ($contents['is_options_shuffle'] ?? false);
-        $this->selectionType    = $contents['selection_type']   ?? 'single';
+        $this->selectionType    = $contents['selection_type']     ?? 'single';
+
+        // Ensure every loaded option has the option_type key (backwards compat)
+        foreach ($this->options as &$opt) {
+            $opt['option_type'] ??= 'text';
+            $opt['image_path']  ??= null;
+        }
     }
 
     private function buildQuestionContents(): array
     {
         return [
             'stem'               => $this->stem,
+            'stem_image_path'    => $this->stemImagePath,
             'explanation'        => $this->explanation,
-            'options'            => $this->options,
+            'options'            => $this->options,  // each option carries its own image_path
             'negative_mark'      => $this->negativeMark,
             'is_options_shuffle' => $this->isOptionsShuffle,
             'selection_type'     => $this->selectionType,

@@ -1,11 +1,11 @@
 {{--
     partials/form/options.blade.php
-    MCQ answer options card: add / remove / toggle correct / weightage.
+    MCQ answer options — each option supports text OR image+label mode.
     Requires Alpine `activeTab` from parent x-data scope.
 --}}
 <div class="card shadow-sm border-0 mb-4">
 
-    {{-- Card Header --}}
+    {{-- ── Card Header ─────────────────────────────────────── --}}
     <div class="card-header bg-white border-bottom py-3">
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
 
@@ -51,7 +51,7 @@
         @endif
     </div>
 
-    {{-- Card Body --}}
+    {{-- ── Card Body ───────────────────────────────────────── --}}
     <div class="card-body p-4">
 
         @error('options')
@@ -60,20 +60,21 @@
             </div>
         @enderror
 
-        {{-- Option rows --}}
         @foreach ($options as $index => $option)
+            @php $isImage = ($option['option_type'] ?? 'text') === 'image'; @endphp
+
             <div class="option-card rounded-3 border mb-3 overflow-hidden
                 {{ $option['is_correct'] ? 'border-success' : 'border-light' }}"
                 wire:key="option-{{ $index }}">
 
-                {{-- Option Header Row --}}
-                <div class="option-header d-flex align-items-center gap-3 px-3 py-2
+                {{-- ── Option Header ──────────────────────── --}}
+                <div class="option-header d-flex align-items-center gap-2 px-3 py-2 flex-wrap
                     {{ $option['is_correct'] ? 'bg-success-subtle' : 'bg-light' }}">
 
-                    {{-- Correct toggle button --}}
+                    {{-- Correct toggle --}}
                     <button type="button"
                         wire:click="toggleCorrect({{ $index }})"
-                        class="btn btn-sm {{ $option['is_correct'] ? 'btn-success' : 'btn-outline-secondary' }} rounded-circle p-0"
+                        class="btn btn-sm {{ $option['is_correct'] ? 'btn-success' : 'btn-outline-secondary' }} rounded-circle p-0 flex-shrink-0"
                         style="width:32px;height:32px;"
                         title="{{ $option['is_correct'] ? 'Mark as Incorrect' : 'Mark as Correct' }}">
                         @if ($selectionType === 'single')
@@ -84,7 +85,7 @@
                     </button>
 
                     {{-- Option label badge --}}
-                    <span class="badge bg-secondary fs-6 fw-bold d-inline-flex align-items-center justify-content-center"
+                    <span class="badge bg-secondary fs-6 fw-bold d-inline-flex align-items-center justify-content-center flex-shrink-0"
                         style="width:30px;height:30px;">
                         {{ $option['id'] }}
                     </span>
@@ -95,9 +96,25 @@
                         </span>
                     @endif
 
+                    {{-- ── Text / Image type toggle ─────────────── --}}
+                    <div class="d-flex align-items-center gap-1 bg-white rounded p-1 border ms-1">
+                        <button type="button"
+                            wire:click="setOptionType({{ $index }}, 'text')"
+                            class="btn btn-xs btn-sm py-0 px-2 {{ ! $isImage ? 'btn-primary' : 'btn-light' }}"
+                            title="Text option">
+                            <i class="ri ri-text me-1"></i>Text
+                        </button>
+                        <button type="button"
+                            wire:click="setOptionType({{ $index }}, 'image')"
+                            class="btn btn-xs btn-sm py-0 px-2 {{ $isImage ? 'btn-primary' : 'btn-light' }}"
+                            title="Image option">
+                            <i class="ri ri-image-line me-1"></i>Image
+                        </button>
+                    </div>
+
                     <div class="ms-auto d-flex align-items-center gap-2">
 
-                        {{-- Weightage input --}}
+                        {{-- Weightage --}}
                         <div class="d-flex align-items-center gap-1">
                             <label class="small text-muted mb-0 text-nowrap">Weightage:</label>
                             <input type="number"
@@ -108,7 +125,7 @@
                                 placeholder="0" />
                         </div>
 
-                        {{-- Remove button --}}
+                        {{-- Remove --}}
                         <button type="button"
                             wire:click="removeOption({{ $index }})"
                             class="btn btn-sm btn-outline-danger"
@@ -119,22 +136,120 @@
                     </div>
                 </div>
 
-                {{-- Option Text Inputs (multilingual) --}}
+                {{-- ── Option Body ─────────────────────────── --}}
                 <div class="option-body p-3">
-                    @foreach ($languages as $langCode => $lang)
-                        <div x-show="activeTab === '{{ $langCode }}'">
-                            <input type="text"
-                                wire:model="options.{{ $index }}.text.{{ $langCode }}"
-                                class="form-control form-control-sm"
-                                placeholder="Option {{ $option['id'] }} — {{ $lang['label'] }}..." />
-                        </div>
-                    @endforeach
-                </div>
 
+                    @if (! $isImage)
+                        {{-- TEXT MODE: multilingual text inputs --}}
+                        @foreach ($languages as $langCode => $lang)
+                            <div x-show="activeTab === '{{ $langCode }}'">
+                                <input type="text"
+                                    wire:model="options.{{ $index }}.text.{{ $langCode }}"
+                                    class="form-control form-control-sm"
+                                    placeholder="Option {{ $option['id'] }} — {{ $lang['label'] }}..." />
+                            </div>
+                        @endforeach
+
+                    @else
+                        {{-- IMAGE MODE: upload + optional text label --}}
+                        <div class="row g-3 align-items-start">
+
+                            {{-- Image upload / preview column --}}
+                            <div class="col-md-5"
+                                x-data="{ dragging: false }"
+                                @dragover.prevent="dragging = true"
+                                @dragleave.prevent="dragging = false"
+                                @drop.prevent="
+                                    dragging = false;
+                                    $refs.optFile{{ $index }}.files = $event.dataTransfer.files;
+                                    $refs.optFile{{ $index }}.dispatchEvent(new Event('change'))
+                                ">
+
+                                {{-- Persisted image --}}
+                                @if (! empty($option['image_path']))
+                                    <div class="position-relative d-inline-block mb-2">
+                                        <img src="{{ Storage::url($option['image_path']) }}"
+                                             alt="Option image"
+                                             class="img-thumbnail rounded"
+                                             style="max-height:120px;object-fit:contain;">
+                                        <button type="button"
+                                            wire:click="removeOptionImagePath({{ $index }})"
+                                            class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 rounded-circle p-0"
+                                            style="width:22px;height:22px;line-height:1;"
+                                            title="Remove">
+                                            <i class="ri ri-close-line" style="font-size:.75rem;"></i>
+                                        </button>
+                                    </div>
+                                @endif
+
+                                {{-- New upload dropzone --}}
+                                @if (empty($option['image_path']))
+                                    <div :class="dragging ? 'border-primary bg-primary bg-opacity-5' : 'border-secondary'"
+                                         class="upload-dropzone border border-2 border-dashed rounded-3 text-center p-3"
+                                         style="cursor:pointer;min-height:90px;"
+                                         @click="$refs.optFile{{ $index }}.click()">
+
+                                        <input type="file"
+                                            x-ref="optFile{{ $index }}"
+                                            wire:model="optionImageUploads.{{ $index }}"
+                                            accept="image/jpeg,image/png,image/gif"
+                                            class="d-none" />
+
+                                        <div wire:loading wire:target="optionImageUploads.{{ $index }}" class="text-muted small">
+                                            <span class="spinner-border spinner-border-sm"></span>
+                                        </div>
+                                        <div wire:loading.remove wire:target="optionImageUploads.{{ $index }}">
+                                            <i class="ri ri-upload-cloud-2-line fs-4 text-muted"></i>
+                                            <p class="mb-0 small text-muted mt-1">JPEG / PNG / GIF</p>
+                                        </div>
+                                    </div>
+                                    @error("optionImageUploads.{$index}")
+                                        <div class="text-danger small mt-1">
+                                            <i class="ri ri-error-warning-line me-1"></i>{{ $message }}
+                                        </div>
+                                    @enderror
+                                @endif
+
+                                {{-- Staged image preview --}}
+                                @if (! empty($optionImageUploads[$index]))
+                                    <div class="mt-2 d-flex align-items-start gap-2">
+                                        <img src="{{ $optionImageUploads[$index]->temporaryUrl() }}"
+                                             alt="Preview"
+                                             class="img-thumbnail rounded"
+                                             style="max-height:80px;object-fit:contain;">
+                                        <button type="button"
+                                            wire:click="removeOptionImageUpload({{ $index }})"
+                                            class="btn btn-outline-danger btn-sm">
+                                            <i class="ri ri-close-line"></i>
+                                        </button>
+                                    </div>
+                                @endif
+
+                            </div>
+
+                            {{-- Optional text label column --}}
+                            <div class="col-md-7">
+                                <label class="form-label small text-muted mb-1">
+                                    <i class="ri ri-text me-1"></i>Label <span class="fw-normal">(optional)</span>
+                                </label>
+                                @foreach ($languages as $langCode => $lang)
+                                    <div x-show="activeTab === '{{ $langCode }}'" class="mb-1">
+                                        <input type="text"
+                                            wire:model="options.{{ $index }}.text.{{ $langCode }}"
+                                            class="form-control form-control-sm"
+                                            placeholder="{{ $lang['flag'] }} Label in {{ $lang['label'] }}..." />
+                                    </div>
+                                @endforeach
+                            </div>
+
+                        </div>
+                    @endif
+
+                </div>
             </div>
         @endforeach
 
-        {{-- Summary row --}}
+        {{-- Summary --}}
         <div class="d-flex gap-3 pt-2 border-top">
             <small class="text-muted">
                 <i class="ri ri-check-circle-fill text-success me-1"></i>
