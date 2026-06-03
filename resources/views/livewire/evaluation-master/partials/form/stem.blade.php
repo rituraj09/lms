@@ -37,15 +37,27 @@
                         content: @js($stem[$langCode])
                     }"
                     x-init="
+
                     const quill = new Quill($refs.editor, {
                         theme: 'snow',
                         placeholder: 'Enter question stem in {{ $lang['label'] }}...',
                         modules: {
                             toolbar: fullToolbar,
                             syntax: true,
-                            formula: true
+                            formula: true,
+                            table: false,
+                            'table-better': {
+                                language: 'en_US',
+                                menus: ['column', 'row', 'merge', 'table', 'cell', 'wrap', 'copy', 'delete'],
+                                toolbarTable: true,
+
+                              },
+                              keyboard: {
+                                bindings: QuillTableBetter.keyboardBindings
+                              }
                         }
                     });
+
                     if(content)
                     {
                        quill.root.innerHTML = content;
@@ -55,8 +67,6 @@
                             $wire.set('stem.{{ $langCode }}', quill.root.innerHTML);
                         }
                     });
-
-
                 "
                 >
                     <div x-ref="editor" style="height:250px"></div>

@@ -83,6 +83,7 @@
 <script src="{{ asset('assets/vendor/libs/@form-validation/bootstrap5.js')}}"></script>
 <script src="{{ asset('assets/vendor/libs/@form-validation/auto-focus.js')}}"></script>
 <script src="{{ asset('assets/vendor/libs/notyf/notyf.js') }}"></script>
+
 @stack('script')
 <script src="{{ asset('assets/js/main.js')}}"></script>
 <script>
