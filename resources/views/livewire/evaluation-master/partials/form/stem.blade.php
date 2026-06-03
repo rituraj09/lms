@@ -33,7 +33,9 @@
 {{--                    placeholder="Enter question stem in {{ $lang['label'] }}..."></textarea>--}}
                 <div
                     wire:ignore
-                    x-data
+                    x-data="{
+                        content: @js($stem[$langCode])
+                    }"
                     x-init="
                     const quill = new Quill($refs.editor, {
                         theme: 'snow',
@@ -44,18 +46,17 @@
                             formula: true
                         }
                     });
-
+                    if(content)
+                    {
+                       quill.root.innerHTML = content;
+                    }
                     quill.on('selection-change', function(range) {
                         if (range === null) {
                             $wire.set('stem.{{ $langCode }}', quill.root.innerHTML);
                         }
                     });
 
-                    $watch('$wire.stem.{{ $langCode }}', value => {
-                        if(quill.root.innerHTML !== value){
-                            quill.root.innerHTML = value || '';
-                        }
-                    });
+
                 "
                 >
                     <div x-ref="editor" style="height:250px"></div>
