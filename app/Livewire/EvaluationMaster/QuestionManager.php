@@ -1,8 +1,7 @@
 <?php
-
 namespace App\Livewire\EvaluationMaster;
-
 use App\Helper\Globals;
+use App\Helper\Code;
 use App\Models\EvaluationMaster\AgeGroup;
 use App\Models\EvaluationMaster\DifficultyLevel;
 use App\Models\EvaluationMaster\PrimarySkillType;
@@ -18,6 +17,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\Auth;
 
 #[Layout('layouts.backend')]
 class QuestionManager extends Component
@@ -439,7 +439,8 @@ class QuestionManager extends Component
 
     private function initializeBlankForm(): void
     {
-        $this->code   = 'Q-' . strtoupper(Str::random(8));
+       $this->code   = Code::generateQuestionCode(Auth::guard('admin')->id());
+        // $this->code   = 'Q-' . strtoupper(Str::random(8));
         $this->status = 'draft';
         $this->pendingStatus = 'draft';
 
