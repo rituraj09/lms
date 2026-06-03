@@ -455,7 +455,8 @@ class QuestionManager extends Component
         $this->addOption();
     }
 
-    private function loadQuestion(int $id): void
+    #[On('edit')]
+    public  function loadQuestion(int $id): void
     {
         $question = Question::findOrFail($id);
 
