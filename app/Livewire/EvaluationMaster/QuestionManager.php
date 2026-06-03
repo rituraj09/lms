@@ -395,6 +395,8 @@ class QuestionManager extends Component
                     'max_score'             => $this->maxScore,
                     'admin_notes'           => $this->adminNotes,
                     'status'                => $this->pendingStatus ?: $this->status,
+                    'created_at'            => now(),
+                    'updated_at'            => now(),
                 ]
             );
 
