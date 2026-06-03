@@ -12891,9 +12891,7 @@ div:not(.nav-align-left):not(.nav-align-right) > .nav-tabs {
   border-color: color-mix(in sRGB, var(--bs-base-color) 60%, var(--bs-paper-bg));
   background-color: var(--bs-gray-75);
 }
-.input-group:not(.input-group-floating):focus-within, .input-group:focus {
-  box-shadow: 0 0 0 1px var(--bs-primary);
-}
+
 .input-group:not(.input-group-floating):focus-within::before, .input-group:focus::before {
   box-shadow: none;
 }

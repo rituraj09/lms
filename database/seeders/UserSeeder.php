@@ -15,7 +15,7 @@ class UserSeeder extends Seeder
     {
 
         \DB::table('admins')->insert([
-            ['name'=>'Ashim Sarma','email'=>'ashimxyz@gmail.com','password'=>bcrypt('123456'),'mobile'=>'7002274743'],
+            ['name'=>'Ashim Sarma','email'=>'ashimxyz@gmail.com','password'=>bcrypt('123456'),'mobile'=>'8638420885'],
         ]);
 
         \DB::table('roles')->insert([
@@ -24,5 +24,11 @@ class UserSeeder extends Seeder
         $admin = Admin::find(1);
         setPermissionsTeamId(null);
         $admin->assignRole('Admin');
+        $this->call(AgeGroupSeeder::class);
+        $this->call(DifficultyLevelSeeder::class);
+        $this->call(PrimarySkillTypeSeeder::class);
+        $this->call(QuestionTypeSeeder::class);
+        $this->call(SubSkillTypeSeeder::class);
+
     }
 }

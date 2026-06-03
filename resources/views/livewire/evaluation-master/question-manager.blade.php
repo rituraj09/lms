@@ -41,3 +41,87 @@
     </div>
 
 </div>
+
+@push('style')
+    <link rel="stylesheet" href="{{asset('assets/vendor/libs/quill/typography.css')}}">
+    <link rel="stylesheet" href="{{asset('assets/vendor/libs/highlight/highlight.css')}}">
+    <link rel="stylesheet" href="{{asset('assets/vendor/libs/quill/katex.css')}}">
+    <link rel="stylesheet" href="{{asset('assets/vendor/libs/quill/editor.css')}}">
+    <style>
+        .ql-container {
+            min-height: 150px;
+            height: auto !important;
+        }
+
+        .ql-editor {
+            min-height: 150px;
+            overflow-y: visible;
+        }
+        .ql-editor img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+        .upload-dropzone { transition: border-color .2s, background .2s; }
+        .upload-dropzone:hover { border-color: var(--bs-primary) !important; background: rgba(var(--bs-primary-rgb),.03); }
+    </style>
+@endpush
+@push('script')
+    <script src="{{asset('assets/vendor/libs/quill/katex.js')}}"></script>
+    <script src="{{asset('assets/vendor/libs/highlight/highlight.js')}}"></script>
+    <script src="{{asset('assets/vendor/libs/quill/quill.js')}}"></script>
+    <script>
+        const fullToolbar = [
+            [
+                {
+                    font: []
+                },
+                {
+                    size: []
+                }
+            ],
+            ['bold', 'italic', 'underline', 'strike'],
+            [
+                {
+                    color: []
+                },
+                {
+                    background: []
+                }
+            ],
+            [
+                {
+                    script: 'super'
+                },
+                {
+                    script: 'sub'
+                }
+            ],
+            [
+                {
+                    header: '1'
+                },
+                {
+                    header: '2'
+                },
+                'blockquote',
+                'code-block'
+            ],
+            [
+                {
+                    list: 'ordered'
+                },
+                {
+                    indent: '-1'
+                },
+                {
+                    indent: '+1'
+                }
+            ],
+            [{ direction: 'rtl' }, { align: [] }],
+            ['link', 'image', 'video', 'formula'],
+            ['clean']
+        ];
+    </script>
+@endpush
+

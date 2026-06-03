@@ -2,6 +2,7 @@
 
 namespace App\Models\EvaluationMaster;
 
+use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Model;
 #[Unguarded]
 class SubSkillType extends Model

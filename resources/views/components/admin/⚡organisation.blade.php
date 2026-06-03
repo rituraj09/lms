@@ -31,7 +31,7 @@ new #[Layout('layouts.backend')] class extends Component {
     public ?string $pincode = null;
     public ?string $website = null;
 
-    public array $social_links = [];
+    public ?array $social_links = [];
 
     // Collections
     public $states;
@@ -129,7 +129,7 @@ new #[Layout('layouts.backend')] class extends Component {
         $this->pincode = $organisation->pincode;
         $this->website = $organisation->website;
 
-        // $this->social_links = json_decode($organisation->social_links, true) ?? [];
+         //$this->social_links = json_decode($organisation->social_links, true) ?? [];
         $this->social_links = $organisation->social_links ?? [];
 
         $this->existing_photo = $organisation->logo_path;

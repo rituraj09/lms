@@ -27,10 +27,39 @@
                 <label class="form-label fw-medium small mb-2">
                     {{ $lang['flag'] }} {{ $lang['label'] }} — Question Stem
                 </label>
-                <textarea wire:model="stem.{{ $langCode }}"
-                    class="form-control"
-                    rows="4"    class="form-control @error('stem') is-invalid @enderror"
-                    placeholder="Enter question stem in {{ $lang['label'] }}..."></textarea>
+{{--                <textarea wire:model="stem.{{ $langCode }}"--}}
+{{--                    rows="4"--}}
+{{--                    class="form-control @error('stem') is-invalid @enderror"--}}
+{{--                    placeholder="Enter question stem in {{ $lang['label'] }}..."></textarea>--}}
+                <div
+                    wire:ignore
+                    x-data
+                    x-init="
+                    const quill = new Quill($refs.editor, {
+                        theme: 'snow',
+                        placeholder: 'Enter question stem in {{ $lang['label'] }}...',
+                        modules: {
+                            toolbar: fullToolbar,
+                            syntax: true,
+                            formula: true
+                        }
+                    });
+
+                    quill.on('selection-change', function(range) {
+                        if (range === null) {
+                            $wire.set('stem.{{ $langCode }}', quill.root.innerHTML);
+                        }
+                    });
+
+                    $watch('$wire.stem.{{ $langCode }}', value => {
+                        if(quill.root.innerHTML !== value){
+                            quill.root.innerHTML = value || '';
+                        }
+                    });
+                "
+                >
+                    <div x-ref="editor" style="height:250px"></div>
+                </div>
             </div>
         @endforeach
     </div>
@@ -121,13 +150,6 @@
                 </div>
             </div>
         @endif
-
     </div>
 </div>
 
-@push('styles')
-<style>
-    .upload-dropzone { transition: border-color .2s, background .2s; }
-    .upload-dropzone:hover { border-color: var(--bs-primary) !important; background: rgba(var(--bs-primary-rgb),.03); }
-</style>
-@endpush
