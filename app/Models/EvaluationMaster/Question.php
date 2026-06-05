@@ -29,6 +29,7 @@ class Question extends Model
 
         return $content['stem']['en'] ?? '';
     }
+
     // Automatically set created_by and updated_by
     protected static function booted()
     {

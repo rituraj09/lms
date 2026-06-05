@@ -6,23 +6,33 @@
 
     {{-- ── VIEW 0: Datatable List ─────────────────────────── --}}
     @if ($view === 0)
-        <livewire:datatable
-            model="App\Models\EvaluationMaster\Question"
-            title="Questions"
-            :new-entry="true"
+        <livewire:datatable model="App\Models\EvaluationMaster\Question" title="Questions" :new-entry="true"
             :columns="[
-                ['key' => 'code',               'label' => 'Code',          'sortable' => true, 'searchable' => true],
+                ['key' => 'code', 'label' => 'Code', 'sortable' => true, 'searchable' => true],
                 ['key' => 'question_type.name', 'label' => 'Question Type', 'sortable' => true, 'searchable' => true],
-                ['key' => 'stem_text', 'label' => 'Question Stem', 'searchable' => true],
-                ['key' => 'admin_notes',        'label' => 'Admin Notes',   'sortable' => true, 'searchable' => true],
-                ['key' => 'actions',            'label' => 'Actions',       'type'     => 'actions'],
-            ]"
-            :actions="[
-                ['label' => 'View',   'icon' => 'icon-base ri ri-focus-2-line',      'event' => 'viewQuestion', 'class' => 'btn-outline-success'],
-                ['label' => 'Edit',   'icon' => 'icon-base ri ri-edit-line',          'event' => 'edit',         'class' => 'btn-outline-primary'],
-                ['label' => 'Delete', 'icon' => 'icon-base ri ri-delete-bin-4-line',  'event' => 'delete',       'class' => 'btn-outline-danger', 'confirm' => true],
-            ]"
-        />
+                ['key' => 'admin_notes', 'label' => 'Admin Notes', 'sortable' => true, 'searchable' => true],
+                ['key' => 'actions', 'label' => 'Actions', 'type' => 'actions'],
+            ]" :actions="[
+                [
+                    'label' => 'View',
+                    'icon' => 'icon-base ri ri-focus-2-line',
+                    'event' => 'viewQuestion',
+                    'class' => 'btn-outline-success',
+                ],
+                [
+                    'label' => 'Edit',
+                    'icon' => 'icon-base ri ri-edit-line',
+                    'event' => 'edit',
+                    'class' => 'btn-outline-primary',
+                ],
+                [
+                    'label' => 'Delete',
+                    'icon' => 'icon-base ri ri-delete-bin-4-line',
+                    'event' => 'delete',
+                    'class' => 'btn-outline-danger',
+                    'confirm' => true,
+                ],
+            ]" />
     @endif
 
     {{-- ── VIEW 1: Create / Edit Form ────────────────────── --}}
@@ -43,10 +53,10 @@
 </div>
 
 @push('style')
-    <link rel="stylesheet" href="{{asset('assets/vendor/libs/quill/typography.css')}}">
-    <link rel="stylesheet" href="{{asset('assets/vendor/libs/highlight/highlight.css')}}">
-    <link rel="stylesheet" href="{{asset('assets/vendor/libs/quill/katex.css')}}">
-    <link rel="stylesheet" href="{{asset('assets/vendor/libs/quill/editor.css')}}">
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/typography.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/highlight/highlight.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/katex.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/editor.css') }}">
     <style>
         .ql-container {
             min-height: 150px;
@@ -57,23 +67,30 @@
             min-height: 150px;
             overflow-y: visible;
         }
+
         .ql-editor img {
             max-width: 100%;
             height: auto;
             display: block;
         }
-        .upload-dropzone { transition: border-color .2s, background .2s; }
-        .upload-dropzone:hover { border-color: var(--bs-primary) !important; background: rgba(var(--bs-primary-rgb),.03); }
+
+        .upload-dropzone {
+            transition: border-color .2s, background .2s;
+        }
+
+        .upload-dropzone:hover {
+            border-color: var(--bs-primary) !important;
+            background: rgba(var(--bs-primary-rgb), .03);
+        }
     </style>
 @endpush
 @push('script')
-    <script src="{{asset('assets/vendor/libs/quill/katex.js')}}"></script>
-    <script src="{{asset('assets/vendor/libs/highlight/highlight.js')}}"></script>
-    <script src="{{asset('assets/vendor/libs/quill/quill.js')}}"></script>
+    <script src="{{ asset('assets/vendor/libs/quill/katex.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/highlight/highlight.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/quill/quill.js') }}"></script>
     <script>
         const fullToolbar = [
-            [
-                {
+            [{
                     font: []
                 },
                 {
@@ -81,24 +98,21 @@
                 }
             ],
             ['bold', 'italic', 'underline', 'strike'],
-            [
-                {
+            [{
                     color: []
                 },
                 {
                     background: []
                 }
             ],
-            [
-                {
+            [{
                     script: 'super'
                 },
                 {
                     script: 'sub'
                 }
             ],
-            [
-                {
+            [{
                     header: '1'
                 },
                 {
@@ -107,8 +121,7 @@
                 'blockquote',
                 'code-block'
             ],
-            [
-                {
+            [{
                     list: 'ordered'
                 },
                 {
@@ -118,10 +131,13 @@
                     indent: '+1'
                 }
             ],
-            [{ direction: 'rtl' }, { align: [] }],
+            [{
+                direction: 'rtl'
+            }, {
+                align: []
+            }],
             ['link', 'image', 'video', 'formula'],
             ['clean']
         ];
     </script>
 @endpush
-

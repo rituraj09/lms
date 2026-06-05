@@ -12,7 +12,7 @@ class Globals
         'en' => ['label' => 'English',    'flag' => '🇬🇧'],
         'as' => ['label' => 'Assamese',   'flag' => '🇮🇳'],
         'hn' => ['label' => 'Hindi',    'flag' => '🇮🇳'],
-        'bn' => ['label' => 'Bengali',    'flag' => '🇧🇩'],
+        'bn' => ['label' => 'Bengali',    'flag' => '🇮🇳'],
     ];
 
 
