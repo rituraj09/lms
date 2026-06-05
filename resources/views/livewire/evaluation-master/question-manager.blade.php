@@ -10,6 +10,7 @@
             :columns="[
                 ['key' => 'code', 'label' => 'Code', 'sortable' => true, 'searchable' => true],
                 ['key' => 'question_type.name', 'label' => 'Question Type', 'sortable' => true, 'searchable' => true],
+                ['key' => 'stem_text', 'label' => 'Question Stem', 'searchable' => true],
                 ['key' => 'admin_notes', 'label' => 'Admin Notes', 'sortable' => true, 'searchable' => true],
                 ['key' => 'actions', 'label' => 'Actions', 'type' => 'actions'],
             ]" :actions="[
@@ -57,6 +58,8 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/highlight/highlight.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/katex.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/editor.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/table.css') }}">
+
     <style>
         .ql-container {
             min-height: 150px;
@@ -66,6 +69,13 @@
         .ql-editor {
             min-height: 150px;
             overflow-y: visible;
+        }
+
+        .ql-editor table,
+        .ql-editor td,
+        .ql-editor th {
+            border: 1px solid #000 !important;
+            border-collapse: collapse;
         }
 
         .ql-editor img {
@@ -88,7 +98,12 @@
     <script src="{{ asset('assets/vendor/libs/quill/katex.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/highlight/highlight.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/quill/quill.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/quill/table.js') }}"></script>
     <script>
+        Quill.register({
+            'modules/table-better': QuillTableBetter
+        }, true);
+
         const fullToolbar = [
             [{
                     font: []
@@ -98,6 +113,7 @@
                 }
             ],
             ['bold', 'italic', 'underline', 'strike'],
+            ['table-better'],
             [{
                     color: []
                 },
@@ -136,7 +152,8 @@
             }, {
                 align: []
             }],
-            ['link', 'image', 'video', 'formula'],
+            ['link', 'video', 'formula', 'table'],
+
             ['clean']
         ];
     </script>

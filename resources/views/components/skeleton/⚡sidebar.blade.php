@@ -77,10 +77,14 @@ new class extends Component {
                 <ul class="menu-sub">
                     <li class="menu-item">
                         <a href="{{ route('admin.questions') }}" class="menu-link">
-                            <div data-i18n="MCQ">MCQ</div>
+                            <div data-i18n="Manager Questions">Manager Questions</div>
                         </a>
                     </li>
-
+                    <li class="menu-item">
+                        <a href="{{ route('admin.question-sets.index') }}" class="menu-link">
+                            <div data-i18n="Manager Question Sets">Manager Question Sets</div>
+                        </a>
+                    </li>
                 </ul>
             </li>
         </ul>
