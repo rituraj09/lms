@@ -2,11 +2,10 @@
     partials/question-picker.blade.php
     Full-screen modal — search + checkbox select questions for a group.
 --}}
-<div
-    class="modal d-flex align-items-start justify-content-center"
+<div class="modal d-flex align-items-start justify-content-center mt-5"
     style="display:flex!important; background:rgba(0,0,0,.5); position:fixed; inset:0; z-index:1055; overflow-y:auto; padding:2rem 1rem;">
 
-    <div class="modal-dialog modal-xl w-100 my-0" style="max-width:1100px;">
+    <div class="modal-dialog modal-xl w-100 mt-5 my-1" style="max-width:800px;">
         <div class="modal-content shadow-lg border-0">
 
             {{-- Modal Header --}}
@@ -31,9 +30,7 @@
                             <span class="input-group-text bg-white">
                                 <i class="ri ri-search-line text-muted"></i>
                             </span>
-                            <input type="text"
-                                wire:model.live.debounce.300ms="pickerSearch"
-                                class="form-control"
+                            <input type="text" wire:model.live.debounce.300ms="pickerSearch" class="form-control"
                                 placeholder="Search by question code..." />
                             @if ($pickerSearch)
                                 <button type="button" wire:click="$set('pickerSearch', '')"
@@ -72,13 +69,15 @@
                         @foreach ($this->pickerQuestions as $question)
                             @php
                                 $isSelected = in_array($question->id, $pickerSelected);
-                                $contents   = json_decode($question->question_contents, true);
-                                $stem       = $contents['stem']['en'] ?? ($contents['stem'][array_key_first($contents['stem'] ?? ['en'=>''])] ?? '');
+                                $contents = json_decode($question->question_contents, true);
+                                $stem =
+                                    $contents['stem']['en'] ??
+                                    ($contents['stem'][array_key_first($contents['stem'] ?? ['en' => ''])] ?? '');
                             @endphp
 
                             <div class="col-md-6 col-xl-4">
                                 <div class="card h-100 border question-picker-card
-                                    {{ $isSelected ? 'border-primary bg-primary bg-opacity-5' : '' }}"
+                                    {{ $isSelected ? 'border-primary bg-primary text-white bg-opacity-5' : '' }}"
                                     style="cursor:pointer; transition: all .15s;"
                                     wire:click="togglePickerQuestion({{ $question->id }})">
 
@@ -87,12 +86,12 @@
                                             {{-- Checkbox --}}
                                             <div class="form-check flex-shrink-0 mt-1">
                                                 <input class="form-check-input" type="checkbox"
-                                                    @checked($isSelected)
-                                                    onclick="event.stopPropagation()"
+                                                    @checked($isSelected) onclick="event.stopPropagation()"
                                                     wire:click.stop="togglePickerQuestion({{ $question->id }})" />
                                             </div>
                                             <div class="flex-grow-1 min-w-0">
-                                                <span class="badge bg-light text-dark border font-monospace small d-block mb-1">
+                                                <span
+                                                    class="badge bg-light text-dark border font-monospace small d-block mb-1">
                                                     {{ $question->code }}
                                                 </span>
                                                 <span class="badge bg-secondary-subtle text-secondary small">
@@ -105,7 +104,8 @@
                                         </div>
 
                                         {{-- Stem preview --}}
-                                        <p class="small text-muted mb-0 mt-2" style="overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">
+                                        <p class="small text-muted mb-0 mt-2"
+                                            style="overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">
                                             {!! strip_tags($stem) ?: '<em>No stem text</em>' !!}
                                         </p>
                                     </div>
@@ -132,11 +132,9 @@
                     <button type="button" wire:click="closePicker" class="btn btn-outline-secondary">
                         Cancel
                     </button>
-                    <button type="button"
-                        wire:click="addSelectedToGroup"
-                        class="btn btn-primary"
-                        @if(empty($pickerSelected)) disabled @endif
-                        wire:loading.attr="disabled" wire:target="addSelectedToGroup">
+                    <button type="button" wire:click="addSelectedToGroup" class="btn btn-primary"
+                        @if (empty($pickerSelected)) disabled @endif wire:loading.attr="disabled"
+                        wire:target="addSelectedToGroup">
                         <span wire:loading wire:target="addSelectedToGroup">
                             <span class="spinner-border spinner-border-sm me-1"></span>Adding…
                         </span>
@@ -153,7 +151,10 @@
 </div>
 
 @push('styles')
-<style>
-    .question-picker-card:hover { border-color: var(--bs-primary) !important; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
-</style>
+    <style>
+        .question-picker-card:hover {
+            border-color: var(--bs-primary) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
+        }
+    </style>
 @endpush

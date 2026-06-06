@@ -25,8 +25,9 @@
 
         <div class="mb-3 pb-3 border-bottom">
             <div class="small text-muted mb-1">Status</div>
-            <span class="badge px-2 py-1
-                @if($setStatus === 'publish') bg-success
+            <span
+                class="badge px-2 py-1
+                @if ($setStatus === 'publish') bg-success
                 @elseif($setStatus === 'draft') bg-warning text-dark
                 @else bg-secondary @endif">
                 {{ ucfirst($setStatus) }}
@@ -54,7 +55,8 @@
             <div class="small fw-semibold mb-2 text-dark">Group Breakdown</div>
             <div class="d-flex flex-column gap-1 mb-3">
                 @foreach ($groups as $g)
-                    <div class="d-flex justify-content-between align-items-center
+                    <div
+                        class="d-flex justify-content-between align-items-center
                         bg-light rounded px-2 py-1">
                         <span class="small text-truncate me-2" style="max-width:130px;"
                             title="{{ $g['title'] }}">{{ $g['title'] }}</span>
@@ -67,10 +69,10 @@
         @endif
 
         {{-- Edit details link --}}
-        <a href="{{ route('admin.question-sets.index') }}"
-            class="btn btn-outline-secondary w-100 btn-sm">
-            <i class="ri ri-arrow-go-back-line me-1"></i>Back to List
-        </a>
+
+        <button type="button" wire:click="backtoQuestionset" class="btn btn-outline-secondary w-100 btn-sm"> <i
+                class="ri ri-arrow-left-line me-1"></i>Back to List
+        </button>
 
     </div>
 </div>

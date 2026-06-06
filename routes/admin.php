@@ -20,5 +20,4 @@ Route::group(['middleware' => 'redirect.notauth:admin'], function ($router) {
     Route::get('/questions/{questionId}', QuestionManager::class)->name('questions.edit');
 
     Route::get('/question-sets',                 QuestionSetManager::class)->name('question-sets.index');
-    Route::get('/question-sets/{setId}/builder', QuestionSetBuilder::class)->name('question-sets.builder');
 });
