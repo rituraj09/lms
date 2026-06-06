@@ -335,6 +335,18 @@ class QuestionSetManager extends Component
         return QuestionSet::findOrFail($this->setId);
     }
 
+
+
+    protected function getAssignedQuestionIds(): array
+    {
+        return QuestionQuestionSetGroup::whereHas('group', function ($q) {
+                $q->where('question_set_id', $this->setId);
+            })
+            ->pluck('question_id')
+            ->unique()
+            ->toArray();
+    }
+
     /**
      * Questions for the picker modal — paginated, filtered,
      * excluding already-assigned questions.
@@ -342,7 +354,19 @@ class QuestionSetManager extends Component
     #[Computed]
     public function pickerQuestions()
     {
-        if (! $this->showPicker) return collect();
+        if (! $this->showPicker) {
+            return collect();
+        }
+
+        // Questions already used in any group of this Question Set
+        $assignedQuestionIds = QuestionQuestionSetGroup::query()
+            ->whereNull('deleted_at')
+            ->whereHas('group', function ($q) {
+                $q->where('question_set_id', $this->setId);
+            })
+            ->pluck('question_id')
+            ->unique()
+            ->toArray();
 
         return Question::query()
             ->when($this->pickerSearch, fn ($q) =>
@@ -351,9 +375,15 @@ class QuestionSetManager extends Component
             ->when($this->pickerTypeFilter, fn ($q) =>
                 $q->where('question_type_id', $this->pickerTypeFilter)
             )
-            ->whereNotIn('id', $this->alreadyInGroup)
+            ->whereNotIn('id', $assignedQuestionIds)
             ->where('status', 'publish')
-            ->select('id', 'code', 'question_type_id', 'question_contents', 'max_score')
+            ->select(
+                'id',
+                'code',
+                'question_type_id',
+                'question_contents',
+                'max_score'
+            )
             ->latest()
             ->paginate(12, pageName: 'picker_page');
     }

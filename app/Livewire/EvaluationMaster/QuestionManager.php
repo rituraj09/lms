@@ -31,8 +31,8 @@ class QuestionManager extends Component
     // ─── Form: Identity ──────────────────────────────────────
     public ?int $questionId   = null;
     public string $code       = '';
-    public string $status     = 'draft';
-    public string $pendingStatus = 'draft';
+    public string $status     = 'publish';
+    public string $pendingStatus = 'publish';
 
     // ─── Form: Classification ────────────────────────────────
     public ?int $questionTypeId      = null;
@@ -113,7 +113,6 @@ class QuestionManager extends Component
             'ageGroupId'         => 'required|exists:age_groups,id',
             'maxScore'           => 'required|numeric|min:0|max:9999.99',
             'timeLimit'          => 'nullable|integer|min:1|max:65535',
-            'status'             => 'required|in:draft,publish,unpublish',
             'negativeMark'       => 'required|numeric|min:0',
             'selectionType'      => 'required|in:single,multiple',
         ];
@@ -326,7 +325,7 @@ class QuestionManager extends Component
     public function resetForm(): void
     {
         $this->reset([
-            'questionId', 'code', 'status', 'pendingStatus',
+            'questionId', 'code',
             'questionTypeId', 'primarySkillTypeId', 'subSkillTypeId',
             'difficultyLevelId', 'ageGroupId',
             'maxScore', 'negativeMark', 'timeLimit',
@@ -443,8 +442,8 @@ class QuestionManager extends Component
     {
        $this->code   = Code::generateQuestionCode(Auth::guard('admin')->id());
         // $this->code   = 'Q-' . strtoupper(Str::random(8));
-        $this->status = 'draft';
-        $this->pendingStatus = 'draft';
+        $this->status = 'publish';
+        $this->pendingStatus = 'publish';
 
         $langKeys = array_keys($this->languages);
         $this->stem        = array_fill_keys($langKeys, '');
