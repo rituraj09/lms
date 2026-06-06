@@ -1,5 +1,5 @@
 {{--
-    partials/form/basic-info.blade.php
+    question/form/basic-info.blade.php
     Code, Question Type, Primary Skill, Sub Skill,
     Difficulty Level, Age Group fields.
 --}}

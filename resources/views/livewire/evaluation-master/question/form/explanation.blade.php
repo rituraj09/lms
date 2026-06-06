@@ -1,5 +1,5 @@
 {{--
-    partials/form/explanation.blade.php
+    question/form/explanation.blade.php
     Optional multilingual explanation card.
     Requires Alpine `activeTab` from parent x-data scope.
 --}}

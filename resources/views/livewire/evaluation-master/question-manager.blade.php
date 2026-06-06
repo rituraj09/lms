@@ -38,12 +38,12 @@
 
     {{-- ── VIEW 1: Create / Edit Form ────────────────────── --}}
     @if ($view === 1)
-        @include('livewire.evaluation-master.partials.question-form')
+        @include('livewire.evaluation-master.question.question-form')
     @endif
 
     {{-- ── VIEW 3: Preview & Publish ─────────────────────── --}}
     @if ($view === 3)
-        @include('livewire.evaluation-master.partials.question-preview')
+        @include('livewire.evaluation-master.question.question-preview')
     @endif
 
     {{-- ── Global Loading Backdrop ───────────────────────── --}}

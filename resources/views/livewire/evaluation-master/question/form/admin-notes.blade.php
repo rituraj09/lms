@@ -1,5 +1,5 @@
 {{--
-    partials/form/admin-notes.blade.php
+    question/form/admin-notes.blade.php
     Internal admin notes textarea and the Preview Question button.
 --}}
 <div class="card shadow-sm border-0 mb-4">

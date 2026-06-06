@@ -1,5 +1,5 @@
 {{--
-    partials/preview/quick-info.blade.php
+    question/preview/quick-info.blade.php
     Right-column quick reference card inside the preview view.
 --}}
 <div class="card shadow-sm border-0 mb-4">

@@ -1,5 +1,5 @@
 {{--
-    partials/preview/publish.blade.php
+    question/preview/publish.blade.php
     Status selection + Save button card inside the preview view.
     Uses Alpine two-way binding with Livewire's @entangle for pendingStatus.
 --}}

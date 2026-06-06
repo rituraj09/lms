@@ -1,5 +1,5 @@
 {{--
-    partials/set-summary.blade.php
+    question-set/partials/set-summary.blade.php
     Right sidebar summary of the question set being built.
 --}}
 <div class="card shadow-sm border-0 mb-4 position-sticky" style="top:1rem;">

@@ -1,5 +1,5 @@
 {{--
-    partials/preview/explanation.blade.php
+    question/preview/explanation.blade.php
     Optional explanation section inside the preview card.
     Only renders when at least one language has content.
     Requires Alpine `previewTab` in ancestor x-data.

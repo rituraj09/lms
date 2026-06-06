@@ -1,5 +1,5 @@
 {{--
-    partials/question-form.blade.php
+    question/question-form.blade.php
     Create / Edit form view.
     Included by question-manager.blade.php when $view === 1.
 --}}
@@ -40,16 +40,16 @@
             <div class="col-lg-8">
 
                 {{-- Basic Information --}}
-                @include('livewire.evaluation-master.partials.form.basic-info')
+                @include('livewire.evaluation-master.question.form.basic-info')
 
                 {{-- Question Stem --}}
-                @include('livewire.evaluation-master.partials.form.stem')
+                @include('livewire.evaluation-master.question.form.stem')
 
                 {{-- Answer Options --}}
-                @include('livewire.evaluation-master.partials.form.options')
+                @include('livewire.evaluation-master.question.form.options')
 
                 {{-- Explanation --}}
-                @include('livewire.evaluation-master.partials.form.explanation')
+                @include('livewire.evaluation-master.question.form.explanation')
 
             </div>
 
@@ -57,10 +57,10 @@
             <div class="col-lg-4">
 
                 {{-- Scoring Settings --}}
-                @include('livewire.evaluation-master.partials.form.scoring')
+                @include('livewire.evaluation-master.question.form.scoring')
 
                 {{-- Admin Notes + Preview Button --}}
-                @include('livewire.evaluation-master.partials.form.admin-notes')
+                @include('livewire.evaluation-master.question.form.admin-notes')
 
             </div>
 

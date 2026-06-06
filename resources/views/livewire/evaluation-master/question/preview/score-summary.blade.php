@@ -1,5 +1,5 @@
 {{--
-    partials/preview/score-summary.blade.php
+    question/preview/score-summary.blade.php
     Right-column score summary card inside the preview view.
 --}}
 <div class="card shadow-sm border-0 mb-4">

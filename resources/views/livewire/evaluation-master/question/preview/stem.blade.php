@@ -1,5 +1,5 @@
 {{--
-    partials/preview/stem.blade.php
+    question/preview/stem.blade.php
     Read-only stem display including optional stem image.
     Requires Alpine `previewTab` in ancestor x-data.
 --}}

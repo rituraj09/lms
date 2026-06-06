@@ -1,5 +1,5 @@
 {{--
-    partials/form/scoring.blade.php
+    question/form/scoring.blade.php
     Right-column scoring settings: time limit, max score,
     negative mark, shuffle toggle, score summary.
 --}}

@@ -1,4 +1,4 @@
-{{-- question-set/manager.blade.php — Step 1 router --}}
+{{-- question-set-manager.blade.php — Step 1 router --}}
 <div>
 
     {{-- ── VIEW 0: Datatable ───────────────────────────────── --}}

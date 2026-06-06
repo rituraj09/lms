@@ -1,5 +1,5 @@
 {{--
-    partials/question-preview.blade.php
+    question/preview.blade.php
     Preview & Publish view.
     Included by question-manager.blade.php when $view === 3.
 --}}
@@ -69,13 +69,13 @@
                 <div class="card-body p-4">
 
                     {{-- Stem --}}
-                    @include('livewire.evaluation-master.partials.preview.stem')
+                    @include('livewire.evaluation-master.question.preview.stem')
 
                     {{-- Options --}}
-                    @include('livewire.evaluation-master.partials.preview.options')
+                    @include('livewire.evaluation-master.question.preview.options')
 
                     {{-- Explanation --}}
-                    @include('livewire.evaluation-master.partials.preview.explanation')
+                    @include('livewire.evaluation-master.question.preview.explanation')
 
                 </div>
             </div>
@@ -85,13 +85,13 @@
         <div class="col-lg-4">
 
             {{-- Score Summary --}}
-            @include('livewire.evaluation-master.partials.preview.score-summary')
+            @include('livewire.evaluation-master.question.preview.score-summary')
 
             {{-- Quick Info --}}
-            @include('livewire.evaluation-master.partials.preview.quick-info')
+            @include('livewire.evaluation-master.question.preview.quick-info')
 
             {{-- Status & Publish --}}
-            @include('livewire.evaluation-master.partials.preview.publish')
+            @include('livewire.evaluation-master.question.preview.publish')
 
         </div>
 

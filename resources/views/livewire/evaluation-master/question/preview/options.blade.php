@@ -1,5 +1,5 @@
 {{--
-    partials/preview/options.blade.php
+    question/preview/options.blade.php
     Read-only options display — handles both text and image option types.
     Requires Alpine `previewTab` in ancestor x-data.
 --}}

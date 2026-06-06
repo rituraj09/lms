@@ -1,5 +1,5 @@
 {{--
-    partials/form/options.blade.php
+    question/form/options.blade.php
     MCQ answer options — each option supports text OR image+label mode.
     Requires Alpine `activeTab` from parent x-data scope.
 --}}
