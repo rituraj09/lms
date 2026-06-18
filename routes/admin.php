@@ -2,6 +2,7 @@
 //routes/admin.php
 use App\Livewire\Admin\Questions\QuestionGroupIndex;
 use App\Livewire\Admin\Questions\QuestionGroupForm;
+use App\Livewire\Admin\Assessments\AssessmentManager;
 
 Route::group(['middleware' => 'redirect.auth:admin'], function ($router) {
    $router->livewire('login', 'admin.login')->name('login');
@@ -20,7 +21,13 @@ Route::group(['middleware' => 'redirect.notauth:admin'], function ($router) {
     Route::get('/question-groups/{groupId}/edit', QuestionGroupForm::class)->name('question-groups.edit');
 
 
-
+    /* ================================================================
+       |  ASSESSMENTS
+       * ================================================================*/
+    Route::get(
+        '/assessments',
+        AssessmentManager::class
+    )->name('assessments.index');
 
 
 });

@@ -80,6 +80,11 @@ new class extends Component {
                             <div data-i18n="Questions">Questions</div>
                         </a>
                     </li>
+                    <li class="menu-item">
+                        <a href="{{ route('admin.assessments.index') }}" class="menu-link">
+                            <div data-i18n="Assessment">Assessments</div>
+                        </a>
+                    </li>
                 </ul>
             </li>
         </ul>
