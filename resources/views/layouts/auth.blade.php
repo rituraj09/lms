@@ -1,4 +1,6 @@
+{{-- views/layouts/auth.blade.php --}}
 <!doctype html>
+
 <html
     lang="en"
     class="layout-wide customizer-hide"

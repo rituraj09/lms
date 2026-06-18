@@ -1,5 +1,5 @@
 <?php
-
+//views/skeleton/sidebar.blade.php
 use Livewire\Component;
 
 new class extends Component {
@@ -72,17 +72,12 @@ new class extends Component {
             <li class="menu-item">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon icon-base ri ri-star-half-fill"></i>
-                    <div data-i18n="Question Master">Question Master</div>
+                    <div data-i18n="Assessment Master">Assessment Master</div>
                 </a>
                 <ul class="menu-sub">
                     <li class="menu-item">
-                        <a href="{{ route('admin.questions') }}" class="menu-link">
-                            <div data-i18n="Manager Questions">Manager Questions</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="{{ route('admin.question-sets.index') }}" class="menu-link">
-                            <div data-i18n="Manager Question Sets">Manager Question Sets</div>
+                        <a href="{{ route('admin.question-groups') }}" class="menu-link">
+                            <div data-i18n="Questions">Questions</div>
                         </a>
                     </li>
                 </ul>

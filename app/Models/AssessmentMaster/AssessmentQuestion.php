@@ -34,12 +34,12 @@ class AssessmentQuestion extends Model
 
     public function question(): BelongsTo
     {
-        return $this->belongsTo(\App\ModelsQuestionMaster\Question::class, 'question_id');
+        return $this->belongsTo(\App\Models\QuestionMaster\Question::class, 'question_id');
     }
 
     public function questionType(): BelongsTo
     {
-        return $this->belongsTo(\App\ModelsQuestionMaster\QuestionType::class, 'question_type_id');
+        return $this->belongsTo(\App\Models\QuestionMaster\QuestionType::class, 'question_type_id');
     }
 
     public function createdBy(): BelongsTo

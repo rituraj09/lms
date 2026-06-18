@@ -1,7 +1,7 @@
 <?php
-use App\Livewire\EvaluationMaster\QuestionManager;
-use App\Livewire\EvaluationMaster\QuestionSetManager;
-use App\Livewire\EvaluationMaster\QuestionSetBuilder;
+//routes/admin.php
+use App\Livewire\Admin\Questions\QuestionGroupIndex;
+use App\Livewire\Admin\Questions\QuestionGroupForm;
 
 Route::group(['middleware' => 'redirect.auth:admin'], function ($router) {
    $router->livewire('login', 'admin.login')->name('login');
@@ -14,21 +14,22 @@ Route::group(['middleware' => 'redirect.notauth:admin'], function ($router) {
     $router->livewire('organisation', 'admin.organisation')->name('organisation');
     $router->livewire('employee', 'admin.employee')->name('employee');
 
+    // Route::get(
+    //     '/admin/question-groups',
+    //     \App\Livewire\Admin\Questions\QuestionGroupIndex::class
+    // );
 
-    $router->livewire(
-    'question-groups',
-    'evaluation-master.question-group-index'
-    )->name('question-groups.index');
+    Route::get('/question-groups', QuestionGroupIndex::class)->name('question-groups');
 
-    $router->livewire(
-        'question-groups/create',
-        'evaluation-master.question-group-form'
-    )->name('question-groups.create');
+    //   $router->get('question-groups', QuestionGroupIndex::class)
+    //     ->name('question-groups.index');
 
-    $router->livewire(
-        'question-groups/{groupId}/edit',
-        'evaluation-master.question-group-form'
-    )->name('question-groups.edit');
+    // $router->get('question-groups/create', QuestionGroupForm::class)
+    //     ->name('question-groups.create');
+
+    // $router->get('question-groups/{groupId}/edit', QuestionGroupForm::class)
+    //     ->name('question-groups.edit');
+
 
 
 });
