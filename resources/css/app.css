@@ -9,3 +9,25 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+
+.card {
+    border-radius: 12px;
+}
+
+.btn {
+    border-radius: 8px;
+}
+
+.badge {
+    font-weight: 500;
+    font-size: 0.75rem;
+}
+
+.bg-purple-subtle {
+    background-color: #f3e8ff;
+}
+
+.text-purple {
+    color: #7e22ce;
+}

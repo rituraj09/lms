@@ -1,5 +1,6 @@
-{{--views/layouts/backend.blade.php --}}
+
 <!doctype html>
+{{--views/layouts/backend.blade.php --}}
 <html
     lang="en"
     class="layout-navbar-fixed layout-menu-fixed layout-compact"

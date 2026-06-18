@@ -14,21 +14,12 @@ Route::group(['middleware' => 'redirect.notauth:admin'], function ($router) {
     $router->livewire('organisation', 'admin.organisation')->name('organisation');
     $router->livewire('employee', 'admin.employee')->name('employee');
 
-    // Route::get(
-    //     '/admin/question-groups',
-    //     \App\Livewire\Admin\Questions\QuestionGroupIndex::class
-    // );
 
     Route::get('/question-groups', QuestionGroupIndex::class)->name('question-groups');
+    Route::get('/question-groups/create', QuestionGroupForm::class)->name('question-groups.create');
+    Route::get('/question-groups/{groupId}/edit', QuestionGroupForm::class)->name('question-groups.edit');
 
-    //   $router->get('question-groups', QuestionGroupIndex::class)
-    //     ->name('question-groups.index');
 
-    // $router->get('question-groups/create', QuestionGroupForm::class)
-    //     ->name('question-groups.create');
-
-    // $router->get('question-groups/{groupId}/edit', QuestionGroupForm::class)
-    //     ->name('question-groups.edit');
 
 
 
