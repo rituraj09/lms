@@ -93,7 +93,7 @@ class QuestionGroupForm extends Component
     /* ================================================================
      |  INTERNAL
      * ================================================================*/
-    protected array $languages = [];
+    public array $languages = [];
 
     /* ================================================================
      |  MOUNT
@@ -371,9 +371,20 @@ class QuestionGroupForm extends Component
         $this->view           = 'question_form';
     }
 
+    /* ================================================================
+  |  EDIT QUESTION — Load existing question into activeQuestion
+  * ================================================================*/
+
+    public string $questionFormKey = '';
     public function editQuestion(int $questionId): void
     {
-        $question = Question::findOrFail($questionId);
+        $question = Question::with([
+            'primarySkill',
+            'subSkill',
+            'difficultyLevel',
+            'ageGroup',
+        ])
+            ->findOrFail($questionId);
 
         if ($question->isUsedInAssessment()) {
             session()->flash(
@@ -385,36 +396,48 @@ class QuestionGroupForm extends Component
 
         $content = $question->question_content ?? [];
 
+        /* ── Stem ─────────────────────────────────────────────────── */
         $stem = [];
         foreach ($this->languages as $lang) {
             $stem[$lang] = $content['stem'][$lang] ?? '';
         }
-
+        /* ── Explanation ──────────────────────────────────────────── */
         $explanation = [];
         foreach ($this->languages as $lang) {
+            // Also try top-level 'explanation' key or nested
             $explanation[$lang] = $content['explanation'][$lang] ?? '';
         }
 
+        /* ── Options ──────────────────────────────────────────────── */
         $options = [];
-        foreach ($content['options'] ?? [] as $opt) {
+        $rawOptions = $content['options'] ?? [];
+
+        // Pad to minimum 2 options
+        while (count($rawOptions) < 2) {
+            $rawOptions[] = [];
+        }
+
+        foreach ($rawOptions as $opt) {
             $text = [];
             foreach ($this->languages as $lang) {
                 $text[$lang] = $opt['text'][$lang] ?? '';
             }
+
             $options[] = [
                 'option_type' => $opt['option_type'] ?? 'text',
-                'is_correct'  => (bool) ($opt['is_correct'] ?? false),
-                'weightage'   => $opt['weightage'] ?? 0,
+                'is_correct'  => (bool)  ($opt['is_correct']  ?? false),
+                'weightage'   => (float) ($opt['weightage']   ?? 0),
                 'text'        => $text,
                 'image_path'  => $opt['image_path'] ?? null,
             ];
         }
 
+        /* ── Set activeQuestion ───────────────────────────────────── */
         $this->activeQuestion = [
             'id'                  => $question->id,
             'question_code'       => $question->question_code,
             'answer_category'     => $question->answer_category,
-            'marks'               => $content['marks'] ?? 1,
+            'marks'               => (float) ($content['marks'] ?? 1),
             'primary_skill_id'    => $question->primary_skill_id,
             'sub_skill_id'        => $question->sub_skill_id,
             'difficulty_level_id' => $question->difficulty_level_id,
@@ -425,7 +448,13 @@ class QuestionGroupForm extends Component
             'explanation'         => $explanation,
         ];
 
-        $this->resetQuestionForm();
+        /* ── Force full re-render of question form ────────────────── */
+        $this->questionFormKey = 'edit-' . $questionId . '-' . time();
+
+        $this->stemImageUpload = null;
+        $this->optionImages    = [];
+        $this->resetErrorBag();
+
         $this->view = 'question_form';
     }
 

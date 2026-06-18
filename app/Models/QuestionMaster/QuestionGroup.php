@@ -3,25 +3,19 @@
 
 namespace App\Models\QuestionMaster;
 
+use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+
+#[Unguarded]
 class QuestionGroup extends Model
 {
-    use HasFactory, SoftDeletes;
+    use  SoftDeletes;
 
-    protected $fillable = [
-        'group_code',
-        'questions_category',
-        'title',
-        'group_content',
-        'admin_note',
-        'created_by',
-        'updated_by',
-    ];
+
 
     protected $casts = [
         'group_content' => 'array',
