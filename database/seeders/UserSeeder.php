@@ -15,7 +15,7 @@ class UserSeeder extends Seeder
     {
 
         \DB::table('admins')->insert([
-            ['name'=>'Ashim Sarma','email'=>'ashimxyz@gmail.com','password'=>bcrypt('123456'),'mobile'=>'7002274743'],
+            ['name'=>'Super Admin','email'=>'superadmin@gmail.com','password'=>bcrypt('123456'),'mobile'=>'7002274743'],
         ]);
 
         \DB::table('roles')->insert([
