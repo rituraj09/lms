@@ -13,7 +13,7 @@
             </p>
         </div>
 
-        <a href="{{ route('admin.question-groups.create') }}" class="btn btn-primary shadow-sm">
+        <a href="{{ route('admin.manage-questions.create') }}" class="btn btn-primary shadow-sm">
             <i class="ri ri-add-line me-1"></i>
             Add New Group
         </a>
@@ -123,7 +123,7 @@
                 {{-- Actions --}}
                 <div class="d-flex gap-2">
 
-                    <a href="{{ route('admin.question-groups.edit', $group->id) }}"
+                    <a href="{{ route('admin.manage-questions.edit', $group->id) }}"
                         class="btn btn-sm btn-outline-primary">
                         <i class="ri ri-edit-box-fill me-1"></i>
                         {{ $group->assessment_groups_count === 0 ? 'Edit' : 'View' }}

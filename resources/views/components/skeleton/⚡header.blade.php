@@ -196,15 +196,16 @@ new class extends Component {
                     <a class="nav-link dropdown-toggle hide-arrow d-flex align-items-center gap-2 ps-2"
                         href="javascript:void(0);" data-bs-toggle="dropdown">
                         <div class="avatar avatar-sm avatar-online">
-                            <img src="{{ is_null($this->admin->details->photo_path)
-                                ? asset('assets/img/avatars/male.png')
-                                : asset('storage/' . $this->admin->details?->photo_path) }}"
+                            <img src="{{ $this->admin->details?->photo_path
+                                ? asset('storage/' . $this->admin->details->photo_path)
+                                : asset('assets/img/avatars/male.png') }}"
                                 alt="avatar" class="rounded-circle" />
                         </div>
                         <div class="d-none d-lg-block lh-1">
                             <span class="d-block fw-semibold small">{{ $this->admin->name }}</span>
                             <span class="d-block text-muted" style="font-size: 0.72rem;">
-                                {{ $this->admin->currentrole->name }}
+                                {{-- ✅ Use safe accessor method --}}
+                                {{ $this->admin->getPrimaryRoleName() }}
                             </span>
                         </div>
                         <i class="ri ri-arrow-down-s-line d-none d-lg-block text-muted"></i>
@@ -216,18 +217,19 @@ new class extends Component {
                         <li class="px-3 py-3 border-bottom rounded-top">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="avatar avatar-online">
-                                    <img src="{{ is_null($this->admin->details->photo_path)
-                                        ? asset('assets/img/avatars/male.png')
-                                        : asset('storage/' . $this->admin->details->photo_path) }}"
+                                    <img src="{{ $this->admin->details?->photo_path
+                                        ? asset('storage/' . $this->admin->details->photo_path)
+                                        : asset('assets/img/avatars/male.png') }}"
                                         alt="avatar" class="w-px-40 h-auto rounded-circle" />
                                 </div>
                                 <div class="lh-sm overflow-hidden">
                                     <h6 class="mb-0 fw-semibold text-truncate">{{ $this->admin->name }}</h6>
                                     <small class="text-muted text-truncate d-block">
-                                        {{ $this->admin->email ?? '' }}
+                                        {{ $this->admin->email ?? 'No Email' }}
                                     </small>
                                     <span class="badge bg-label-primary mt-1" style="font-size:0.65rem;">
-                                        {{ $this->admin->currentrole->name }}
+                                        {{-- ✅ Safe method --}}
+                                        {{ $this->admin->getPrimaryRoleName() }}
                                     </span>
                                 </div>
                             </div>
@@ -292,13 +294,15 @@ new class extends Component {
                                         class="d-flex align-items-center gap-2 mb-1 px-2 py-1 rounded-2 bg-label-primary">
                                         <i class="ri ri-shield-check-fill icon-14px text-primary"></i>
                                         <small class="text-primary fw-semibold">
-                                            Active: {{ $this->admin->currentrole->name }}
+                                            {{-- ✅ Safe --}}
+                                            Active: {{ $this->admin->getPrimaryRoleName() }}
                                         </small>
                                     </div>
                                 </div>
                             </li>
                             @foreach ($this->admin->roles as $role)
-                                @if ($this->admin->current_role_id !== $role->id)
+                                {{-- ✅ Fixed: Check against role id, not current_role_id --}}
+                                @if ($this->admin->roles->first()?->id !== $role->id)
                                     <li>
                                         <a class="dropdown-item rounded-2 mx-1 px-3 py-2" href="#"
                                             wire:click="switchRole({{ $role->id }})">
@@ -306,7 +310,7 @@ new class extends Component {
                                                 <span class="icon-avatar bg-label-success">
                                                     <i class="ri ri-shuffle-line"></i>
                                                 </span>
-                                                <span>Switch to {{ $role->name }}</span>
+                                                <span>Switch to {{ $role->display_name ?? $role->name }}</span>
                                             </div>
                                         </a>
                                     </li>
@@ -329,7 +333,6 @@ new class extends Component {
                     </ul>
                 </li>
                 {{-- / User Dropdown --}}
-
             </ul>
         </div>
     </nav>
