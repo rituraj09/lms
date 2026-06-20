@@ -9,6 +9,7 @@ use App\Policies\QuestionPolicy;
 use App\Policies\QuestionGroupPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use App\Models\Admin;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -21,7 +22,7 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
         // ── Super admin bypasses ALL permission checks ─────────────
-        Gate::before(function ($user, $ability) {
+       Gate::before(function ($user, $ability) {
             if ($user instanceof Admin && $user->isSuperAdmin()) {
                 return true;
             }

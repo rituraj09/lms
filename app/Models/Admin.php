@@ -11,6 +11,7 @@ use App\Models\Master\AdminDetail;
 use App\Models\Master\Organisation;
 use App\Models\Role;  // ← Correct import - from App\Models
 
+
 class Admin extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles, SoftDeletes;

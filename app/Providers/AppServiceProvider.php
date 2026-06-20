@@ -28,10 +28,13 @@ class AppServiceProvider extends ServiceProvider
     {
         // ── Super Admin bypasses ALL permission & organisation checks ──
         Gate::before(function ($user, $ability) {
-            if ($user instanceof Admin && $user->hasRole('super_admin', 'admin')) {
-                return true;
-            }
-        });
+        if ($user instanceof \App\Models\Admin
+            && $user->hasRole('super_admin')) {
+            return true;
+        }
+
+        return null;
+    });
         Livewire::component('admin.questions.question-group-index', QuestionGroupIndex::class);
         Livewire::component('admin.questions.question-group-form',  QuestionGroupForm::class);
         Livewire::component('admin.questions.question-form',        QuestionForm::class);

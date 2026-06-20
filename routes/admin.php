@@ -31,14 +31,15 @@ Route::group(['middleware' => 'redirect.notauth:admin'], function ($router) {
 
     // Organisations
     Route::prefix('organisations')->name('organisations.')->group(function () {
+
         Route::get('/', \App\Livewire\Admin\Organisation\OrganisationList::class)
-            ->name('index')->middleware('can:organisation.view');
+            ->name('index');
         Route::get('/create', \App\Livewire\Admin\Organisation\OrganisationForm::class)
-            ->name('create')->middleware('can:organisation.create');
+            ->name('create');
         Route::get('/{id}/edit', \App\Livewire\Admin\Organisation\OrganisationForm::class)
-            ->name('edit')->middleware('can:organisation.edit');
+            ->name('edit');
         Route::get('/{orgId}/dashboard', \App\Livewire\Admin\Organisation\OrganisationDashboard::class)
-            ->name('dashboard')->middleware('can:organisation.view');
+            ->name('dashboard');
         // Route::get('/{orgId}/students', \App\Livewire\Admin\Student\StudentList::class)
         //     ->name('students')->middleware('can:student.view');
     });

@@ -84,7 +84,7 @@ class OrganisationForm extends Component
     public function mount(?int $id = null): void
     {
         $this->organisationTypes = OrganisationType::active()->get();
-        $this->states = State::active()->get();
+        $this->states = State::all();
 
         if ($id) {
             $this->organisation = Organisation::findOrFail($id);
@@ -118,14 +118,14 @@ class OrganisationForm extends Component
 
             // Load districts for selected state
             if ($this->state_id) {
-                $this->districts = District::where('state_id', $this->state_id)->active()->get();
+                $this->districts = District::where('state_id', $this->state_id)->get();
             }
         }
     }
 
     public function updatedStateId(): void
     {
-        $this->districts = District::where('state_id', $this->state_id)->active()->get();
+        $this->districts = District::where('state_id', $this->state_id)->get();
         $this->district_id = 0; // Reset district selection
     }
 
