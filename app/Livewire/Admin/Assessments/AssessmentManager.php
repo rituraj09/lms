@@ -122,14 +122,14 @@ class AssessmentManager extends Component
         return Assessment::with(['ageGroup', 'createdBy'])
             ->withCount('assessmentGroups')
             ->when($this->search, fn($q) =>
-            $q->where('title', 'like', "%{$this->search}%")
-                ->orWhere('assessment_code', 'like', "%{$this->search}%")
+                $q->where('title', 'like', "%{$this->search}%")
+                  ->orWhere('assessment_code', 'like', "%{$this->search}%")
             )
             ->when($this->statusFilter, fn($q) =>
-            $q->where('status', $this->statusFilter)
+                $q->where('status', $this->statusFilter)
             )
             ->when($this->typeFilter, fn($q) =>
-            $q->where('assessment_type_id', $this->typeFilter)
+                $q->where('assessment_type_id', $this->typeFilter)
             )
             ->latest()
             ->paginate($this->perPage);
@@ -245,8 +245,8 @@ class AssessmentManager extends Component
                 'total_marks'        => $this->total_marks,
                 'passing_marks'      => $this->passing_marks,
                 'duration_minutes'   => !empty($this->duration_minutes)
-                    ? (int) $this->duration_minutes
-                    : null,
+                                            ? (int) $this->duration_minutes
+                                            : null,
                 'admin_note'         => $this->admin_note,
                 'has_negative_mark'  => (bool) $this->has_negative_mark,
                 'status'             => $this->status,
@@ -285,9 +285,9 @@ class AssessmentManager extends Component
         $this->assessmentGroups = [];
 
         $groups = AssessmentGroup::with([
-            'questionGroup',
-            'assessmentQuestions.question',
-        ])
+                'questionGroup',
+                'assessmentQuestions.question',
+            ])
             ->where('assessment_id', $assessmentId)
             ->orderBy('id')
             ->get();
@@ -389,8 +389,8 @@ class AssessmentManager extends Component
     {
         return QuestionGroup::with('questions')
             ->when($this->groupPickerSearch, fn($q) =>
-            $q->where('title', 'like', "%{$this->groupPickerSearch}%")
-                ->orWhere('group_code', 'like', "%{$this->groupPickerSearch}%")
+                $q->where('title', 'like', "%{$this->groupPickerSearch}%")
+                  ->orWhere('group_code', 'like', "%{$this->groupPickerSearch}%")
             )
             ->withCount('questions')
             ->orderBy('group_code')
@@ -445,9 +445,9 @@ class AssessmentManager extends Component
             $alreadyUsedQIds = collect(
                 $this->assessmentGroups[$agIndex]['questions'] ?? []
             )
-                ->pluck('question_id')
-                ->values()
-                ->toArray();
+            ->pluck('question_id')
+            ->values()
+            ->toArray();
         } else {
             // new mode — check all ags with same group_id
             $alreadyUsedQIds = collect($this->assessmentGroups)
@@ -789,8 +789,8 @@ class AssessmentManager extends Component
             'languages'     => Globals::LANGUAGES,
             'questionTypes' => $this->questionTypes,
             'pickerGroups'  => ($this->showGroupPicker && $this->pickerMode === 'new')
-                ? $this->pickerGroups
-                : collect(),
+                                ? $this->pickerGroups
+                                : collect(),
         ]);
     }
 }

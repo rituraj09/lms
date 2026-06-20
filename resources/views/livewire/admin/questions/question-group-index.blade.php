@@ -5,7 +5,7 @@
 
         <div>
             <h4 class="fw-bold mb-1">
-                <i class="bi bi-question-circle text-primary me-2"></i>
+                <i class="ri ri-question-line text-primary me-2"></i>
                 Question Groups
             </h4>
             <p class="text-muted small mb-0">
@@ -13,9 +13,8 @@
             </p>
         </div>
 
-        <a href="{{ route('admin.question-groups.create') }}"
-           class="btn btn-primary shadow-sm">
-            <i class="bi bi-plus-lg me-1"></i>
+        <a href="{{ route('admin.manage-questions.create') }}" class="btn btn-primary shadow-sm">
+            <i class="ri ri-add-line me-1"></i>
             Add New Group
         </a>
     </div>
@@ -31,19 +30,16 @@
                 <div class="col-md-6">
                     <div class="input-group">
                         <span class="input-group-text bg-light">
-                            <i class="bi bi-search text-muted"></i>
+                            <i class="ri ri-search-line text-muted"></i>
                         </span>
-                        <input type="text"
-                               wire:model.live.debounce.300ms="search"
-                               class="form-control"
-                               placeholder="Search by title, code or note...">
+                        <input type="text" wire:model.live.debounce.300ms="search" class="form-control"
+                            placeholder="Search by title, code or note...">
                     </div>
                 </div>
 
                 {{-- Category --}}
                 <div class="col-md-3">
-                    <select wire:model.live="categoryFilter"
-                            class="form-select">
+                    <select wire:model.live="categoryFilter" class="form-select">
                         <option value="">All Categories</option>
                         <option value="single">Single</option>
                         <option value="multiple">Multiple</option>
@@ -52,8 +48,7 @@
 
                 {{-- Per Page --}}
                 <div class="col-md-3">
-                    <select wire:model.live="perPage"
-                            class="form-select">
+                    <select wire:model.live="perPage" class="form-select">
                         <option value="10">10 / page</option>
                         <option value="25">25 / page</option>
                         <option value="50">50 / page</option>
@@ -84,12 +79,11 @@
                 <div class="d-flex align-items-start gap-3">
 
                     {{-- Toggle Button --}}
-                    <button wire:click="toggleGroup({{ $group->id }})"
-                            class="btn btn-sm btn-light border">
+                    <button wire:click="toggleGroup({{ $group->id }})" class="btn btn-sm btn-light border">
                         @if (in_array($group->id, $expandedGroups))
-                            <i class="bi bi-chevron-down"></i>
+                            <i class="ri ri-arrow-down-s-line"></i>
                         @else
-                            <i class="bi bi-chevron-right"></i>
+                            <i class="ri ri-arrow-right-s-line"></i>
                         @endif
                     </button>
 
@@ -102,17 +96,16 @@
                         <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
 
                             {{-- Category Badge --}}
-                            <span class="badge
-                                {{ $group->questions_category === 'single'
-                                    ? 'bg-primary-subtle text-primary'
-                                    : 'bg-purple-subtle text-purple' }}">
+                            <span
+                                class="badge
+                                {{ $group->questions_category === 'single' ? 'bg-primary-subtle text-primary' : 'bg-purple-subtle text-purple' }}">
                                 {{ ucfirst($group->questions_category) }}
                             </span>
 
                             {{-- Locked Badge --}}
                             @if ($group->assessment_groups_count > 0)
                                 <span class="badge bg-warning-subtle text-warning">
-                                    <i class="bi bi-lock-fill me-1"></i>
+                                    <i class="ri ri-git-repository-private-line me-1"></i>
                                     In Assessment
                                 </span>
                             @endif
@@ -130,16 +123,15 @@
                 {{-- Actions --}}
                 <div class="d-flex gap-2">
 
-                    <a href="{{ route('admin.question-groups.edit', $group->id) }}"
-                       class="btn btn-sm btn-outline-primary">
-                        <i class="bi bi-pencil-square me-1"></i>
+                    <a href="{{ route('admin.manage-questions.edit', $group->id) }}"
+                        class="btn btn-sm btn-outline-primary">
+                        <i class="ri ri-edit-box-fill me-1"></i>
                         {{ $group->assessment_groups_count === 0 ? 'Edit' : 'View' }}
                     </a>
 
                     @if ($group->assessment_groups_count === 0)
-                        <button wire:click="confirmDelete({{ $group->id }})"
-                                class="btn btn-sm btn-outline-danger">
-                            <i class="bi bi-trash me-1"></i>
+                        <button wire:click="confirmDelete({{ $group->id }})" class="btn btn-sm btn-outline-danger">
+                            <i class="ri ri-delete-bin-line me-1"></i>
                             Delete
                         </button>
                     @endif
@@ -154,17 +146,29 @@
                 <div class="card-body border-top bg-light">
 
                     @forelse ($group->questions as $question)
+                        <div class="d-flex justify-content-between align-items-start py-2 border-bottom">
 
-                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                            <div class="text-muted small d-flex">
 
-                            <div class="text-muted small">
-                                <i class="bi bi-question-circle text-primary me-2"></i>
-                                {{ $question->question_content['question_text'] ?? '(No text)' }}
+                                {{-- Serial Number --}}
+                                <span class="fw-semibold text-dark me-2">
+                                    {{ $loop->iteration }}.
+                                </span>
+
+                                <div>
+                                    <i class="ri-question-line text-primary me-2"></i>
+                                    {!! data_get($question->question_content, 'stem.en') !!}
+                                </div>
+
                             </div>
 
                             @if ($question->assessment_questions_count > 0)
                                 <span class="badge bg-warning-subtle text-warning">
-                                    <i class="bi bi-lock-fill me-1"></i> Used
+                                    <i class="ri ri-git-repository-private-line me-1"></i> Used
+                                </span>
+                            @else
+                                <span class="badge bg-success-subtle text-success">
+                                    <i class="ri ri-lock-unlock-line me-1"></i> Available
                                 </span>
                             @endif
 
@@ -185,7 +189,7 @@
 
         <div class="card border-0 shadow-sm">
             <div class="card-body text-center py-5 text-muted">
-                <i class="bi bi-folder2-open display-6 mb-3"></i>
+                <i class="ri ri-folder-2-line display-6 mb-3"></i>
                 <h6>No question groups found</h6>
                 <p class="small mb-0">Click "Add New Group" to create one.</p>
             </div>

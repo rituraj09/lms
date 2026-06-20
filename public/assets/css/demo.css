@@ -101,3 +101,82 @@
   text-align: center;
   margin-top: 1.25rem;
 }
+
+/* ============================================
+   ADD THIS TO YOUR demo.css OR @push('style')
+   ============================================ */
+
+/* Hide brand text when menu is collapsed */
+html.layout-menu-collapsed .app-brand-text-group,
+html.layout-menu-collapsed .app-brand-text,
+html.layout-menu-collapsed .app-brand-subtext {
+    display: none !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+}
+
+/* Center logo icon when collapsed */
+html.layout-menu-collapsed .app-brand {
+    justify-content: center !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+html.layout-menu-collapsed .app-brand-link {
+    justify-content: center !important;
+    gap: 0 !important;
+}
+
+/* Hide toggle button when collapsed */
+html.layout-menu-collapsed .layout-menu-toggle {
+    display: none !important;
+}
+
+/* When hover expands the sidebar again */
+html.layout-menu-collapsed .layout-menu:hover .app-brand-text-group,
+html.layout-menu-collapsed .layout-menu:hover .app-brand-text,
+html.layout-menu-collapsed .layout-menu:hover .app-brand-subtext {
+    display: flex !important;
+    opacity: 1 !important;
+    width: auto !important;
+}
+
+html.layout-menu-collapsed .layout-menu:hover .app-brand {
+    justify-content: space-between !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+}
+
+html.layout-menu-collapsed .layout-menu:hover .app-brand-link {
+    justify-content: flex-start !important;
+    gap: 0.5rem !important;
+}
+
+html.layout-menu-collapsed .layout-menu:hover .layout-menu-toggle {
+    display: flex !important;
+}
+
+/* ============================================
+   ICON AVATAR — perfectly centered
+   Use: <span class="icon-avatar bg-label-*">
+           <i class="ri ri-*"></i>
+        </span>
+   ============================================ */
+
+.icon-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.icon-avatar i {
+    font-size: 0.78rem;
+    line-height: 1;
+    display: block;
+}

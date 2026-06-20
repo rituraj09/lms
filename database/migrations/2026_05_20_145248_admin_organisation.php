@@ -1,3 +1,5 @@
+// database/migrations/xxxx_create_admin_organisation_table.php
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -6,22 +8,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('admin_organisations', function (Blueprint $table) {
-            $table->foreignId('admin_id')->constrained('admins');
-            $table->foreignId('organisation_id')->constrained('organisations');
+        Schema::create('admin_organisation', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('admin_id')->constrained('admins')->cascadeOnDelete();
+            $table->foreignId('organisation_id')->constrained('organisations')->cascadeOnDelete();
+            $table->enum('access_level', ['full', 'limited', 'view_only'])->default('limited');
+            $table->timestamps();
+
+            $table->unique(['admin_id', 'organisation_id']);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('admin_organisations');//
+        Schema::dropIfExists('admin_organisation');
     }
 };
