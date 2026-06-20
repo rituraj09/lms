@@ -405,8 +405,10 @@
                                     <div class="input-group">
                                         <input type="number" wire:model="duration_minutes" class="form-control"
                                             min="1" placeholder="e.g. 60">
+                                    </div>
+                                </div>
                                 <div class="col-md-3">
-                                    <label class="form-label fw-medium small d-block">
+                                    <label class="form-label fw-medium small d-block"> Has Negative Mark?
                                     </label>
                                     <div class="form-check form-switch mt-2">
                                         <input class="form-check-input" type="checkbox"
@@ -417,12 +419,15 @@
                                     </div>
                                 </div>
 
-                            </div>
-                        </div>
+
+
                     </div>
 
                 </div>
 
+
+            </div>
+                </div>
                 <div class="col-lg-4">
 
                     <div class="card shadow-sm border-0 mb-4">
@@ -443,7 +448,7 @@
     ] as $val => [$color, $icon])
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" wire:model="status"
-                                            value="{{ $val }}" id="status-{{ $val }}">
+                                               value="{{ $val }}" id="status-{{ $val }}">
                                         <label class="form-check-label small" for="status-{{ $val }}">
                                             <i class="ri {{ $icon }} text-{{ $color }} me-1"></i>
                                             {{ ucfirst($val) }}
@@ -454,12 +459,12 @@
 
                             <label class="form-label fw-medium small">Admin Note</label>
                             <textarea wire:model="admin_note" class="form-control border-0 bg-light" rows="3"
-                                placeholder="Internal note...">
+                                      placeholder="Internal note...">
                             </textarea>
                         </div>
                         <div class="card-footer bg-white p-3">
                             <button type="button" wire:click="saveAssessment" wire:loading.attr="disabled"
-                                class="btn btn-primary w-100">
+                                    class="btn btn-primary w-100">
                                 <span wire:loading wire:target="saveAssessment">
                                     <span class="spinner-border spinner-border-sm me-1"></span>
                                     Saving…

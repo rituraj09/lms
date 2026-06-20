@@ -35,7 +35,7 @@ new class extends Component {
             @if ($activeOrg)
                 {{-- Organisation Mode Brand --}}
                 <a href="{{ route('admin.organisations.dashboard', $activeOrg->id) }}"
-                    class="app-brand-link d-flex align-items-center gap-2" wire:navigate>
+                    class="app-brand-link d-flex align-items-center gap-2" >
                     <span class="app-brand-logo flex-shrink-0">
                         @if ($activeOrg->logo)
                             <img style="width: 36px; height: 36px; object-fit: cover;"
@@ -62,7 +62,7 @@ new class extends Component {
             @else
                 {{-- Normal Mode Brand --}}
                 <a href="{{ route('admin.home') }}" class="app-brand-link d-flex align-items-center gap-2"
-                    wire:navigate>
+                    >
                     <span class="app-brand-logo flex-shrink-0">
                         <img style="width: 36px; height: 36px; object-fit: contain;" class="rounded"
                             src="{{ asset('assets/img/favicon/favicon.png') }}" alt="{{ config('app.name') }}" />
@@ -138,7 +138,7 @@ new class extends Component {
                 {{-- Org Dashboard --}}
                 <li class="menu-item">
                     <a href="{{ route('admin.organisations.dashboard', $activeOrg->id) }}" class="menu-link"
-                        wire:navigate>
+                        >
                         <i class="menu-icon icon-base ri ri-dashboard-line"></i>
                         <div>Dashboard</div>
                     </a>
@@ -159,11 +159,11 @@ new class extends Component {
                         </a>
                         <ul class="menu-sub">
                             <li class="menu-item">
-                                <a href="#" class="menu-link" wire:navigate>
+                                <a href="#" class="menu-link" >
                                     <div>All Students</div>
                                 </a>
                                 {{-- <a href="{{ route('admin.organisations.students', $activeOrg->id) }}" class="menu-link"
-                                    wire:navigate>
+                                    >
                                     <div>All Students</div>
                                 </a> --}}
                             </li>
@@ -317,7 +317,7 @@ new class extends Component {
                             </li>
                             <li class="menu-item">
                                 <a href="{{ route('admin.organisations.edit', $activeOrg->id) }}" class="menu-link"
-                                    wire:navigate>
+                                    >
                                     <div>Edit Organisation</div>
                                 </a>
                             </li>
@@ -343,7 +343,7 @@ new class extends Component {
                         @if ($org->id !== $activeOrg->id)
                             <li class="menu-item">
                                 <a href="{{ route('admin.organisations.dashboard', $org->id) }}" class="menu-link"
-                                    wire:navigate>
+                                    >
                                     <span class="menu-icon">
                                         <i class="ri ri-building-line"></i>
                                     </span>
@@ -363,7 +363,7 @@ new class extends Component {
 
                 {{-- Dashboard --}}
                 <li class="menu-item">
-                    <a href="{{ route('admin.home') }}" class="menu-link" wire:navigate>
+                    <a href="{{ route('admin.home') }}" class="menu-link" >
                         <i class="menu-icon icon-base ri ri-dashboard-line"></i>
                         <div>Dashboard</div>
                     </a>
@@ -561,16 +561,13 @@ new class extends Component {
                             </a>
                             <ul class="menu-sub">
                                 <li class="menu-item">
-                                    <a href="{{ route('admin.admins.index') }}" class="menu-link" wire:navigate>
+                                    <a href="{{ route('admin.admins.index') }}" class="menu-link" >
                                         <div>All Admins</div>
                                     </a>
                                 </li>
                                 @if ($can('role.view'))
                                     <li class="menu-item">
-                                        {{-- <a href="{{ route('admin.roles.index') }}" class="menu-link" wire:navigate>
-                                            <div>Roles & Permissions</div>
-                                        </a> --}}
-                                        <a href="#" class="menu-link" wire:navigate>
+                                        <a href="{{ route('admin.roles.index') }}" class="menu-link">
                                             <div>Roles & Permissions</div>
                                         </a>
                                     </li>
@@ -595,7 +592,7 @@ new class extends Component {
                         </a>
                         <ul class="menu-sub">
                             <li class="menu-item">
-                                <a href="{{ route('admin.organisations.index') }}" class="menu-link" wire:navigate>
+                                <a href="{{ route('admin.organisations.index') }}" class="menu-link">
                                     <div>Organisations</div>
                                 </a>
                             </li>

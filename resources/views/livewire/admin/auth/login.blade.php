@@ -292,8 +292,8 @@
     @endif
 
     {{-- Loading Backdrop --}}
-    <div wire:loading wire:target="forgotPassword,cancel,login,newPassword,resetPassword,sendSMS,sendEmail">
+
+    <div wire:loading wire:target="forgotPassword,cancel,login,newPassword,resetPassword">
         @include('utilities.backdrop')
     </div>
-
 </div>

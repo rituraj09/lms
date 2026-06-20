@@ -12,11 +12,11 @@
                 </ol>
             </nav>
         </div>
-        @can('organisation.create')
-            <a href="{{ route('admin.organisations.create') }}" class="btn btn-primary" wire:navigate>
-                <i class="fas fa-plus me-2"></i>Add Organisation
+        @if (auth('admin')->user()->isSuperAdmin() || auth('admin')->user()->can('organisation.create'))
+            <a href="{{ route('admin.organisations.create') }}" class="btn btn-primary" >
+                <i class="ri ri-add-line me-2"></i>Add Organisation
             </a>
-        @endcan
+        @endif
     </div>
 
     {{-- Filters --}}
@@ -26,9 +26,9 @@
                 <div class="col-md-5">
                     <label class="form-label">Search</label>
                     <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <span class="input-group-text"><i class="ri ri-search-line"></i></span>
                         <input type="text" wire:model.live.debounce.400ms="search" class="form-control"
-                            placeholder="Search by name, code or email...">
+                               placeholder="Search by name, code or email...">
                     </div>
                 </div>
                 <div class="col-md-2">
@@ -58,8 +58,8 @@
                     </select>
                 </div>
                 <div class="col-md-1">
-                    <button wire:click="$set('search', '')" class="btn btn-outline-secondary w-100">
-                        <i class="fas fa-redo"></i>
+                    <button wire:click="$set('search', '')" class="btn btn-lg btn-outline-secondary p-4 w-100">
+                        <i class="ri ri-arrow-go-forward-line"></i>
                     </button>
                 </div>
             </div>
@@ -82,10 +82,10 @@
                         <div class="card h-100 organisation-card border-0 shadow-sm">
                             {{-- Banner --}}
                             <div class="org-banner position-relative"
-                                style="height: 100px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 0.5rem 0.5rem 0 0; overflow:hidden;">
+                                 style="height: 100px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 0.5rem 0.5rem 0 0; overflow:hidden;">
                                 @if ($org->banner)
-                                    <img src="{{ asset('storage/' . $org->banner) }}" class="w-100 h-100 object-fit-cover"
-                                        alt="">
+                                    <img src="{{ asset('storage/' . $org->banner) }}"
+                                         class="w-100 h-100 object-fit-cover" alt="">
                                 @endif
                                 <span
                                     class="badge position-absolute top-0 end-0 m-2
@@ -98,10 +98,10 @@
                                 {{-- Logo & Name --}}
                                 <div class="d-flex align-items-center mb-3">
                                     <div class="org-logo me-3"
-                                        style="width:60px; height:60px; border-radius:50%; overflow:hidden; border:3px solid #fff; box-shadow:0 2px 8px rgba(0,0,0,0.15); margin-top:-30px; background:#fff;">
+                                         style="width:60px; height:60px; border-radius:50%; overflow:hidden; border:3px solid #fff; box-shadow:0 2px 8px rgba(0,0,0,0.15); margin-top:-30px; background:#fff;">
                                         @if ($org->logo)
                                             <img src="{{ asset('storage/' . $org->logo) }}"
-                                                class="w-100 h-100 object-fit-cover" alt="{{ $org->name }}">
+                                                 class="w-100 h-100 object-fit-cover" alt="{{ $org->name }}">
                                         @else
                                             <div
                                                 class="w-100 h-100 d-flex align-items-center justify-content-center bg-primary text-white fw-bold fs-5">
@@ -118,18 +118,18 @@
                                 {{-- Info --}}
                                 <div class="org-info">
                                     <div class="d-flex align-items-center mb-1 text-sm text-muted">
-                                        <i class="fas fa-building me-2 text-primary"></i>
+                                        <i class="ri ri-community-line me-2 text-primary"></i>
                                         {{ $org->organisationType?->name ?? 'N/A' }}
                                     </div>
                                     @if ($org->email)
                                         <div class="d-flex align-items-center mb-1 text-sm text-muted">
-                                            <i class="fas fa-envelope me-2 text-primary"></i>
+                                            <i class="ri ri-mail-line me-2 text-primary"></i>
                                             {{ $org->email }}
                                         </div>
                                     @endif
                                     @if ($org->city)
                                         <div class="d-flex align-items-center mb-1 text-sm text-muted">
-                                            <i class="fas fa-map-marker-alt me-2 text-primary"></i>
+                                            <i class="ri ri-map-pin-line me-2 text-primary"></i>
                                             {{ $org->city }}{{ $org->district?->name ? ', ' . $org->district->name : '' }}
                                         </div>
                                     @endif
@@ -158,21 +158,21 @@
                             <div
                                 class="card-footer bg-transparent border-top d-flex justify-content-between align-items-center">
                                 <button wire:click="enterOrganisation({{ $org->id }})"
-                                    class="btn btn-primary btn-sm">
-                                    <i class="fas fa-arrow-right me-1"></i> Enter
+                                        class="btn btn-primary btn-sm mt-3">
+                                    <i class="ri ri-arrow-right-s-line me-1"></i> Enter
                                 </button>
                                 <div class="d-flex gap-1">
                                     @can('organisation.edit')
                                         <a href="{{ route('admin.organisations.edit', $org->id) }}"
-                                            class="btn btn-outline-secondary btn-sm" title="Edit" wire:navigate>
-                                            <i class="fas fa-edit"></i>
+                                           class="btn btn-outline-secondary btn-sm" title="Edit" >
+                                            <i class="ri ri-pencil-fill"></i>
                                         </a>
                                     @endcan
                                     @can('organisation.delete')
                                         <button wire:click="deleteOrganisation({{ $org->id }})"
-                                            wire:confirm="Are you sure you want to delete this organisation?"
-                                            class="btn btn-outline-danger btn-sm" title="Delete">
-                                            <i class="fas fa-trash"></i>
+                                                wire:confirm="Are you sure you want to delete this organisation?"
+                                                class="btn btn-outline-danger btn-sm" title="Delete">
+                                            <i class="ri ri-delete-bin-fill"></i>
                                         </button>
                                     @endcan
                                 </div>
@@ -190,7 +190,7 @@
             {{-- Empty State --}}
             <div class="card">
                 <div class="card-body text-center py-5">
-                    <i class="fas fa-building fa-4x text-muted mb-3"></i>
+                    <i class="ri ri-community-line fa-4x text-muted mb-3"></i>
                     <h5>No Organisations Found</h5>
                     <p class="text-muted mb-3">
                         @if ($search || $statusFilter || $typeFilter)
@@ -201,8 +201,8 @@
                     </p>
                     @can('organisation.create')
                         @if (!$search && !$statusFilter && !$typeFilter)
-                            <a href="{{ route('admin.organisations.create') }}" class="btn btn-primary" wire:navigate>
-                                <i class="fas fa-plus me-2"></i>Create Organisation
+                            <a href="{{ route('admin.organisations.create') }}" class="btn btn-primary" >
+                                <i class="ri ri-add-line me-2"></i>Create Organisation
                             </a>
                         @else
                             <button wire:click="$set('search', '')" class="btn btn-outline-secondary">

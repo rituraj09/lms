@@ -16,7 +16,7 @@
             </nav>
         </div>
         @can('organisation.edit')
-            <a href="{{ route('admin.organisations.edit', $organisation->id) }}" class="btn btn-primary" wire:navigate>
+            <a href="{{ route('admin.organisations.edit', $organisation->id) }}" class="btn btn-primary" >
                 <i class="fas fa-edit me-2"></i>Edit Organisation
             </a>
         @endcan
@@ -137,7 +137,7 @@
                     <div class="d-flex flex-wrap gap-2">
                         @can('student.view')
                             <a href="{{ route('admin.organisation.students', $organisation->id) }}"
-                                class="btn btn-outline-primary" wire:navigate>
+                                class="btn btn-outline-primary" >
                                 <i class="fas fa-user-graduate me-2"></i>Manage Students
                             </a>
                         @endcan

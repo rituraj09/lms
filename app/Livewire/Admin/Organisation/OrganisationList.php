@@ -10,6 +10,7 @@ use App\Models\Master\Organisation;
 use App\Services\OrganisationContext;
 use Livewire\Attributes\Layout;
 
+
 #[Layout('layouts.backend')]
 class OrganisationList extends Component
 {

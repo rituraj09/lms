@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -10,22 +11,14 @@ use Spatie\Permission\Traits\HasRoles;
 use App\Models\Master\AdminDetail;
 use App\Models\Master\Organisation;
 use App\Models\Role;  // ← Correct import - from App\Models
-
+#[Unguarded]
 class Admin extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles, SoftDeletes;
 
     protected $guard_name = 'admin';
 
-    protected $fillable = [
-        'name',
-        'email',
-        'mobile',
-        'password',
-        'avatar',
-        'status',
-        'current_organisation_id',
-    ];
+
 
     protected $hidden = [
         'password',
@@ -106,7 +99,16 @@ class Admin extends Authenticatable
     }
 
     // ─── Permission Helpers ───────────────────────────────────
-
+    public function permissions()
+    {
+        return $this->morphToMany(
+            Permission::class,
+            'model',
+            'model_has_permissions',
+            'model_id',
+            'permission_id'
+        );
+    }
     public function getRolePermissions(): \Illuminate\Support\Collection
     {
         return $this->getPermissionsViaRoles();

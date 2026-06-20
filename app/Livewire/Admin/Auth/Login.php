@@ -91,7 +91,7 @@ class Login extends Component
         )) {
             RateLimiter::clear($key);
             $this->handleOrganisationContext($admin);
-            $this->redirect(route('admin.home'), navigate: true);
+            $this->redirect(route('admin.home'), navigate: false);
             return;
         }
 

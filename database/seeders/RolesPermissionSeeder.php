@@ -122,11 +122,23 @@ class RolesPermissionSeeder extends Seeder
                 'description'  => 'Full system access.',
                 'is_system'    => true,
                 'color'        => '#dc3545',
-                'icon'         => 'fas fa-crown',
+                'icon'         => 'ri ri-vip-crown-line',
                 'guard_name'   => $guard,
             ]
         );
-
+        $superAdmin->syncPermissions([
+            'organisation.view', 'organisation.edit', 'organisation.settings',
+            'student.view', 'student.create', 'student.edit',
+            'student.transfer', 'student.import', 'student.export',
+            'course.view', 'course.assign',
+            'assessment.view', 'assessment.assign',
+            'question.view',
+            'admin.view',
+            'report.view', 'report.export',
+            'activity.view',
+            'settings.view',
+            'leaderboard.view',
+        ]);
         // Admin
         $adminRole = Role::firstOrCreate(
             [
@@ -138,7 +150,7 @@ class RolesPermissionSeeder extends Seeder
                 'description'  => 'General administrator.',
                 'is_system'    => true,
                 'color'        => '#0d6efd',
-                'icon'         => 'fas fa-user-shield',
+                'icon'         => 'ri ri-user-settings-fill',
                 'guard_name'   => $guard,
             ]
         );
@@ -167,7 +179,7 @@ class RolesPermissionSeeder extends Seeder
                 'description'  => 'Trainer with student & assignment access.',
                 'is_system'    => true,
                 'color'        => '#198754',
-                'icon'         => 'fas fa-chalkboard-teacher',
+                'icon'         => 'ri ri-presentation-fill',
                 'guard_name'   => $guard,
             ]
         );
