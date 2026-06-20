@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Organisation;
+use App\Models\Master\Organisation;
 use Illuminate\Support\Facades\Session;
 
 class OrganisationContext

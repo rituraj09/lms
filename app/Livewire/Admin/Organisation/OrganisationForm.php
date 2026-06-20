@@ -155,7 +155,7 @@ class OrganisationForm extends Component
         } else {
             Organisation::create($data);
             $this->dispatch('notify', type: 'success', message: 'Organisation created successfully!');
-            $this->redirect(route('admin.organisations.index'), navigate: true);
+            $this->redirect(route('admin.organisations.index'), navigate: false);
         }
     }
 

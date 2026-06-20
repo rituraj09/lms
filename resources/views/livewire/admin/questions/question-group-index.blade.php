@@ -12,11 +12,12 @@
                 Manage and organize question groups efficiently.
             </p>
         </div>
-
+        @can('question.create')
         <a href="{{ route('admin.manage-questions.create') }}" class="btn btn-primary shadow-sm">
             <i class="ri ri-add-line me-1"></i>
             Add New Group
         </a>
+        @endcan
     </div>
 
 

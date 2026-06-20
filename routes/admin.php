@@ -25,12 +25,11 @@ Route::group(['middleware' => 'redirect.notauth:admin'], function ($router) {
     })->name('logout');
 
     $router->livewire('home', 'admin.home')->name('home');
-    $router->livewire('role', 'admin.role')->name('role');
-    $router->livewire('designation', 'admin.designation')->name('designation');
-    $router->livewire('employee', 'admin.employee')->name('employee');
+
 
     // Organisations
     Route::group(['middleware' => ['auth:admin']], function () {
+
         Route::prefix('organisations')->name('organisations.')->group(callback: function () {
             Route::get('/', \App\Livewire\Admin\Organisation\OrganisationList::class)
                 ->name('index')->middleware('can:organisation.view');
@@ -60,19 +59,29 @@ Route::group(['middleware' => 'redirect.notauth:admin'], function ($router) {
         Route::get('roles', \App\Livewire\Admin\RolePermission\RoleManager::class)
             ->name('roles.index')
             ->middleware('can:role.view');
+        /* ================================================================
+             |  Question Bank
+             * ================================================================*/
+
+
+        Route::get('/manage-questions', QuestionGroupIndex::class)
+            ->name('manage-questions')->middleware('can:question.view');
+        Route::get('/manage-questions/create', QuestionGroupForm::class)
+            ->name('manage-questions.create')->middleware('can:question.create');
+        Route::get('/manage-questions/{groupId}/edit', QuestionGroupForm::class)
+            ->name('manage-questions.edit')->middleware('can:questions.edit');
+        /* ================================================================
+          |  ASSESSMENTS
+          * ================================================================*/
+        Route::get(
+            '/assessments',
+            AssessmentManager::class
+        )->name('assessments.index')->middleware('can:assessment.view');
+
     });
-    Route::get('/manage-questions', QuestionGroupIndex::class)->name('manage-questions');
-    Route::get('/manage-questions/create', QuestionGroupForm::class)->name('manage-questions.create');
-    Route::get('/manage-questions/{groupId}/edit', QuestionGroupForm::class)->name('manage-questions.edit');
 
 
-    /* ================================================================
-       |  ASSESSMENTS
-       * ================================================================*/
-    Route::get(
-        '/assessments',
-        AssessmentManager::class
-    )->name('assessments.index');
+
 
 
 });

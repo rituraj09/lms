@@ -9,7 +9,7 @@ new class extends Component {
     {
         \App\Services\OrganisationContext::clear();
         auth('admin')->user()->setCurrentOrganisation(null);
-        $this->redirect(route('admin.home'), navigate: true);
+        $this->redirect(route('admin.home'), navigate: false);
     }
 };
 ?>
@@ -430,29 +430,6 @@ new class extends Component {
                         </ul>
                     </li>
 
-                    <li class="menu-item">
-                        <a href="javascript:void(0);" class="menu-link menu-toggle">
-                            <i class="menu-icon icon-base ri ri-user-received-line"></i>
-                            <div>Enrollments</div>
-                        </a>
-                        <ul class="menu-sub">
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>All Enrollments</div>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>Pending Approvals</div>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>Completed</div>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
                 @endif
 
                 {{-- ==================== ASSESSMENT & EVALUATION ==================== --}}
@@ -542,13 +519,6 @@ new class extends Component {
                                         <div>All Students</div>
                                     </a>
                                 </li>
-                                @if ($can('student.import'))
-                                    <li class="menu-item">
-                                        <a href="#" class="menu-link">
-                                            <div>Import Students</div>
-                                        </a>
-                                    </li>
-                                @endif
                             </ul>
                         </li>
                     @endif
@@ -557,12 +527,12 @@ new class extends Component {
                         <li class="menu-item">
                             <a href="javascript:void(0);" class="menu-link menu-toggle">
                                 <i class="menu-icon icon-base ri ri-admin-line"></i>
-                                <div>Administrators</div>
+                                <div>User Management</div>
                             </a>
                             <ul class="menu-sub">
                                 <li class="menu-item">
                                     <a href="{{ route('admin.admins.index') }}" class="menu-link" >
-                                        <div>All Admins</div>
+                                        <div>All Users</div>
                                     </a>
                                 </li>
                                 @if ($can('role.view'))
@@ -594,11 +564,6 @@ new class extends Component {
                             <li class="menu-item">
                                 <a href="{{ route('admin.organisations.index') }}" class="menu-link">
                                     <div>Organisations</div>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="{{ route('admin.designation') }}" class="menu-link">
-                                    <div>Designations</div>
                                 </a>
                             </li>
                         </ul>

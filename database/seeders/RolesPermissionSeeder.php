@@ -132,8 +132,8 @@ class RolesPermissionSeeder extends Seeder
             'student.transfer', 'student.import', 'student.export',
             'course.view', 'course.assign',
             'assessment.view', 'assessment.assign',
-            'question.view',
-            'admin.view',
+            'question.view',  'question.create', 'question.edit',
+            'admin.view','admin.create','admin.edit','admin.delete',
             'report.view', 'report.export',
             'activity.view',
             'settings.view',
@@ -187,12 +187,7 @@ class RolesPermissionSeeder extends Seeder
             'organisation.view',
             'student.view', 'student.create', 'student.edit',
             'student.import', 'student.export',
-            'course.view', 'course.assign',
-            'assessment.view', 'assessment.assign',
-            'question.view',
             'report.view',
-            'activity.view',
-            'leaderboard.view',
         ]);
 
         // ── Final cache clear ──────────────────────────────────────

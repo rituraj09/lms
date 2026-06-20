@@ -59,10 +59,12 @@
                     Manage all assessments and their question groups.
                 </p>
             </div>
+            @can('assessment.create'))
             <button type="button" wire:click="createAssessment" class="btn btn-primary btn-sm shadow-sm">
                 <i class="ri ri-add-large-line me-1"></i>
                 New Assessment
             </button>
+                @endcan
         </div>
 
         {{-- Filters --}}
@@ -215,10 +217,12 @@
                         <i class="ri ri-draft-line" style="font-size:3rem;opacity:.3;"></i>
                         <h6 class="mt-3 fw-semibold">No Assessments Found</h6>
                         <p class="small mb-4">Click "New Assessment" to get started.</p>
+                        @can('assessment.create')
                         <button type="button" wire:click="createAssessment" class="btn btn-primary btn-sm">
                             <i class="ri ri-add-large-line me-1"></i>
                             New Assessment
                         </button>
+                            @endcan
                     </div>
                 @endforelse
 
