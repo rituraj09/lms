@@ -2,4 +2,25 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::livewire('/','welcome')->name('welcome');
+Route::view('/', 'website.index')->name('home');
+
+Route::view('/cognitive', 'website.cognitive')
+    ->name('cognitive');
+
+Route::view('/life-skill', 'website.life-skill')
+    ->name('life-skill');
+
+Route::view('/solutions', 'website.solutions')
+    ->name('solutions');
+
+Route::view('/use-cases', 'website.use-cases')
+    ->name('use-cases');
+
+Route::view('/about', 'website.about')
+    ->name('about');
+
+Route::view('/resources', 'website.resources')
+    ->name('resources');
+
+Route::view('/contact', 'website.contact')
+    ->name('contact');
