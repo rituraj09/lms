@@ -34,7 +34,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <span>© 2025 MindShiksha. All rights reserved.</span>
+            <span>© {{ date('Y') }} MindShiksha. All rights reserved.</span>
             <span>Powered by research-backed Cognitive &amp; Life Skill Development Frameworks.</span>
         </div>
     </div>
