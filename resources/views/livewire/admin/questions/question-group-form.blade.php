@@ -62,7 +62,7 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-0 small">
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.manage-questions') }}">
+                            <a href="{{ route('admin.questions.index') }}">
                                 Question Groups
                             </a>
                         </li>
@@ -79,7 +79,7 @@
                         <i class="ri ri-arrow-left-line me-1"></i> Cancel
                     </button>
                 @else
-                    <a href="{{ route('admin.manage-questions') }}" class="btn btn-outline-secondary btn-sm">
+                    <a href="{{ route('admin.questions.index') }}" class="btn btn-outline-secondary btn-sm">
                         <i class="ri ri-arrow-left-line me-1"></i> Back
                     </a>
                 @endif
@@ -512,7 +512,7 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-0 small">
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.manage-questions') }}">
+                            <a href="{{ route('admin.questions.index') }}">
                                 Question Groups
                             </a>
                         </li>
@@ -522,7 +522,7 @@
             </div>
 
             <div class="d-flex gap-2">
-                <a href="{{ route('admin.manage-questions') }}" class="btn btn-outline-secondary btn-sm">
+                <a href="{{ route('admin.questions.index') }}" class="btn btn-outline-secondary btn-sm">
                     <i class="ri ri-arrow-left-line me-1"></i> Back to List
                 </a>
 
@@ -853,7 +853,7 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-0 small">
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.manage-questions') }}">
+                            <a href="{{ route('admin.questions.index') }}">
                                 Question Groups
                             </a>
                         </li>

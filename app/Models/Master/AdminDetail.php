@@ -5,6 +5,7 @@ namespace App\Models\Master;
 use App\Models\Admin;
 use App\Models\Master\State;
 use App\Models\Master\District;
+use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;

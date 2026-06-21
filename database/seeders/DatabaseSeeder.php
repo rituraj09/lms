@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
         $this->call(SubSkillTypeSeeder::class);
         $this->call(RolesPermissionSeeder::class);
         $this->call(UserSeeder::class);
+        $this->call(OrganisationTypeSeeder::class);
 
     }
 }

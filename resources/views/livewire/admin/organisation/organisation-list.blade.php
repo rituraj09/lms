@@ -13,7 +13,7 @@
             </nav>
         </div>
         @if (auth('admin')->user()->isSuperAdmin() || auth('admin')->user()->can('organisation.create'))
-            <a href="{{ route('admin.organisations.create') }}" class="btn btn-primary" wire:navigate>
+            <a href="{{ route('admin.organisations.create') }}" class="btn btn-primary">
                 <i class="ri ri-add-line me-2"></i>Add Organisation
             </a>
         @endif
@@ -58,8 +58,8 @@
                     </select>
                 </div>
                 <div class="col-md-1">
-                    <button wire:click="$set('search', '')" class="btn btn-lg btn-outline-secondary p-4 w-100">
-                        <i class="ri ri-arrow-go-forward-line"></i>
+                    <button wire:click="$set('search', '')" class="btn btn-lg btn-primary p-4 w-100">
+                        <i class="ri ri-search-line"></i>
                     </button>
                 </div>
             </div>
@@ -98,7 +98,7 @@
                                 {{-- Logo & Name --}}
                                 <div class="d-flex align-items-center mb-3">
                                     <div class="org-logo me-3"
-                                        style="width:60px; height:60px; border-radius:50%; overflow:hidden; border:3px solid #fff; box-shadow:0 2px 8px rgba(0,0,0,0.15); margin-top:-30px; background:#fff;">
+                                        style="z-index:100; width:60px; height:60px; border-radius:50%; overflow:hidden; border:3px solid #fff; box-shadow:0 2px 8px rgba(0,0,0,0.15); margin-top:-60px; background:#fff;">
                                         @if ($org->logo)
                                             <img src="{{ asset('storage/' . $org->logo) }}"
                                                 class="w-100 h-100 object-fit-cover" alt="{{ $org->name }}">
@@ -159,12 +159,14 @@
                                 class="card-footer bg-transparent border-top d-flex justify-content-between align-items-center">
                                 <button wire:click="enterOrganisation({{ $org->id }})"
                                     class="btn btn-primary btn-sm mt-3">
+
                                     <i class="ri ri-arrow-right-s-line me-1"></i> Enter
                                 </button>
                                 <div class="d-flex gap-1">
                                     @can('organisation.edit')
                                         <a href="{{ route('admin.organisations.edit', $org->id) }}"
-                                            class="btn btn-outline-secondary btn-sm" title="Edit" wire:navigate>
+                                            class="btn btn-outline-secondary btn-sm" title="Edit">
+
                                             <i class="ri ri-pencil-fill"></i>
                                         </a>
                                     @endcan
@@ -172,6 +174,7 @@
                                         <button wire:click="deleteOrganisation({{ $org->id }})"
                                             wire:confirm="Are you sure you want to delete this organisation?"
                                             class="btn btn-outline-danger btn-sm" title="Delete">
+
                                             <i class="ri ri-delete-bin-fill"></i>
                                         </button>
                                     @endcan
@@ -201,7 +204,8 @@
                     </p>
                     @can('organisation.create')
                         @if (!$search && !$statusFilter && !$typeFilter)
-                            <a href="{{ route('admin.organisations.create') }}" class="btn btn-primary" wire:navigate>
+                            <a href="{{ route('admin.organisations.create') }}" class="btn btn-primary">
+
                                 <i class="ri ri-add-line me-2"></i>Create Organisation
                             </a>
                         @else

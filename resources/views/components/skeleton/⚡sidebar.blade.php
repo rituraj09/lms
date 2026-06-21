@@ -1,5 +1,5 @@
 <?php
-// views/components/skeleton/sidebar.blade.php
+// resources/views/components/skeleton/sidebar.blade.php
 use Livewire\Component;
 
 new class extends Component {
@@ -9,7 +9,7 @@ new class extends Component {
     {
         \App\Services\OrganisationContext::clear();
         auth('admin')->user()->setCurrentOrganisation(null);
-        $this->redirect(route('admin.home'), navigate: true);
+        $this->redirect(route('admin.home'), navigate: false);
     }
 };
 ?>
@@ -22,9 +22,16 @@ new class extends Component {
             $activeOrg = \App\Services\OrganisationContext::get();
             $isSuperAdmin = $authAdmin?->isSuperAdmin() ?? false;
 
-            // Helper: check permission OR super admin
-            $can = fn(string $perm) => $isSuperAdmin || $authAdmin?->can($perm);
-            $canAny = fn(array $perms) => $isSuperAdmin || collect($perms)->some(fn($p) => $authAdmin?->can($p));
+            // ✅ Updated: Check system mode permissions
+            $canSystem = fn(string $perm) => $isSuperAdmin || $authAdmin?->hasSystemPermission($perm);
+            $canAnySystem = fn(array $perms) => $isSuperAdmin ||
+                collect($perms)->some(fn($p) => $authAdmin?->hasSystemPermission($p));
+
+            // ✅ New: Check org mode permissions
+            $canOrg = fn(string $perm) => $isSuperAdmin ||
+                ($activeOrg && $authAdmin?->hasOrgPermission($perm, $activeOrg->id));
+            $canAnyOrg = fn(array $perms) => $isSuperAdmin ||
+                ($activeOrg && collect($perms)->some(fn($p) => $authAdmin?->hasOrgPermission($p, $activeOrg->id)));
         @endphp
 
         {{-- ============================================ --}}
@@ -35,34 +42,33 @@ new class extends Component {
             @if ($activeOrg)
                 {{-- Organisation Mode Brand --}}
                 <a href="{{ route('admin.organisations.dashboard', $activeOrg->id) }}"
-                    class="app-brand-link d-flex align-items-center gap-2" wire:navigate>
+                    class="app-brand-link d-flex align-items-center gap-2">
                     <span class="app-brand-logo flex-shrink-0">
                         @if ($activeOrg->logo)
                             <img style="width: 36px; height: 36px; object-fit: cover;"
-                                class="rounded-circle border border-2 border-primary"
+                                class="rounded-circle border border-2 border-success"
                                 src="{{ asset('storage/' . $activeOrg->logo) }}" alt="{{ $activeOrg->name }}" />
                         @else
-                            <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--bs-primary);"
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--bs-success);"
                                 class="d-flex align-items-center justify-content-center text-white fw-bold">
                                 {{ strtoupper(substr($activeOrg->name, 0, 2)) }}
                             </div>
                         @endif
                     </span>
                     <div class="app-brand-text-group d-flex flex-column lh-sm">
-                        <span class="app-brand-text fw-bold fs-6 text-primary text-nowrap"
+                        <span class="app-brand-text fw-bold fs-6 text-success text-nowrap"
                             style="max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                             {{ $activeOrg->name }}
                         </span>
                         <span class="app-brand-subtext text-muted text-nowrap"
                             style="font-size: 0.53rem; letter-spacing: 0.02em;">
-                            {{ $activeOrg->code }} · Organisation Mode
+                            <i class="ri ri-building-line me-1"></i>{{ $activeOrg->code }} · Org Mode
                         </span>
                     </div>
                 </a>
             @else
                 {{-- Normal Mode Brand --}}
-                <a href="{{ route('admin.home') }}" class="app-brand-link d-flex align-items-center gap-2"
-                    wire:navigate>
+                <a href="{{ route('admin.home') }}" class="app-brand-link d-flex align-items-center gap-2">
                     <span class="app-brand-logo flex-shrink-0">
                         <img style="width: 36px; height: 36px; object-fit: contain;" class="rounded"
                             src="{{ asset('assets/img/favicon/favicon.png') }}" alt="{{ config('app.name') }}" />
@@ -73,7 +79,7 @@ new class extends Component {
                         </span>
                         <span class="app-brand-subtext text-muted text-nowrap"
                             style="font-size: 0.53rem; letter-spacing: 0.02em;">
-                            Comprehensive Intelligence Framework
+                            <i class="ri ri-dashboard-line me-1"></i>System Mode
                         </span>
                     </div>
                 </a>
@@ -110,13 +116,13 @@ new class extends Component {
                 {{-- Organisation Info Banner --}}
                 <li class="menu-item">
                     <div class="px-3 py-3 mx-2 mb-2 rounded-3"
-                        style="background: rgba(105,108,255,0.08); border: 1px solid rgba(105,108,255,0.2);">
+                        style="background: rgba(25,135,84,0.08); border: 1px solid rgba(25,135,84,0.2);">
                         <div class="d-flex align-items-center gap-2 mb-1">
-                            <span class="badge bg-label-primary" style="font-size: 0.62rem;">
-                                <i class="ri ri-building-line me-1"></i>ACTIVE
+                            <span class="badge bg-label-success" style="font-size: 0.62rem;">
+                                <i class="ri ri-building-line me-1"></i>ACTIVE ORG
                             </span>
                         </div>
-                        <p class="fw-semibold mb-0 text-primary" style="font-size: 0.8rem;">
+                        <p class="fw-semibold mb-0 text-success" style="font-size: 0.8rem;">
                             {{ $activeOrg->name }}
                         </p>
                         <p class="text-muted mb-0" style="font-size: 0.68rem;">
@@ -126,201 +132,46 @@ new class extends Component {
                     </div>
                 </li>
 
-                {{-- Home / Exit --}}
-                <li class="menu-item">
-                    <a href="{{ route('admin.home') }}" class="menu-link" wire:click.prevent="exitOrganisation">
-                        <i class="menu-icon icon-base ri ri-arrow-left-circle-line"></i>
-                        <div>Home</div>
-                        <span class="badge bg-label-secondary ms-auto" style="font-size: 0.6rem;">Exit</span>
-                    </a>
-                </li>
+                {{-- Home / Exit (Show if user has any system permissions) --}}
+                @if ($isSuperAdmin || $authAdmin->getSystemPermissions()->isNotEmpty())
+                    <li class="menu-item">
+                        <a href="{{ route('admin.home') }}" class="menu-link" wire:click.prevent="exitOrganisation">
+                            <i class="menu-icon icon-base ri ri-arrow-left-circle-line"></i>
+                            <div>Home</div>
+                            <span class="badge bg-label-warning ms-auto" style="font-size: 0.6rem;">Exit</span>
+                        </a>
+                    </li>
+                @endif
 
                 {{-- Org Dashboard --}}
-                <li class="menu-item">
-                    <a href="{{ route('admin.organisations.dashboard', $activeOrg->id) }}" class="menu-link"
-                        wire:navigate>
-                        <i class="menu-icon icon-base ri ri-dashboard-line"></i>
-                        <div>Dashboard</div>
-                    </a>
-                </li>
-
-                {{-- Students --}}
-                @if ($can('student.view'))
-                    <li class="menu-header small mt-4">
-                        <span class="menu-header-text text-uppercase"
-                            style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
-                            Students
-                        </span>
-                    </li>
+                @if ($canOrg('org.dashboard.view'))
                     <li class="menu-item">
-                        <a href="javascript:void(0);" class="menu-link menu-toggle">
-                            <i class="menu-icon icon-base ri ri-graduation-cap-line"></i>
-                            <div>Students</div>
-                        </a>
-                        <ul class="menu-sub">
-                            <li class="menu-item">
-                                <a href="#" class="menu-link" wire:navigate>
-                                    <div>All Students</div>
-                                </a>
-                                {{-- <a href="{{ route('admin.organisations.students', $activeOrg->id) }}" class="menu-link"
-                                    wire:navigate>
-                                    <div>All Students</div>
-                                </a> --}}
-                            </li>
-                            @if ($can('student.create'))
-                                <li class="menu-item">
-                                    <a href="#" class="menu-link">
-                                        <div>Add Student</div>
-                                    </a>
-                                </li>
-                            @endif
-                            @if ($can('student.import'))
-                                <li class="menu-item">
-                                    <a href="#" class="menu-link">
-                                        <div>Import Students</div>
-                                    </a>
-                                </li>
-                            @endif
-                            @if ($can('student.transfer'))
-                                <li class="menu-item">
-                                    <a href="#" class="menu-link">
-                                        <div>Transfer Student</div>
-                                    </a>
-                                </li>
-                            @endif
-                        </ul>
-                    </li>
-                @endif
-
-                {{-- Learning --}}
-                <li class="menu-header small mt-4">
-                    <span class="menu-header-text text-uppercase"
-                        style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
-                        Learning
-                    </span>
-                </li>
-
-                @if ($can('course.assign'))
-                    <li class="menu-item">
-                        <a href="javascript:void(0);" class="menu-link menu-toggle">
-                            <i class="menu-icon icon-base ri ri-book-open-line"></i>
-                            <div>Courses</div>
-                        </a>
-                        <ul class="menu-sub">
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>Assigned Courses</div>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>Assign Course</div>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                @endif
-
-                @if ($can('assessment.assign'))
-                    <li class="menu-item">
-                        <a href="javascript:void(0);" class="menu-link menu-toggle">
-                            <i class="menu-icon icon-base ri ri-file-list-3-line"></i>
-                            <div>Assessments</div>
-                        </a>
-                        <ul class="menu-sub">
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>Assigned Assessments</div>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>Assign Assessment</div>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>Results & Scores</div>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                @endif
-
-                {{-- Reports --}}
-                @if ($can('report.view'))
-                    <li class="menu-header small mt-4">
-                        <span class="menu-header-text text-uppercase"
-                            style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
-                            Reports & Analytics
-                        </span>
-                    </li>
-                    <li class="menu-item">
-                        <a href="javascript:void(0);" class="menu-link menu-toggle">
-                            <i class="menu-icon icon-base ri ri-bar-chart-box-line"></i>
-                            <div>Reports</div>
-                        </a>
-                        <ul class="menu-sub">
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>Overview</div>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>Course Progress</div>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>Assessment Reports</div>
-                                </a>
-                            </li>
-                            @if ($can('report.export'))
-                                <li class="menu-item">
-                                    <a href="#" class="menu-link">
-                                        <div>Export Reports</div>
-                                    </a>
-                                </li>
-                            @endif
-                        </ul>
-                    </li>
-                @endif
-
-                {{-- Logs & Settings --}}
-                @if ($can('activity.view'))
-                    <li class="menu-header small mt-4">
-                        <span class="menu-header-text text-uppercase"
-                            style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
-                            Logs & Settings
-                        </span>
-                    </li>
-                    <li class="menu-item">
-                        <a href="#" class="menu-link">
-                            <i class="menu-icon icon-base ri ri-history-line"></i>
-                            <div>Activity Logs</div>
+                        <a href="{{ route('admin.org.dashboard', $activeOrg->id) }}" class="menu-link">
+                            <i class="menu-icon icon-base ri ri-dashboard-line"></i>
+                            <div>Dashboard</div>
                         </a>
                     </li>
                 @endif
-
-                @if ($can('organisation.settings'))
+                {{-- Side bar can be add here ritz from sidebar_orgMode.txt file- --}}
+                @if ($canOrg('org.settings.view'))
                     <li class="menu-item">
                         <a href="javascript:void(0);" class="menu-link menu-toggle">
                             <i class="menu-icon icon-base ri ri-settings-3-line"></i>
                             <div>Org Settings</div>
                         </a>
                         <ul class="menu-sub">
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
+                            {{-- <li class="menu-item">
+                                <a href="{{ route('admin.org.settings.index', $activeOrg->id) }}" class="menu-link">
                                     <div>General</div>
                                 </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="{{ route('admin.organisations.edit', $activeOrg->id) }}" class="menu-link"
-                                    wire:navigate>
-                                    <div>Edit Organisation</div>
-                                </a>
-                            </li>
+                            </li> --}}
+                            @if ($canOrg('org.settings.edit'))
+                                <li class="menu-item">
+                                    <a href="{{ route('admin.org.edit', $activeOrg->id) }}" class="menu-link">
+                                        <div>Edit Organisation</div>
+                                    </a>
+                                </li>
+                            @endif
                         </ul>
                     </li>
                 @endif
@@ -342,8 +193,7 @@ new class extends Component {
                     @foreach ($adminOrgs as $org)
                         @if ($org->id !== $activeOrg->id)
                             <li class="menu-item">
-                                <a href="{{ route('admin.organisations.dashboard', $org->id) }}" class="menu-link"
-                                    wire:navigate>
+                                <a href="{{ route('admin.org.dashboard', $org->id) }}" class="menu-link">
                                     <span class="menu-icon">
                                         <i class="ri ri-building-line"></i>
                                     </span>
@@ -358,19 +208,19 @@ new class extends Component {
                 @endif
             @else
                 {{-- ======================================== --}}
-                {{-- NORMAL ADMIN MODE MENU                   --}}
+                {{-- NORMAL SYSTEM MODE MENU                  --}}
                 {{-- ======================================== --}}
 
                 {{-- Dashboard --}}
                 <li class="menu-item">
-                    <a href="{{ route('admin.home') }}" class="menu-link" wire:navigate>
+                    <a href="{{ route('admin.home') }}" class="menu-link">
                         <i class="menu-icon icon-base ri ri-dashboard-line"></i>
                         <div>Dashboard</div>
                     </a>
                 </li>
 
                 {{-- ==================== LEARNING MANAGEMENT ==================== --}}
-                @if ($canAny(['course.view', 'course.create']))
+                @if ($canAnySystem(['system.course.view', 'system.course.create', 'system.module.view']))
                     <li class="menu-header small mt-4">
                         <span class="menu-header-text text-uppercase"
                             style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
@@ -378,7 +228,7 @@ new class extends Component {
                         </span>
                     </li>
 
-                    @if ($can('course.view'))
+                    @if ($canSystem('system.course.view'))
                         <li class="menu-item">
                             <a href="javascript:void(0);" class="menu-link menu-toggle">
                                 <i class="menu-icon icon-base ri ri-book-open-line"></i>
@@ -390,7 +240,7 @@ new class extends Component {
                                         <div>All Courses</div>
                                     </a>
                                 </li>
-                                @if ($can('course.create'))
+                                @if ($canSystem('system.course.create'))
                                     <li class="menu-item">
                                         <a href="#" class="menu-link">
                                             <div>Create Course</div>
@@ -402,61 +252,34 @@ new class extends Component {
                                         <div>Categories</div>
                                     </a>
                                 </li>
+                            </ul>
+                        </li>
+                    @endif
+
+                    @if ($canSystem('system.module.view'))
+                        <li class="menu-item">
+                            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                                <i class="menu-icon icon-base ri ri-layout-masonry-line"></i>
+                                <div>Modules & Lessons</div>
+                            </a>
+                            <ul class="menu-sub">
                                 <li class="menu-item">
                                     <a href="#" class="menu-link">
-                                        <div>Archived Courses</div>
+                                        <div>All Modules</div>
+                                    </a>
+                                </li>
+                                <li class="menu-item">
+                                    <a href="#" class="menu-link">
+                                        <div>All Lessons</div>
                                     </a>
                                 </li>
                             </ul>
                         </li>
                     @endif
-
-                    <li class="menu-item">
-                        <a href="javascript:void(0);" class="menu-link menu-toggle">
-                            <i class="menu-icon icon-base ri ri-layout-masonry-line"></i>
-                            <div>Modules & Lessons</div>
-                        </a>
-                        <ul class="menu-sub">
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>All Modules</div>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>All Lessons</div>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <li class="menu-item">
-                        <a href="javascript:void(0);" class="menu-link menu-toggle">
-                            <i class="menu-icon icon-base ri ri-user-received-line"></i>
-                            <div>Enrollments</div>
-                        </a>
-                        <ul class="menu-sub">
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>All Enrollments</div>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>Pending Approvals</div>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>Completed</div>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
                 @endif
 
                 {{-- ==================== ASSESSMENT & EVALUATION ==================== --}}
-                @if ($canAny(['question.view', 'assessment.view']))
+                @if ($canAnySystem(['system.question.view', 'system.assessment.view']))
                     <li class="menu-header small mt-4">
                         <span class="menu-header-text text-uppercase"
                             style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
@@ -464,7 +287,7 @@ new class extends Component {
                         </span>
                     </li>
 
-                    @if ($can('question.view'))
+                    @if ($canSystem('system.question.view'))
                         <li class="menu-item">
                             <a href="javascript:void(0);" class="menu-link menu-toggle">
                                 <i class="menu-icon icon-base ri ri-question-answer-line"></i>
@@ -472,15 +295,16 @@ new class extends Component {
                             </a>
                             <ul class="menu-sub">
                                 <li class="menu-item">
-                                    <a href="{{ route('admin.manage-questions') }}" class="menu-link">
+                                    <a href="{{ route('admin.questions.index') }}" class="menu-link">
                                         <div>Manage Questions</div>
                                     </a>
                                 </li>
+
                             </ul>
                         </li>
                     @endif
 
-                    @if ($can('assessment.view'))
+                    @if ($canSystem('system.assessment.view'))
                         <li class="menu-item">
                             <a href="javascript:void(0);" class="menu-link menu-toggle">
                                 <i class="menu-icon icon-base ri ri-file-list-3-line"></i>
@@ -500,29 +324,10 @@ new class extends Component {
                             </ul>
                         </li>
                     @endif
-
-                    <li class="menu-item">
-                        <a href="javascript:void(0);" class="menu-link menu-toggle">
-                            <i class="menu-icon icon-base ri ri-medal-line"></i>
-                            <div>Certificates</div>
-                        </a>
-                        <ul class="menu-sub">
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>All Certificates</div>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>Templates</div>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
                 @endif
 
                 {{-- ==================== USER MANAGEMENT ==================== --}}
-                @if ($canAny(['student.view', 'admin.view', 'role.view']))
+                @if ($canAnySystem(['system.student.view', 'system.admin.view', 'system.role.view']))
                     <li class="menu-header small mt-4">
                         <span class="menu-header-text text-uppercase"
                             style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
@@ -530,7 +335,7 @@ new class extends Component {
                         </span>
                     </li>
 
-                    @if ($can('student.view'))
+                    @if ($canSystem('system.student.view'))
                         <li class="menu-item">
                             <a href="javascript:void(0);" class="menu-link menu-toggle">
                                 <i class="menu-icon icon-base ri ri-graduation-cap-line"></i>
@@ -542,46 +347,38 @@ new class extends Component {
                                         <div>All Students</div>
                                     </a>
                                 </li>
-                                @if ($can('student.import'))
-                                    <li class="menu-item">
-                                        <a href="#" class="menu-link">
-                                            <div>Import Students</div>
-                                        </a>
-                                    </li>
-                                @endif
                             </ul>
                         </li>
                     @endif
 
-                    @if ($can('admin.view'))
+                    @if ($canSystem('system.admin.view'))
                         <li class="menu-item">
                             <a href="javascript:void(0);" class="menu-link menu-toggle">
                                 <i class="menu-icon icon-base ri ri-admin-line"></i>
-                                <div>Administrators</div>
+                                <div>Administrator</div>
                             </a>
                             <ul class="menu-sub">
                                 <li class="menu-item">
-                                    <a href="{{ route('admin.admins.index') }}" class="menu-link" wire:navigate>
-                                        <div>All Admins</div>
+                                    <a href="{{ route('admin.admins.index') }}" class="menu-link">
+                                        <div>All Users</div>
                                     </a>
                                 </li>
-                                @if ($can('role.view'))
-                                    <li class="menu-item">
-                                        {{-- <a href="{{ route('admin.roles.index') }}" class="menu-link" wire:navigate>
-                                            <div>Roles & Permissions</div>
-                                        </a> --}}
-                                        <a href="#" class="menu-link" wire:navigate>
-                                            <div>Roles & Permissions</div>
-                                        </a>
-                                    </li>
-                                @endif
                             </ul>
+                        </li>
+                    @endif
+
+                    @if ($canSystem('system.role.view'))
+                        <li class="menu-item">
+                            <a href="{{ route('admin.roles.index') }}" class="menu-link">
+                                <i class="menu-icon icon-base ri ri-shield-star-line"></i>
+                                <div>Roles & Designations</div>
+                            </a>
                         </li>
                     @endif
                 @endif
 
                 {{-- ==================== ORGANISATION ==================== --}}
-                @if ($can('organisation.view'))
+                @if ($canSystem('system.organisation.view'))
                     <li class="menu-header small mt-4">
                         <span class="menu-header-text text-uppercase"
                             style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
@@ -595,13 +392,8 @@ new class extends Component {
                         </a>
                         <ul class="menu-sub">
                             <li class="menu-item">
-                                <a href="{{ route('admin.organisations.index') }}" class="menu-link" wire:navigate>
+                                <a href="{{ route('admin.organisations.index') }}" class="menu-link">
                                     <div>Organisations</div>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="{{ route('admin.designation') }}" class="menu-link">
-                                    <div>Designations</div>
                                 </a>
                             </li>
                         </ul>
@@ -609,7 +401,7 @@ new class extends Component {
                 @endif
 
                 {{-- ==================== REPORTS & ANALYTICS ==================== --}}
-                @if ($can('report.view'))
+                @if ($canSystem('system.report.view'))
                     <li class="menu-header small mt-4">
                         <span class="menu-header-text text-uppercase"
                             style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
@@ -637,12 +429,7 @@ new class extends Component {
                                     <div>Assessment Reports</div>
                                 </a>
                             </li>
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>User Activity</div>
-                                </a>
-                            </li>
-                            @if ($can('report.export'))
+                            @if ($canSystem('system.report.export'))
                                 <li class="menu-item">
                                     <a href="#" class="menu-link">
                                         <div>Export Reports</div>
@@ -678,27 +465,9 @@ new class extends Component {
                         </li>
                     </ul>
                 </li>
-                <li class="menu-item">
-                    <a href="javascript:void(0);" class="menu-link menu-toggle">
-                        <i class="menu-icon icon-base ri ri-discuss-line"></i>
-                        <div>Forums & Discussion</div>
-                    </a>
-                    <ul class="menu-sub">
-                        <li class="menu-item">
-                            <a href="#" class="menu-link">
-                                <div>All Forums</div>
-                            </a>
-                        </li>
-                        <li class="menu-item">
-                            <a href="#" class="menu-link">
-                                <div>Moderation Queue</div>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
 
                 {{-- ==================== SYSTEM SETTINGS ==================== --}}
-                @if ($can('settings.view'))
+                @if ($canSystem('system.settings.view'))
                     <li class="menu-header small mt-4">
                         <span class="menu-header-text text-uppercase"
                             style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
@@ -719,67 +488,6 @@ new class extends Component {
                             <li class="menu-item">
                                 <a href="#" class="menu-link">
                                     <div>Branding & Logo</div>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>Localization</div>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>Maintenance Mode</div>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="menu-item">
-                        <a href="javascript:void(0);" class="menu-link menu-toggle">
-                            <i class="menu-icon icon-base ri ri-mail-settings-line"></i>
-                            <div>Email & Notifications</div>
-                        </a>
-                        <ul class="menu-sub">
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>Email Configuration</div>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>Email Templates</div>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>Notification Rules</div>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="menu-item">
-                        <a href="javascript:void(0);" class="menu-link menu-toggle">
-                            <i class="menu-icon icon-base ri ri-shield-keyhole-line"></i>
-                            <div>Security</div>
-                        </a>
-                        <ul class="menu-sub">
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>Security Settings</div>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>Password Policy</div>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>Two-Factor Auth</div>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>Audit Logs</div>
                                 </a>
                             </li>
                         </ul>

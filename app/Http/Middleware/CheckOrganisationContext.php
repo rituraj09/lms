@@ -19,10 +19,12 @@ class CheckOrganisationContext
 
         // If not super_admin, check organisation access
         if (!$admin->isSuperAdmin() && OrganisationContext::isActive()) {
+            // ✅ FIXED: geatId() → getId()
             $orgId = OrganisationContext::getId();
+
             if (!$admin->hasOrganisationAccess($orgId)) {
                 OrganisationContext::clear();
-                return redirect()->route('admin.dashboard')
+                return redirect()->route('admin.home')
                     ->with('error', 'You do not have access to this organisation.');
             }
         }

@@ -59,10 +59,12 @@
                     Manage all assessments and their question groups.
                 </p>
             </div>
+            @can('assessment.create'))
             <button type="button" wire:click="createAssessment" class="btn btn-primary btn-sm shadow-sm">
                 <i class="ri ri-add-large-line me-1"></i>
                 New Assessment
             </button>
+                @endcan
         </div>
 
         {{-- Filters --}}
@@ -215,10 +217,12 @@
                         <i class="ri ri-draft-line" style="font-size:3rem;opacity:.3;"></i>
                         <h6 class="mt-3 fw-semibold">No Assessments Found</h6>
                         <p class="small mb-4">Click "New Assessment" to get started.</p>
+                        @can('assessment.create')
                         <button type="button" wire:click="createAssessment" class="btn btn-primary btn-sm">
                             <i class="ri ri-add-large-line me-1"></i>
                             New Assessment
                         </button>
+                            @endcan
                     </div>
                 @endforelse
 
@@ -405,16 +409,10 @@
                                     <div class="input-group">
                                         <input type="number" wire:model="duration_minutes" class="form-control"
                                             min="1" placeholder="e.g. 60">
-                                        <span class="input-group-text bg-light">min</span>
                                     </div>
-                                    <small class="text-muted">
-                                        Leave blank = per group/question
-                                    </small>
                                 </div>
-
                                 <div class="col-md-3">
-                                    <label class="form-label fw-medium small d-block">
-                                        Negative Marking
+                                    <label class="form-label fw-medium small d-block"> Has Negative Mark?
                                     </label>
                                     <div class="form-check form-switch mt-2">
                                         <input class="form-check-input" type="checkbox"
@@ -425,12 +423,15 @@
                                     </div>
                                 </div>
 
-                            </div>
-                        </div>
+
+
                     </div>
 
                 </div>
 
+
+            </div>
+                </div>
                 <div class="col-lg-4">
 
                     <div class="card shadow-sm border-0 mb-4">
@@ -451,7 +452,7 @@
     ] as $val => [$color, $icon])
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" wire:model="status"
-                                            value="{{ $val }}" id="status-{{ $val }}">
+                                               value="{{ $val }}" id="status-{{ $val }}">
                                         <label class="form-check-label small" for="status-{{ $val }}">
                                             <i class="ri {{ $icon }} text-{{ $color }} me-1"></i>
                                             {{ ucfirst($val) }}
@@ -462,12 +463,12 @@
 
                             <label class="form-label fw-medium small">Admin Note</label>
                             <textarea wire:model="admin_note" class="form-control border-0 bg-light" rows="3"
-                                placeholder="Internal note...">
+                                      placeholder="Internal note...">
                             </textarea>
                         </div>
                         <div class="card-footer bg-white p-3">
                             <button type="button" wire:click="saveAssessment" wire:loading.attr="disabled"
-                                class="btn btn-primary w-100">
+                                    class="btn btn-primary w-100">
                                 <span wire:loading wire:target="saveAssessment">
                                     <span class="spinner-border spinner-border-sm me-1"></span>
                                     Saving…
@@ -1361,7 +1362,6 @@
                                     Add to Assessment
                                 @endif
                             </button>
-
                         </div>
 
                     </div>

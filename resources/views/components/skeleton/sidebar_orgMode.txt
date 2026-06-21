@@ -1,0 +1,176 @@
+  {{-- Students Section --}}
+                @if ($canOrg('org.student.view'))
+                    <li class="menu-header small mt-4">
+                        <span class="menu-header-text text-uppercase"
+                            style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
+                            Students
+                        </span>
+                    </li>
+                    <li class="menu-item">
+                        <a href="javascript:void(0);" class="menu-link menu-toggle">
+                            <i class="menu-icon icon-base ri ri-graduation-cap-line"></i>
+                            <div>Students</div>
+                        </a>
+                        <ul class="menu-sub">
+                            <li class="menu-item">
+                                <a href="{{ route('admin.org.students.index', $activeOrg->id) }}" class="menu-link">
+                                    <div>All Students</div>
+                                </a>
+                            </li>
+                            @if ($canOrg('org.student.create'))
+                                <li class="menu-item">
+                                    <a href="{{ route('admin.org.students.create', $activeOrg->id) }}"
+                                        class="menu-link">
+                                        <div>Add Student</div>
+                                    </a>
+                                </li>
+                            @endif
+                            @if ($canOrg('org.student.import'))
+                                <li class="menu-item">
+                                    <a href="#" class="menu-link">
+                                        <div>Import Students</div>
+                                    </a>
+                                </li>
+                            @endif
+                            @if ($canOrg('org.student.transfer'))
+                                <li class="menu-item">
+                                    <a href="#" class="menu-link">
+                                        <div>Transfer Student</div>
+                                    </a>
+                                </li>
+                            @endif
+                        </ul>
+                    </li>
+                @endif
+
+                {{-- Learning Section --}}
+                <li class="menu-header small mt-4">
+                    <span class="menu-header-text text-uppercase"
+                        style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
+                        Learning
+                    </span>
+                </li>
+
+                @if ($canOrg('org.course.view'))
+                    <li class="menu-item">
+                        <a href="javascript:void(0);" class="menu-link menu-toggle">
+                            <i class="menu-icon icon-base ri ri-book-open-line"></i>
+                            <div>Courses</div>
+                        </a>
+                        <ul class="menu-sub">
+                            <li class="menu-item">
+                                <a href="{{ route('admin.org.courses.index', $activeOrg->id) }}" class="menu-link">
+                                    <div>Assigned Courses</div>
+                                </a>
+                            </li>
+                            @if ($canOrg('org.course.assign'))
+                                <li class="menu-item">
+                                    {{-- <a href="{{ route('admin.org.courses.assign', $activeOrg->id) }}"
+                                        class="menu-link">
+                                        <div>Assign Course</div>
+                                    </a> --}}
+                                </li>
+                            @endif
+                        </ul>
+                    </li>
+                @endif
+
+                @if ($canOrg('org.assessment.view'))
+                    <li class="menu-item">
+                        <a href="javascript:void(0);" class="menu-link menu-toggle">
+                            <i class="menu-icon icon-base ri ri-file-list-3-line"></i>
+                            <div>Assessments</div>
+                        </a>
+                        <ul class="menu-sub">
+                            <li class="menu-item">
+                                {{-- <a href="{{ route('admin.org.assessments.index', $activeOrg->id) }}"
+                                    class="menu-link">
+                                    <div>Assigned Assessments</div>
+                                </a> --}}
+                            </li>
+                            @if ($canOrg('org.assessment.assign'))
+                                <li class="menu-item">
+                                    {{-- <a href="{{ route('admin.org.assessments.assign', $activeOrg->id) }}"
+                                        class="menu-link">
+                                        <div>Assign Assessment</div>
+                                    </a> --}}
+                                </li>
+                            @endif
+                            <li class="menu-item">
+                                <a href="#" class="menu-link">
+                                    <div>Results & Scores</div>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
+
+                {{-- Reports & Analytics --}}
+                @if ($canOrg('org.report.view'))
+                    <li class="menu-header small mt-4">
+                        <span class="menu-header-text text-uppercase"
+                            style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
+                            Reports & Analytics
+                        </span>
+                    </li>
+                    <li class="menu-item">
+                        <a href="javascript:void(0);" class="menu-link menu-toggle">
+                            <i class="menu-icon icon-base ri ri-bar-chart-box-line"></i>
+                            <div>Reports</div>
+                        </a>
+                        <ul class="menu-sub">
+                            <li class="menu-item">
+                                {{-- <a href="{{ route('admin.org.reports.index', $activeOrg->id) }}" class="menu-link">
+                                    <div>Overview</div>
+                                </a> --}}
+                            </li>
+                            @if ($canOrg('org.report.export'))
+                                <li class="menu-item">
+                                    {{-- <a href="{{ route('admin.org.reports.export', $activeOrg->id) }}"
+                                        class="menu-link">
+                                        <div>Export Reports</div>
+                                    </a> --}}
+                                </li>
+                            @endif
+                        </ul>
+                    </li>
+                @endif
+
+                {{-- Logs & Settings --}}
+                @if ($canOrg('org.activity.view'))
+                    <li class="menu-header small mt-4">
+                        <span class="menu-header-text text-uppercase"
+                            style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
+                            Logs & Settings
+                        </span>
+                    </li>
+                    <li class="menu-item">
+                        {{-- <a href="{{ route('admin.org.activity', $activeOrg->id) }}" class="menu-link">
+                            <i class="menu-icon icon-base ri ri-history-line"></i>
+                            <div>Activity Logs</div>
+                        </a> --}}
+                    </li>
+                @endif
+
+                @if ($canOrg('org.settings.view'))
+                    <li class="menu-item">
+                        <a href="javascript:void(0);" class="menu-link menu-toggle">
+                            <i class="menu-icon icon-base ri ri-settings-3-line"></i>
+                            <div>Org Settings</div>
+                        </a>
+                        <ul class="menu-sub">
+                            <li class="menu-item">
+                                <a href="{{ route('admin.org.settings.index', $activeOrg->id) }}" class="menu-link">
+                                    <div>General</div>
+                                </a>
+                            </li>
+                            @if ($canOrg('org.settings.edit'))
+                                <li class="menu-item">
+                                    <a href="{{ route('admin.org.edit', $activeOrg->id) }}" class="menu-link">
+                                        <div>Edit Organisation</div>
+                                    </a>
+                                </li>
+                            @endif
+                        </ul>
+                    </li>
+                @endif

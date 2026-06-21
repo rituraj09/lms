@@ -137,7 +137,7 @@ class AdminForm extends Component
         $this->dispatch('notify', type: 'success',
             message: $this->isEditing ? 'Admin updated successfully!' : 'Admin created successfully!');
 
-        $this->redirect(route('admin.admins.index'), navigate: true);
+        $this->redirect(route('admin.admins.index'), navigate: false);
     }
 
     public function render()

@@ -2,42 +2,55 @@
 
 namespace App\Services;
 
-use App\Models\Master\Organisation;
-use Illuminate\Support\Facades\Session;
-
 class OrganisationContext
 {
-    const SESSION_KEY = 'active_organisation_id';
+    private const SESSION_KEY = 'organisation_context';
 
-    public static function set(int $organisationId): void
+    /**
+     * ✅ Set organisation context
+     */
+    public static function set(?int $organisationId): void
     {
-        Session::put(self::SESSION_KEY, $organisationId);
+        if ($organisationId) {
+            session([self::SESSION_KEY => $organisationId]);
+        } else {
+            session()->forget(self::SESSION_KEY);
+        }
     }
 
-    public static function get(): ?Organisation
-    {
-        $id = Session::get(self::SESSION_KEY);
-        if (!$id) return null;
-        return Organisation::find($id);
-    }
-
+    /**
+     * ✅ Get organisation ID (not geatId!)
+     */
     public static function getId(): ?int
     {
-        return Session::get(self::SESSION_KEY);
+        return session(self::SESSION_KEY);
     }
 
-    public static function clear(): void
-    {
-        Session::forget(self::SESSION_KEY);
-    }
-
+    /**
+     * Check if organisation context is active
+     */
     public static function isActive(): bool
     {
-        return Session::has(self::SESSION_KEY);
+        return !is_null(self::getId());
     }
 
-    public static function check(int $organisationId): bool
+    /**
+     * Get current organisation object (if you need it)
+     */
+    public static function get()
     {
-        return self::getId() === $organisationId;
+        $orgId = self::getId();
+        if ($orgId) {
+            return \App\Models\Master\Organisation::find($orgId);
+        }
+        return null;
+    }
+
+    /**
+     * Clear organisation context
+     */
+    public static function clear(): void
+    {
+        session()->forget(self::SESSION_KEY);
     }
 }

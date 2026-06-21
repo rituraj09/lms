@@ -1,5 +1,5 @@
 <?php
-// app/Livewire/Admin/Auth/Login.php
+
 namespace App\Livewire\Admin\Auth;
 
 use App\Models\Admin;
@@ -30,14 +30,17 @@ class Login extends Component
     // ── State ──────────────────────────────────────────────────
     public bool   $mobile_verified = false;
     public bool   $email_verified  = false;
-    public int    $createForm      = 0;  // 0=login | 1=forgot | 2=new password
+    public int    $createForm      = 0;
     public ?Admin $official        = null;
 
     // ─────────────────────────────────────────────────────────
     // LOGIN
     // ─────────────────────────────────────────────────────────
 
-    public function login(): void
+    /**
+     * ✅ FIXED: Remove void return type
+     */
+    public function login()
     {
         $this->validate(
             [
@@ -67,7 +70,7 @@ class Login extends Component
 
         // Find active admin
         $admin = Admin::where($this->field, $this->email)
-                      ->with('roles')
+                      ->with('roles', 'organisations')
                       ->active()
                       ->first();
 
@@ -90,23 +93,51 @@ class Login extends Component
             $this->remember
         )) {
             RateLimiter::clear($key);
-            $this->handleOrganisationContext($admin);
-            $this->redirect(route('admin.home'), navigate: true);
-            return;
+
+            // Get the authenticated user
+            $authenticatedAdmin = Auth::guard('admin')->user();
+            $redirectUrl = $this->getRedirectUrl($authenticatedAdmin);
+
+            // ✅ Use redirect() with return
+            return redirect($redirectUrl);
         }
 
         $this->addError('password', 'Invalid credentials. Please try again.');
     }
 
-    protected function handleOrganisationContext(Admin $admin): void
+    /**
+     * Determine redirect URL based on user type and permissions
+     */
+    private function getRedirectUrl(Admin $admin): string
     {
-        if (!$admin->isSuperAdmin()) {
-            $singleOrg = $admin->getSingleOrganisation();
-            if ($singleOrg) {
-                $admin->setCurrentOrganisation($singleOrg->id);
-                OrganisationContext::set($singleOrg->id);
-            }
+        // Super admin goes to system home
+        if ($admin->isSuperAdmin()) {
+            return route('admin.home');
         }
+
+        // Load organisations for non-super-admin users
+        $organisations = $admin->organisations;
+
+        // If user has organisations assigned
+        if ($organisations->isNotEmpty()) {
+            // Get the first active organisation
+            $organisation = $organisations->first();
+
+            // Set the current organisation
+            $admin->setCurrentOrganisation($organisation->id);
+            OrganisationContext::set($organisation->id);
+
+            // Redirect to organisation dashboard
+            return route('admin.org.dashboard', $organisation->id);
+        }
+
+        // If user has system-level permissions, go to home
+        if ($admin->getSystemPermissions()->isNotEmpty()) {
+            return route('admin.home');
+        }
+
+        // Default: system home
+        return route('admin.home');
     }
 
     // ─────────────────────────────────────────────────────────

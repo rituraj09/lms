@@ -10,6 +10,7 @@ use App\Models\Master\Organisation;
 use App\Services\OrganisationContext;
 use Livewire\Attributes\Layout;
 
+
 #[Layout('layouts.backend')]
 class OrganisationList extends Component
 {
@@ -53,7 +54,7 @@ class OrganisationList extends Component
         }
 
         OrganisationContext::set($id);
-        $this->redirect(route('admin.organisation.dashboard', $id), navigate: true);
+        $this->redirect(route('admin.organisations.dashboard', $id), navigate: false);
     }
 
     public function deleteOrganisation(int $id): void

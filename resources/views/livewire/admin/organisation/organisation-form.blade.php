@@ -8,7 +8,7 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb breadcrumb-dots mb-2">
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.organisations.index') }}" wire:navigate class="text-decoration-none">
+                            <a href="{{ route('admin.organisations.index') }}" class="text-decoration-none">
                                 <i class="ri ri-home-4-line me-1"></i>Organisations
                             </a>
                         </li>
@@ -29,7 +29,7 @@
                                 : 'Register a new organisation by filling in the required information.' }}
                         </p>
                     </div>
-                    <a href="{{ route('admin.organisations.index') }}" wire:navigate
+                    <a href="{{ route('admin.organisations.index') }}"
                         class="btn btn-outline-secondary d-inline-flex align-items-center gap-2">
                         <i class="ri ri-arrow-left-line"></i>
                         <span>Back to List</span>
@@ -652,7 +652,7 @@
                                 <div class="d-flex gap-2 flex-wrap">
 
                                     {{-- Cancel --}}
-                                    <a href="{{ route('admin.organisations.index') }}" wire:navigate
+                                    <a href="{{ route('admin.organisations.index') }}"
                                         class="btn btn-secondary d-inline-flex align-items-center gap-2">
                                         <i class="ri ri-close-line"></i>
                                         <span>Cancel</span>
@@ -743,87 +743,88 @@
             </div>
         </div>
     </div>
+    @push('styles')
+        {{-- Custom CSS for Bootstrap enhancements --}}
+        <style>
+            :root {
+                --indigo: #667eea;
+                --indigo-light: #eef2f9;
+            }
 
-    {{-- Custom CSS for Bootstrap enhancements --}}
-    <style>
-        :root {
-            --indigo: #667eea;
-            --indigo-light: #eef2f9;
-        }
+            .text-indigo {
+                color: var(--indigo) !important;
+            }
 
-        .text-indigo {
-            color: var(--indigo) !important;
-        }
+            .bg-indigo-light {
+                background-color: var(--indigo-light);
+            }
 
-        .bg-indigo-light {
-            background-color: var(--indigo-light);
-        }
+            .form-control:focus,
+            .form-select:focus {
+                border-color: var(--indigo);
+                box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            }
 
-        .form-control:focus,
-        .form-select:focus {
-            border-color: var(--indigo);
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-        }
+            .form-control-lg,
+            .form-select-lg {
+                padding: 0.75rem 1rem;
+                font-size: 0.95rem;
+            }
 
-        .form-control-lg,
-        .form-select-lg {
-            padding: 0.75rem 1rem;
-            font-size: 0.95rem;
-        }
+            .input-group-text {
+                border-color: #dee2e6;
+            }
 
-        .input-group-text {
-            border-color: #dee2e6;
-        }
+            .card {
+                border-radius: 0.875rem;
+            }
 
-        .card {
-            border-radius: 0.875rem;
-        }
+            .btn-group-lg>.btn {
+                padding: 0.5rem 1rem;
+            }
 
-        .btn-group-lg>.btn {
-            padding: 0.5rem 1rem;
-        }
+            .hover-opacity-100:hover {
+                opacity: 1 !important;
+            }
 
-        .hover-opacity-100:hover {
-            opacity: 1 !important;
-        }
+            .object-fit-cover {
+                object-fit: cover;
+            }
 
-        .object-fit-cover {
-            object-fit: cover;
-        }
+            .letter-spacing-1 {
+                letter-spacing: 0.1em;
+            }
 
-        .letter-spacing-1 {
-            letter-spacing: 0.1em;
-        }
+            .alert-sm {
+                padding: 0.5rem 1rem;
+                font-size: 0.875rem;
+            }
 
-        .alert-sm {
-            padding: 0.5rem 1rem;
-            font-size: 0.875rem;
-        }
+            .breadcrumb {
+                background-color: transparent;
+                padding: 0;
+            }
 
-        .breadcrumb {
-            background-color: transparent;
-            padding: 0;
-        }
+            .breadcrumb-dots .breadcrumb-item::after {
+                content: "•";
+                padding: 0 0.5rem;
+            }
 
-        .breadcrumb-dots .breadcrumb-item::after {
-            content: "•";
-            padding: 0 0.5rem;
-        }
+            .breadcrumb-dots .breadcrumb-item:last-child::after {
+                content: "";
+            }
 
-        .breadcrumb-dots .breadcrumb-item:last-child::after {
-            content: "";
-        }
+            /* Status button groups */
+            .btn-group .btn-check:checked+.btn {
+                font-weight: 600;
+            }
 
-        /* Status button groups */
-        .btn-group .btn-check:checked+.btn {
-            font-weight: 600;
-        }
-
-        /* Smooth transitions */
-        .btn,
-        .form-control,
-        .form-select {
-            transition: all 0.2s ease;
-        }
-    </style>
+            /* Smooth transitions */
+            .btn,
+            .form-control,
+            .form-select {
+                transition: all 0.2s ease;
+            }
+        </style>
+    @endpush
 </div>

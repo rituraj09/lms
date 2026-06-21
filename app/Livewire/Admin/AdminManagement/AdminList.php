@@ -1,7 +1,6 @@
 <?php
 // app/Livewire/Admin/AdminManagement/AdminList.php
 
-
 namespace App\Livewire\Admin\AdminManagement;
 
 use Livewire\Component;
@@ -14,14 +13,18 @@ class AdminList extends Component
 {
     use WithPagination;
 
-    public string $search = '';
-    public string $roleFilter = '';
+    public string $search       = '';
+    public string $roleFilter   = '';
     public string $statusFilter = '';
-    public int $perPage = 10;
+    public int    $perPage      = 10;
+
+    // ✅ Modal properties
+    public bool  $showDetailModal = false;
+    public ?int  $viewingAdminId  = null;
 
     protected $queryString = [
-        'search' => ['except' => ''],
-        'roleFilter' => ['except' => ''],
+        'search'       => ['except' => ''],
+        'roleFilter'   => ['except' => ''],
         'statusFilter' => ['except' => ''],
     ];
 
@@ -30,6 +33,53 @@ class AdminList extends Component
         $this->resetPage();
     }
 
+    // ─── Modal Methods ────────────────────────────────────────
+
+    /**
+     * Open detail modal
+     */
+    public function viewAdmin(int $id): void
+    {
+        $this->viewingAdminId  = $id;
+        $this->showDetailModal = true;
+    }
+
+    /**
+     * Close detail modal
+     */
+    public function closeDetailModal(): void
+    {
+        $this->showDetailModal = false;
+        $this->viewingAdminId  = null;
+    }
+
+    // ─── Actions ──────────────────────────────────────────────
+
+    /**
+     * Toggle admin status
+     */
+    public function toggleStatus(int $id): void
+    {
+        $this->authorize('admin.edit');
+
+        $admin = Admin::findOrFail($id);
+
+        // Prevent changing own status
+        if ($admin->id === auth('admin')->id()) {
+            $this->dispatch('notify', type: 'error', message: 'You cannot change your own status!');
+            return;
+        }
+
+        $admin->update([
+            'status' => $admin->status === 'active' ? 'inactive' : 'active',
+        ]);
+
+        $this->dispatch('notify', type: 'success', message: 'Admin status updated!');
+    }
+
+    /**
+     * Delete admin
+     */
     public function deleteAdmin(int $id): void
     {
         $this->authorize('admin.delete');
@@ -49,28 +99,20 @@ class AdminList extends Component
         }
 
         $admin->delete();
+
+        // Close modal if viewing the deleted admin
+        if ($this->viewingAdminId === $id) {
+            $this->closeDetailModal();
+        }
+
         $this->dispatch('notify', type: 'success', message: 'Admin deleted successfully!');
     }
 
-    public function toggleStatus(int $id): void
-    {
-        $this->authorize('admin.edit');
+    // ─── Computed Properties ──────────────────────────────────
 
-        $admin = Admin::findOrFail($id);
-
-        // Prevent changing own status
-        if ($admin->id === auth('admin')->id()) {
-            $this->dispatch('notify', type: 'error', message: 'You cannot change your own status!');
-            return;
-        }
-
-        $admin->update([
-            'status' => $admin->status === 'active' ? 'inactive' : 'active'
-        ]);
-
-        $this->dispatch('notify', type: 'success', message: 'Admin status updated!');
-    }
-
+    /**
+     * Get paginated admins list
+     */
     public function getAdminsProperty()
     {
         return Admin::query()
@@ -87,10 +129,32 @@ class AdminList extends Component
             ->paginate($this->perPage);
     }
 
+    /**
+     * Get the admin being viewed in modal
+     */
+    public function getViewingAdminProperty(): ?Admin
+    {
+        if (!$this->viewingAdminId) {
+            return null;
+        }
+
+        return Admin::with([
+                'roles',
+                'details.state',
+                'details.district',
+                'organisations',
+                'currentOrganisation'
+            ])
+            ->find($this->viewingAdminId);
+    }
+
+    // ─── Render ───────────────────────────────────────────────
+
     public function render()
     {
         return view('livewire.admin.admin-management.admin-list', [
-            'admins' => $this->admins,
+            'admins'       => $this->admins,
+            'viewingAdmin' => $this->viewingAdmin,
         ]);
     }
 }
