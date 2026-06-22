@@ -137,7 +137,7 @@ class OrganisationForm extends Component
         $data = collect($validated)
             ->except(['logo', 'banner'])
             ->toArray();
-
+ dd($data);
         $data['slug'] = Str::slug($this->name);
 
         // Handle Logo Upload
@@ -154,6 +154,7 @@ class OrganisationForm extends Component
             $this->organisation->update($data);
             $this->dispatch('notify', type: 'success', message: 'Organisation updated successfully!');
         } else {
+
             Organisation::create($data);
             $this->dispatch('notify', type: 'success', message: 'Organisation created successfully!');
             $this->redirect(route('admin.organisations.index'), navigate: false);
