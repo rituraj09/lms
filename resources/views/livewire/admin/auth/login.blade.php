@@ -204,18 +204,18 @@
 
             {{-- Logo --}}
             <div class="d-flex justify-content-center mb-4">
-                <img src="{{ asset('assets/img/favicon/favicon.png') }}" class="w-px-75 h-px-75"
+                <img src="{{ asset('brand-logo/logo-alt/logo-text-bottom.png') }}" class="h-px-100"
                     alt="{{ config('app.name') }}">
             </div>
 
             {{-- App Name --}}
-            <div class="app-brand justify-content-center mb-1">
-                <a href="#" class="app-brand-link gap-2">
-                    <span class="app-brand-text demo text-heading fw-semibold">
-                        {{ config('app.name') }}
-                    </span>
-                </a>
-            </div>
+{{--            <div class="app-brand justify-content-center mb-1">--}}
+{{--                <a href="#" class="app-brand-link gap-2">--}}
+{{--                    <span class="app-brand-text demo text-heading fw-semibold">--}}
+{{--                        {{ config('app.name') }}--}}
+{{--                    </span>--}}
+{{--                </a>--}}
+{{--            </div>--}}
 
             <div class="card-body mt-1">
                 <h4 class="mb-1 text-center">Admin Login</h4>

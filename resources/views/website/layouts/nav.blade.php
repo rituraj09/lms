@@ -5,7 +5,7 @@
     <div class="nav-inner">
 
         <a href="{{ route('home') }}" class="nav-logo" onclick="showPage('home')">
-            <img src="{{ asset('website/assets/logo-full.png') }}" style="height:28px;width:auto" alt="MindShiksha">
+            <img src="{{ asset('brand-logo/logo-alt/logo-text-right-bottom.png') }}" style="height:46px;width:auto" alt="MindShiksha">
 
         </a>
         <div class="nav-links">

@@ -21,7 +21,7 @@
 
     <title>@yield('title', config('app.name', 'LMS Platform'))</title>
 
-    <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/favicon/favicon.ico') }}" />
+    <link rel="icon" type="image/x-icon" href="{{ asset('brand-logo/logo-alt/favicon.ico') }}" />
 
     {{-- Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com" />

@@ -71,7 +71,7 @@ new class extends Component {
                 <a href="{{ route('admin.home') }}" class="app-brand-link d-flex align-items-center gap-2">
                     <span class="app-brand-logo flex-shrink-0">
                         <img style="width: 36px; height: 36px; object-fit: contain;" class="rounded"
-                             src="{{ asset('assets/img/brand-logo/logo-short.png') }}" alt="{{ config('app.name') }}" />
+                             src="{{ asset('brand-logo/logo-alt/logo-only.png') }}" alt="{{ config('app.name') }}" />
                     </span>
                     <div class="app-brand-text-group d-flex flex-column lh-sm">
                         <span class="app-brand-text fw-bold fs-6 text-primary text-nowrap">
