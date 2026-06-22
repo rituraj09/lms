@@ -59,7 +59,7 @@
                     Manage all assessments and their question groups.
                 </p>
             </div>
-            @can('assessment.create'))
+            @can('assessment.create')
             <button type="button" wire:click="createAssessment" class="btn btn-primary btn-sm shadow-sm">
                 <i class="ri ri-add-large-line me-1"></i>
                 New Assessment
