@@ -136,3 +136,41 @@
     gap: 0;
   }
 }
+.demo-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:0.4rem;
+  white-space:nowrap;                              /* never wraps to 2 lines */
+  font-family:'Poppins',sans-serif;
+  font-weight:600;
+  /* fluid sizing — scales smoothly between screen sizes */
+  font-size:clamp(0.8rem, 1.6vw, 0.95rem);
+  padding:clamp(9px, 1.4vw, 13px) clamp(14px, 2.4vw, 26px);
+  border-radius:12px;
+}
+
+.demo-btn i{
+  font-size:0.82rem;
+  flex-shrink:0;
+}
+
+/* TABLET: slightly tighter */
+@media (max-width:768px){
+  .demo-btn{
+    font-size:0.85rem;
+    padding:10px 18px;
+  }
+}
+
+/* MOBILE: hide the text, show only the icon (compact icon button) */
+@media (max-width:480px){
+  .demo-btn .btn-label{ display:none; }
+  .demo-btn{
+    padding:11px;
+    width:42px;
+    height:42px;
+    border-radius:10px;
+  }
+  .demo-btn i{ font-size:1rem; margin:0; }
+}
