@@ -137,7 +137,7 @@ class OrganisationForm extends Component
         $data = collect($validated)
             ->except(['logo', 'banner'])
             ->toArray();
- dd($data);
+
         $data['slug'] = Str::slug($this->name);
 
         // Handle Logo Upload

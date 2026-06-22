@@ -18,10 +18,6 @@ class Organisation extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = [
-        'settings',
-    ];
-
     protected $casts = [
         'settings'           => 'array',
         'subscription_start' => 'date',
@@ -36,7 +32,7 @@ class Organisation extends Model
         static::creating(function ($org) {
             // Auto slug
             if (empty($org->slug)) {
-                $org->slug = self::generateUniqueSlug($org->name);
+                $org->slug = self::generateUniqueSlug-($org->name);
             }
             // Auto code
             if (empty($org->code)) {
