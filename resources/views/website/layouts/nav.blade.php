@@ -43,7 +43,9 @@
         </div>
 
         <div class="nav-actions">
-            <a href="/admin/login" class="btn btn-secondary">Login</a>
+            <a href="/admin/login" class="btn btn-secondary">
+                <i class="fas fa-sign-in" style="margin-right:0.4rem;font-size:0.82rem;"></i>
+                Login</a>
             <a href="{{ route('contact') }}" class="btn btn-primary">
                 <i class="fas fa-calendar-alt" style="margin-right:0.4rem;font-size:0.82rem;"></i>
                 Request a Demo
