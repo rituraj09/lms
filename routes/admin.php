@@ -3,6 +3,8 @@
 use App\Livewire\Admin\Questions\QuestionGroupIndex;
 use App\Livewire\Admin\Questions\QuestionGroupForm;
 use App\Livewire\Admin\Assessments\AssessmentManager;
+use App\Livewire\Admin\Assessments\AssessmentList;
+use App\Livewire\Admin\Assessments\AssignAssessment;
 use App\Livewire\Admin\Auth\Login;
 use App\Services\OrganisationContext;
 
@@ -105,9 +107,17 @@ Route::group(['middleware' => 'redirect.notauth:admin'], function ($router) {
         // SYSTEM LEVEL - ASSESSMENTS
         // ────────────────────────────────────────────────────────────
         Route::prefix('assessments')->name('assessments.')->group(function () {
-            Route::get('/', AssessmentManager::class)
-                ->name('index')
+            Route::get('/view', AssessmentManager::class)
+                ->name('view')
                 ->middleware('can:system.assessment.view');
+
+            Route::get('/assessment_list', AssessmentList::class)
+                ->name('assessment_list')
+                ->middleware('can:system.assessment.assign_view');
+
+            Route::get('/assessments/assign/{encryptedId}', AssignAssessment::class)
+                ->name('assign')
+                ->middleware('can:system.assessment.assign');
         });
 
     });

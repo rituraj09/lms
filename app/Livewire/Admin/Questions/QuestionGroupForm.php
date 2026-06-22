@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Livewire\Admin\Questions;
 
 use Livewire\Component;
@@ -24,15 +23,15 @@ class QuestionGroupForm extends Component
     use WithFileUploads;
 
     /* ================================================================
-     |  VIEW STATES
-     |  'group_form'     → Create / Edit group info
-     |  'group_view'     → Group saved — show readonly group + questions list
-     |  'question_form'  → Add / Edit single question
+     | VIEW STATES
+     | 'group_form'     → Create / Edit group info
+     | 'group_view'     → Group saved — show readonly group + questions list
+     | 'question_form'  → Add / Edit single question
      * ================================================================*/
     public string $view = 'group_form';
 
     /* ================================================================
-     |  LOCKED
+     | LOCKED
      * ================================================================*/
     #[Locked]
     public ?int $groupId = null;
@@ -41,25 +40,26 @@ class QuestionGroupForm extends Component
     public bool $isGroupLocked = false;
 
     /* ================================================================
-     |  GROUP FIELDS
+     | GROUP FIELDS
      * ================================================================*/
-    public string $group_code         = '';
+    public string $group_code        = '';
     public string $questions_category = 'single';
-    public string $admin_note         = '';
+    public string $admin_note        = '';
 
     /**
      * group_content JSON structure:
      * {
      *   "title": {
-     *       "en": "...",
-     *       "hn": "...",
-     *       ...
+     *     "en": "...",
+     *     "hn": "...",
+     *     ...
      *   },
      *   "content": {
-     *       "en": "<p>Rich text...</p>",
-     *       "hn": "...",
-     *       ...
-     *   }
+     *     "en": "<p>Rich text...</p>",
+     *     "hn": "...",
+     *     ...
+     *   },
+     *   "image": "question-groups/images/xxx.jpg"  ← NEW (only for 'multiple')
      * }
      *
      * "content" key is only used when questions_category === 'multiple'
@@ -67,23 +67,29 @@ class QuestionGroupForm extends Component
     public array $group_content = [];
 
     /* ================================================================
-     |  ACTIVE QUESTION
+     | GROUP CONTENT IMAGE UPLOAD  ← NEW
+     * ================================================================*/
+    public $groupContentImage                = null;   // TemporaryUploadedFile
+    public ?string $existingGroupContentImage = null;  // already-saved path
+
+    /* ================================================================
+     | ACTIVE QUESTION
      * ================================================================*/
     public array $activeQuestion = [];
 
     /* ================================================================
-     |  QUESTION IMAGE UPLOADS
+     | QUESTION IMAGE UPLOADS
      * ================================================================*/
     public $stemImageUpload  = null;
     public array $optionImages = [];
 
     /* ================================================================
-     |  QUESTIONS LIST
+     | QUESTIONS LIST
      * ================================================================*/
     public array $questionsList = [];
 
     /* ================================================================
-     |  DROPDOWN DATA
+     | DROPDOWN DATA
      * ================================================================*/
     public array $primarySkillTypes = [];
     public array $subSkillTypes     = [];
@@ -91,12 +97,12 @@ class QuestionGroupForm extends Component
     public array $ageGroups         = [];
 
     /* ================================================================
-     |  INTERNAL
+     | INTERNAL
      * ================================================================*/
     public array $languages = [];
 
     /* ================================================================
-     |  MOUNT
+     | MOUNT
      * ================================================================*/
     public function mount(?int $groupId = null): void
     {
@@ -117,7 +123,7 @@ class QuestionGroupForm extends Component
     }
 
     /* ================================================================
-     |  DROPDOWNS
+     | DROPDOWNS
      * ================================================================*/
     private function loadDropdowns(): void
     {
@@ -135,9 +141,8 @@ class QuestionGroupForm extends Component
     }
 
     /* ================================================================
-     |  INITIALIZERS
+     | INITIALIZERS
      * ================================================================*/
-
     /**
      * Ensure all language keys exist in group_content
      * for both 'title' and 'content' nodes.
@@ -148,6 +153,8 @@ class QuestionGroupForm extends Component
             $this->group_content['title'][$lang]   ??= '';
             $this->group_content['content'][$lang] ??= '';
         }
+        // Ensure image key exists
+        $this->group_content['image'] ??= null;
     }
 
     private function emptyQuestion(): array
@@ -163,7 +170,7 @@ class QuestionGroupForm extends Component
         return [
             'id'                  => null,
             'question_code'       => $this->generateQuestionCode(),
-            'answer_category'     => 'single_optional',
+            'answer_category'     => 'single_choice',
             'marks'               => 1,
             'primary_skill_id'    => null,
             'sub_skill_id'        => null,
@@ -182,7 +189,6 @@ class QuestionGroupForm extends Component
     private function emptyOption(): array
     {
         $text = [];
-
         foreach ($this->languages as $lang) {
             $text[$lang] = '';
         }
@@ -197,7 +203,7 @@ class QuestionGroupForm extends Component
     }
 
     /* ================================================================
-     |  CODE GENERATORS
+     | CODE GENERATORS
      * ================================================================*/
     private function generateGroupCode(): string
     {
@@ -218,7 +224,7 @@ class QuestionGroupForm extends Component
     }
 
     /* ================================================================
-     |  LOAD GROUP
+     | LOAD GROUP
      * ================================================================*/
     private function loadGroup(int $id): void
     {
@@ -240,10 +246,14 @@ class QuestionGroupForm extends Component
             $this->group_content['content'][$lang]
                 = $stored['content'][$lang] ?? '';
         }
+
+        // Load stored image  ← NEW
+        $this->group_content['image']      = $stored['image'] ?? null;
+        $this->existingGroupContentImage   = $stored['image'] ?? null;
     }
 
     /* ================================================================
-     |  LOAD QUESTIONS LIST
+     | LOAD QUESTIONS LIST
      * ================================================================*/
     public function loadQuestionsList(): void
     {
@@ -259,24 +269,24 @@ class QuestionGroupForm extends Component
                 $content = $q->question_content ?? [];
 
                 return [
-                    'id'              => $q->id,
-                    'question_code'   => $q->question_code,
-                    'answer_category' => $q->answer_category,
-                    'marks'           => $content['marks'] ?? 0,
-                    'primary_skill'   => $q->primarySkill?->name ?? '—',
-                    'difficulty'      => $q->difficultyLevel?->name ?? '—',
-                    'age_group'       => $q->ageGroup?->name ?? '—',
-                    'stem_en'         => strip_tags($content['stem']['en'] ?? ''),
-                    'options_count'   => count($content['options'] ?? []),
-                    'in_assessment'   => $q->isUsedInAssessment(),
+                    'id'             => $q->id,
+                    'question_code'  => $q->question_code,
+                    'answer_category'=> $q->answer_category,
+                    'marks'          => $content['marks'] ?? 0,
+                    'primary_skill'  => $q->primarySkill?->name  ?? '—',
+                    'difficulty'     => $q->difficultyLevel?->name ?? '—',
+                    'age_group'      => $q->ageGroup?->name       ?? '—',
+                    'stem_en'        => strip_tags($content['stem']['en'] ?? ''),
+                    'options_count'  => count($content['options'] ?? []),
+                    'in_assessment'  => $q->isUsedInAssessment(),
                 ];
             })
             ->toArray();
     }
 
     /* ================================================================
-     |  UPDATED HOOK — questions_category change
-     |  When category switches, ensure content keys exist
+     | UPDATED HOOK — questions_category change
+     | When category switches, ensure content keys exist
      * ================================================================*/
     public function updatedQuestionsCategory(): void
     {
@@ -284,10 +294,39 @@ class QuestionGroupForm extends Component
         foreach ($this->languages as $lang) {
             $this->group_content['content'][$lang] ??= '';
         }
+        // Ensure image key exists
+        $this->group_content['image'] ??= null;
     }
 
     /* ================================================================
-     |  GROUP FORM ACTIONS
+     | GROUP CONTENT IMAGE HELPERS  ← NEW
+     * ================================================================*/
+
+    /**
+     * Remove the already-saved image from disk and clear state.
+     */
+    public function removeGroupContentImagePath(): void
+    {
+        $path = $this->existingGroupContentImage;
+
+        if ($path && Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+        }
+
+        $this->existingGroupContentImage = null;
+        $this->group_content['image']    = null;
+    }
+
+    /**
+     * Discard a newly-selected upload (not yet saved).
+     */
+    public function removeGroupContentImageUpload(): void
+    {
+        $this->groupContentImage = null;
+    }
+
+    /* ================================================================
+     | GROUP FORM ACTIONS
      * ================================================================*/
     public function editGroup(): void
     {
@@ -305,9 +344,10 @@ class QuestionGroupForm extends Component
         }
 
         $rules = [
-            'group_code'         => 'required|string|max:100',
-            'questions_category' => 'required|in:single,multiple',
-            'group_content'      => 'nullable|array',
+            'group_code'        => 'required|string|max:100',
+            'questions_category'=> 'required|in:single,multiple',
+            'group_content'     => 'nullable|array',
+            'groupContentImage' => 'nullable|image|max:5120',   // ← NEW
         ];
 
         // If multiple, require at least English content
@@ -316,15 +356,37 @@ class QuestionGroupForm extends Component
         }
 
         $messages = [
-            'group_code.required'              => 'Group code is required.',
-            'questions_category.required'      => 'Please select a question category.',
-            'group_content.content.en.required'=> 'Please enter the group content in English.',
-            'group_content.content.en.min'     => 'Group content is too short.',
+            'group_code.required'               => 'Group code is required.',
+            'questions_category.required'       => 'Please select a question category.',
+            'group_content.content.en.required' => 'Please enter the group content in English.',
+            'group_content.content.en.min'      => 'Group content is too short.',
+            'groupContentImage.image'           => 'File must be a valid image.',
+            'groupContentImage.max'             => 'Image must not exceed 5 MB.',
         ];
 
         $this->validate($rules, $messages);
 
         try {
+            // ── Handle group content image upload  ← NEW ─────────────
+            $imagePath = $this->existingGroupContentImage;
+
+            if ($this->groupContentImage) {
+                // Delete old image if it exists
+                if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+                    Storage::disk('public')->delete($imagePath);
+                }
+
+                $imagePath = $this->groupContentImage
+                    ->store('question-groups/images', 'public');
+
+                $this->existingGroupContentImage = $imagePath;
+                $this->groupContentImage         = null;
+            }
+
+            // Embed image path into the JSON payload
+            $this->group_content['image'] = $imagePath;
+            // ─────────────────────────────────────────────────────────
+
             $group = QuestionGroup::updateOrCreate(
                 ['id' => $this->groupId],
                 [
@@ -333,16 +395,14 @@ class QuestionGroupForm extends Component
                     'group_content'      => $this->group_content,
                     'admin_note'         => $this->admin_note,
                     'created_by'         => $this->groupId
-                                             ? QuestionGroup::find($this->groupId)?->created_by
-                                             : auth()->id(),
+                        ? QuestionGroup::find($this->groupId)?->created_by
+                        : auth()->id(),
                     'updated_by'         => auth()->id(),
                 ]
             );
 
             $this->groupId = $group->id;
-
             $this->loadQuestionsList();
-
             $this->view = 'group_view';
 
             session()->flash('success', 'Question Group saved successfully.');
@@ -362,7 +422,7 @@ class QuestionGroupForm extends Component
     }
 
     /* ================================================================
-     |  QUESTION FORM ACTIONS
+     | QUESTION FORM ACTIONS
      * ================================================================*/
     public function addNewQuestion(): void
     {
@@ -372,10 +432,10 @@ class QuestionGroupForm extends Component
     }
 
     /* ================================================================
-  |  EDIT QUESTION — Load existing question into activeQuestion
-  * ================================================================*/
-
+     | EDIT QUESTION — Load existing question into activeQuestion
+     * ================================================================*/
     public string $questionFormKey = '';
+
     public function editQuestion(int $questionId): void
     {
         $question = Question::with([
@@ -383,8 +443,7 @@ class QuestionGroupForm extends Component
             'subSkill',
             'difficultyLevel',
             'ageGroup',
-        ])
-            ->findOrFail($questionId);
+        ])->findOrFail($questionId);
 
         if ($question->isUsedInAssessment()) {
             session()->flash(
@@ -401,6 +460,7 @@ class QuestionGroupForm extends Component
         foreach ($this->languages as $lang) {
             $stem[$lang] = $content['stem'][$lang] ?? '';
         }
+
         /* ── Explanation ──────────────────────────────────────────── */
         $explanation = [];
         foreach ($this->languages as $lang) {
@@ -409,7 +469,7 @@ class QuestionGroupForm extends Component
         }
 
         /* ── Options ──────────────────────────────────────────────── */
-        $options = [];
+        $options    = [];
         $rawOptions = $content['options'] ?? [];
 
         // Pad to minimum 2 options
@@ -425,8 +485,8 @@ class QuestionGroupForm extends Component
 
             $options[] = [
                 'option_type' => $opt['option_type'] ?? 'text',
-                'is_correct'  => (bool)  ($opt['is_correct']  ?? false),
-                'weightage'   => (float) ($opt['weightage']   ?? 0),
+                'is_correct'  => (bool) ($opt['is_correct'] ?? false),
+                'weightage'   => (float) ($opt['weightage'] ?? 0),
                 'text'        => $text,
                 'image_path'  => $opt['image_path'] ?? null,
             ];
@@ -450,11 +510,9 @@ class QuestionGroupForm extends Component
 
         /* ── Force full re-render of question form ────────────────── */
         $this->questionFormKey = 'edit-' . $questionId . '-' . time();
-
         $this->stemImageUpload = null;
         $this->optionImages    = [];
         $this->resetErrorBag();
-
         $this->view = 'question_form';
     }
 
@@ -462,7 +520,7 @@ class QuestionGroupForm extends Component
     {
         $this->validateQuestion();
 
-        $category = $this->activeQuestion['answer_category'] ?? 'single_optional';
+        $category = $this->activeQuestion['answer_category'] ?? 'single_choice';
 
         if ($category !== 'open_text') {
             $correctCount = collect($this->activeQuestion['options'])
@@ -479,7 +537,6 @@ class QuestionGroupForm extends Component
 
         try {
             DB::transaction(function () {
-
                 $stemImagePath = $this->activeQuestion['existing_image'] ?? null;
 
                 if ($this->stemImageUpload) {
@@ -491,7 +548,7 @@ class QuestionGroupForm extends Component
                         ->store("questions/{$this->groupId}/stems", 'public');
 
                     $this->activeQuestion['existing_image'] = $stemImagePath;
-                    $this->stemImageUpload = null;
+                    $this->stemImageUpload                  = null;
                 }
 
                 $options = $this->activeQuestion['options'];
@@ -506,8 +563,8 @@ class QuestionGroupForm extends Component
                         $optPath = $this->optionImages[$j]
                             ->store("questions/{$this->groupId}/options", 'public');
 
-                        $options[$j]['image_path']                          = $optPath;
-                        $this->activeQuestion['options'][$j]['image_path']  = $optPath;
+                        $options[$j]['image_path']                           = $optPath;
+                        $this->activeQuestion['options'][$j]['image_path']   = $optPath;
                         unset($this->optionImages[$j]);
                     }
                 }
@@ -534,8 +591,8 @@ class QuestionGroupForm extends Component
                         'explaination'        => json_encode($this->activeQuestion['explanation']),
                         'admin_notes'         => null,
                         'created_by'          => $this->activeQuestion['id']
-                                                    ? Question::find($this->activeQuestion['id'])?->created_by
-                                                    : auth()->id(),
+                            ? Question::find($this->activeQuestion['id'])?->created_by
+                            : auth()->id(),
                         'updated_by'          => auth()->id(),
                     ]
                 );
@@ -594,7 +651,7 @@ class QuestionGroupForm extends Component
     }
 
     /* ================================================================
-     |  RESET QUESTION FORM
+     | RESET QUESTION FORM
      * ================================================================*/
     private function resetQuestionForm(): void
     {
@@ -605,7 +662,7 @@ class QuestionGroupForm extends Component
     }
 
     /* ================================================================
-     |  OPTION MANAGEMENT
+     | OPTION MANAGEMENT
      * ================================================================*/
     public function addOption(): void
     {
@@ -636,9 +693,9 @@ class QuestionGroupForm extends Component
 
     public function toggleCorrect(int $optIndex): void
     {
-        $category = $this->activeQuestion['answer_category'] ?? 'single_optional';
+        $category = $this->activeQuestion['answer_category'] ?? 'single_choice';
 
-        if ($category === 'single_optional') {
+        if ($category === 'single_choice') {
             foreach ($this->activeQuestion['options'] as $i => $_) {
                 $this->activeQuestion['options'][$i]['is_correct'] = ($i === $optIndex);
                 if ($i !== $optIndex) {
@@ -672,7 +729,7 @@ class QuestionGroupForm extends Component
     }
 
     /* ================================================================
-     |  STEM IMAGE
+     | STEM IMAGE
      * ================================================================*/
     public function removeStemImagePath(): void
     {
@@ -691,7 +748,7 @@ class QuestionGroupForm extends Component
     }
 
     /* ================================================================
-     |  OPTION IMAGE
+     | OPTION IMAGE
      * ================================================================*/
     public function removeOptionImagePath(int $optIndex): void
     {
@@ -710,12 +767,13 @@ class QuestionGroupForm extends Component
     }
 
     /* ================================================================
-     |  QUESTION VALIDATION
+     | QUESTION VALIDATION
      * ================================================================*/
     private function validateQuestion(): void
     {
         $rules = [
-            'activeQuestion.answer_category'     => 'required|in:single_optional,multi_optional,open_text',
+            'activeQuestion.answer_category'     =>
+                'required|in:single_choice,multi_choice,open_text',
             'activeQuestion.marks'               => 'required|numeric|min:0',
             'activeQuestion.primary_skill_id'    => 'required|integer',
             'activeQuestion.sub_skill_id'        => 'required|integer',
@@ -725,7 +783,7 @@ class QuestionGroupForm extends Component
             'stemImageUpload'                    => 'nullable|image|max:2048',
         ];
 
-        $category = $this->activeQuestion['answer_category'] ?? 'single_optional';
+        $category = $this->activeQuestion['answer_category'] ?? 'single_choice';
 
         if ($category !== 'open_text') {
             $rules['activeQuestion.options'] = 'required|array|min:2';
@@ -759,7 +817,7 @@ class QuestionGroupForm extends Component
     }
 
     /* ================================================================
-     |  RENDER
+     | RENDER
      * ================================================================*/
     public function render()
     {

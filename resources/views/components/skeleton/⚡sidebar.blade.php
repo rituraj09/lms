@@ -42,26 +42,26 @@ new class extends Component {
             @if ($activeOrg)
                 {{-- Organisation Mode Brand --}}
                 <a href="{{ route('admin.organisations.dashboard', $activeOrg->id) }}"
-                    class="app-brand-link d-flex align-items-center gap-2">
+                   class="app-brand-link d-flex align-items-center gap-2">
                     <span class="app-brand-logo flex-shrink-0">
                         @if ($activeOrg->logo)
                             <img style="width: 36px; height: 36px; object-fit: cover;"
-                                class="rounded-circle border border-2 border-success"
-                                src="{{ asset('storage/' . $activeOrg->logo) }}" alt="{{ $activeOrg->name }}" />
+                                 class="rounded-circle border border-2 border-success"
+                                 src="{{ asset('storage/' . $activeOrg->logo) }}" alt="{{ $activeOrg->name }}" />
                         @else
                             <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--bs-success);"
-                                class="d-flex align-items-center justify-content-center text-white fw-bold">
+                                 class="d-flex align-items-center justify-content-center text-white fw-bold">
                                 {{ strtoupper(substr($activeOrg->name, 0, 2)) }}
                             </div>
                         @endif
                     </span>
                     <div class="app-brand-text-group d-flex flex-column lh-sm">
                         <span class="app-brand-text fw-bold fs-6 text-success text-nowrap"
-                            style="max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                              style="max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                             {{ $activeOrg->name }}
                         </span>
                         <span class="app-brand-subtext text-muted text-nowrap"
-                            style="font-size: 0.53rem; letter-spacing: 0.02em;">
+                              style="font-size: 0.53rem; letter-spacing: 0.02em;">
                             <i class="ri ri-building-line me-1"></i>{{ $activeOrg->code }} · Org Mode
                         </span>
                     </div>
@@ -71,14 +71,14 @@ new class extends Component {
                 <a href="{{ route('admin.home') }}" class="app-brand-link d-flex align-items-center gap-2">
                     <span class="app-brand-logo flex-shrink-0">
                         <img style="width: 36px; height: 36px; object-fit: contain;" class="rounded"
-                            src="{{ asset('assets/img/favicon/favicon.png') }}" alt="{{ config('app.name') }}" />
+                             src="{{ asset('assets/img/brand-logo/logo-short.png') }}" alt="{{ config('app.name') }}" />
                     </span>
                     <div class="app-brand-text-group d-flex flex-column lh-sm">
                         <span class="app-brand-text fw-bold fs-6 text-primary text-nowrap">
                             {{ config('app.name') }}
                         </span>
                         <span class="app-brand-subtext text-muted text-nowrap"
-                            style="font-size: 0.53rem; letter-spacing: 0.02em;">
+                              style="font-size: 0.53rem; letter-spacing: 0.02em;">
                             <i class="ri ri-dashboard-line me-1"></i>System Mode
                         </span>
                     </div>
@@ -87,9 +87,9 @@ new class extends Component {
 
             {{-- Collapse Toggle --}}
             <a href="javascript:void(0);"
-                class="layout-menu-toggle menu-link text-large ms-auto d-xl-flex d-none flex-shrink-0">
+               class="layout-menu-toggle menu-link text-large ms-auto d-xl-flex d-none flex-shrink-0">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"
-                    xmlns="http://www.w3.org/2000/svg">
+                     xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M8.47365 11.7183C8.11707 12.0749 8.11707 12.6531 8.47365 13.0097L12.071 16.607C12.4615 16.9975 12.4615 17.6305 12.071 18.021C11.6805 18.4115 11.0475 18.4115 10.657 18.021L5.83009 13.1941C5.37164 12.7356 5.37164 11.9924 5.83009 11.5339L10.657 6.707C11.0475 6.31653 11.6805 6.31653 12.071 6.707C12.4615 7.09747 12.4615 7.73053 12.071 8.121L8.47365 11.7183Z"
                         fill-opacity="0.9" />
@@ -116,7 +116,7 @@ new class extends Component {
                 {{-- Organisation Info Banner --}}
                 <li class="menu-item">
                     <div class="px-3 py-3 mx-2 mb-2 rounded-3"
-                        style="background: rgba(25,135,84,0.08); border: 1px solid rgba(25,135,84,0.2);">
+                         style="background: rgba(25,135,84,0.08); border: 1px solid rgba(25,135,84,0.2);">
                         <div class="d-flex align-items-center gap-2 mb-1">
                             <span class="badge bg-label-success" style="font-size: 0.62rem;">
                                 <i class="ri ri-building-line me-1"></i>ACTIVE ORG
@@ -186,7 +186,7 @@ new class extends Component {
                 @if ($adminOrgs->count() > 1)
                     <li class="menu-header small mt-4">
                         <span class="menu-header-text text-uppercase"
-                            style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
+                              style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
                             Switch Organisation
                         </span>
                     </li>
@@ -223,7 +223,7 @@ new class extends Component {
                 @if ($canAnySystem(['system.course.view', 'system.course.create', 'system.module.view']))
                     <li class="menu-header small mt-4">
                         <span class="menu-header-text text-uppercase"
-                            style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
+                              style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
                             Learning Management
                         </span>
                     </li>
@@ -282,7 +282,7 @@ new class extends Component {
                 @if ($canAnySystem(['system.question.view', 'system.assessment.view']))
                     <li class="menu-header small mt-4">
                         <span class="menu-header-text text-uppercase"
-                            style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
+                              style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
                             Assessment & Evaluation
                         </span>
                     </li>
@@ -312,10 +312,17 @@ new class extends Component {
                             </a>
                             <ul class="menu-sub">
                                 <li class="menu-item">
-                                    <a href="{{ route('admin.assessments.index') }}" class="menu-link">
+                                    <a href="{{ route('admin.assessments.view') }}" class="menu-link">
                                         <div>Manage Assessments</div>
                                     </a>
                                 </li>
+                                @if ($canSystem('system.assessment.assign_view'))
+                                    <li class="menu-item">
+                                        <a href="{{ route('admin.assessments.assessment_list') }}" class="menu-link">
+                                            <div>Assign Assessments</div>
+                                        </a>
+                                    </li>
+                                @endif
                                 <li class="menu-item">
                                     <a href="#" class="menu-link">
                                         <div>Results & Scores</div>
@@ -330,7 +337,7 @@ new class extends Component {
                 @if ($canAnySystem(['system.student.view', 'system.admin.view', 'system.role.view']))
                     <li class="menu-header small mt-4">
                         <span class="menu-header-text text-uppercase"
-                            style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
+                              style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
                             User Management
                         </span>
                     </li>
@@ -381,7 +388,7 @@ new class extends Component {
                 @if ($canSystem('system.organisation.view'))
                     <li class="menu-header small mt-4">
                         <span class="menu-header-text text-uppercase"
-                            style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
+                              style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
                             Organization
                         </span>
                     </li>
@@ -404,7 +411,7 @@ new class extends Component {
                 @if ($canSystem('system.report.view'))
                     <li class="menu-header small mt-4">
                         <span class="menu-header-text text-uppercase"
-                            style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
+                              style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
                             Reports & Analytics
                         </span>
                     </li>
@@ -443,7 +450,7 @@ new class extends Component {
                 {{-- ==================== COMMUNICATION ==================== --}}
                 <li class="menu-header small mt-4">
                     <span class="menu-header-text text-uppercase"
-                        style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
+                          style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
                         Communication
                     </span>
                 </li>
@@ -470,7 +477,7 @@ new class extends Component {
                 @if ($canSystem('system.settings.view'))
                     <li class="menu-header small mt-4">
                         <span class="menu-header-text text-uppercase"
-                            style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
+                              style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
                             System Settings
                         </span>
                     </li>

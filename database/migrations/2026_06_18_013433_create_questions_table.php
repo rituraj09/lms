@@ -27,7 +27,7 @@ return new class extends Migration
             $table->foreignId('age_group_id')
                   ->constrained('age_groups')
                   ->restrictOnDelete();
-            $table->enum('answer_category', ['single_optional', 'multi_optional', 'open_text']);
+            $table->enum('answer_category', ['single_choice', 'multi_choice', 'open_text']);
             $table->json('question_content')->nullable();
             $table->text('explaination')->nullable();
             $table->text('admin_notes')->nullable();

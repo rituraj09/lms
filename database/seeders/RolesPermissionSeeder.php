@@ -58,8 +58,10 @@ class RolesPermissionSeeder extends Seeder
             ['name' => 'system.assessment.edit',             'display_name' => 'Edit Assessment',                 'group' => 'System - Assessments',      'sort_order' => 3],
             ['name' => 'system.assessment.delete',           'display_name' => 'Delete Assessment',               'group' => 'System - Assessments',      'sort_order' => 4],
             ['name' => 'system.assessment.publish',          'display_name' => 'Publish Assessment',              'group' => 'System - Assessments',      'sort_order' => 5],
+            ['name' => 'system.assessment.assign',           'display_name' => 'Assign Assessment to Org',        'group' => 'System - Assessments',      'sort_order' => 6],
+            ['name' => 'system.assessment.assign_view',       'display_name' => 'Assign View Assessment to Org',         'group' => 'System - Assessments',      'sort_order' => 7],
 
-            // System - Students
+                // System - Students
             ['name' => 'system.student.view',                'display_name' => 'View All Students',               'group' => 'System - Students',         'sort_order' => 1],
             ['name' => 'system.student.create',              'display_name' => 'Create Student',                  'group' => 'System - Students',         'sort_order' => 2],
             ['name' => 'system.student.edit',                'display_name' => 'Edit Student',                    'group' => 'System - Students',         'sort_order' => 3],

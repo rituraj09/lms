@@ -17,7 +17,7 @@
     <meta name="robots" content="noindex, nofollow" />
     <title>{{config('app.name','MindSiksha EDTech')}}</title>
     <meta name="description" content="" />
-    <link rel="icon" type="image/x-icon" href="{{asset('assets/img/favicon/favicon.png')}}" />
+    <link rel="icon" type="image/x-icon" href="{{asset('assets/img/favicon/favicon.ico')}}" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

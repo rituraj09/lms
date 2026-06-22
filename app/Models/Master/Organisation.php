@@ -10,12 +10,17 @@ use App\Models\Master\OrganisationType;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
 
 #[Unguarded]
 class Organisation extends Model
 {
     use SoftDeletes;
+
+    protected $fillable = [
+        'settings',
+    ];
 
     protected $casts = [
         'settings'           => 'array',
@@ -198,6 +203,28 @@ class Organisation extends Model
         $settings = $this->settings ?? [];
         data_set($settings, $key, $value);
         $this->update(['settings' => $settings]);
+    }
+
+    public function assessments(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            \App\Models\AssessmentMaster\Assessment::class,
+            'assessment_organisation'
+        )
+            ->withPivot([
+                'assigned_by',
+                'status',
+                'assigned_date',
+                'expiry_date',
+                'assignment_note',
+            ])
+            ->withTimestamps();
+    }
+    public function activeAssessments(): BelongsToMany
+    {
+        return $this->assessments()
+            ->wherePivot('status', 'active')
+            ->where('assessments.status', 'public');
     }
 }
 
