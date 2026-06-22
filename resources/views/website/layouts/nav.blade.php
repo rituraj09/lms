@@ -5,10 +5,8 @@
     <div class="nav-inner">
 
         <a href="{{ route('home') }}" class="nav-logo" onclick="showPage('home')">
-            <img src="{{ asset('website/assets/logo-full.png') }}" style="height:68px;width:auto" alt="MindShiksha">
-            <span class="nav-logo-text">
-                <span class="logo-mind">Mind</span><span class="logo-shiksha">Shiksha</span>
-            </span>
+            <img src="{{ asset('website/assets/logo-full.png') }}" style="height:28px;width:auto" alt="MindShiksha">
+
         </a>
         <div class="nav-links">
             <a href="{{ route('home') }}" class="nav-link  {{ request()->routeIs('home') ? 'active' : '' }}">Home</a>
