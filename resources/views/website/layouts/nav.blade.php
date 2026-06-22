@@ -41,11 +41,11 @@
         </div>
 
         <div class="nav-actions">
-            <a href="/admin/login" class="btn btn-secondary">
-                <i class="fas fa-sign-in" style="margin-right:0.4rem;font-size:0.82rem;"></i>
+            <a href="/admin/login" class="btn btn-secondary demo-btn">
+                <i class="fas fa-sign-in"></i>
                 Login</a>
-            <a href="{{ route('contact') }}" class="btn btn-primary">
-                <i class="fas fa-calendar-alt" style="margin-right:0.4rem;font-size:0.82rem;"></i>
+            <a href="{{ route('contact') }}" class="btn btn-primary demo-btn">
+                <i class="fas fa-calendar-alt"></i>
                 Request a Demo
             </a>
             <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
