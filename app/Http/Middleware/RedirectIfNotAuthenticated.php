@@ -14,7 +14,7 @@ class RedirectIfNotAuthenticated
      *
      * @param  Closure(Request): (Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, ...$guards): Response
     {
         if (empty($guards)) {
             $guards = [null];

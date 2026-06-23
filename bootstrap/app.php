@@ -31,6 +31,14 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'protect.superadmin' => \App\Http\Middleware\ProtectSuperAdmin::class,
         ]);
+        $middleware->redirectTo(
+            guests: function ($request) {
+                if ($request->is('admin') || $request->is('admin/*')) {
+                    return route('admin.login');
+                }
+                return route('home');
+            }
+        );
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
