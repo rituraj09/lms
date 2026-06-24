@@ -16,10 +16,13 @@ use App\Models\QuestionMaster\Question;
 use App\Models\EvaluationMaster\AgeGroup;
 use App\Models\EvaluationMaster\QuestionType;
 use App\Helper\Globals;
+use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\Storage;
 
 #[Layout('layouts.backend')]
 class AssessmentManager extends Component
 {
+    use WithFileUploads;
     /* ================================================================
      |  VIEW STATES
      |  'list'     → Assessment listing
@@ -97,6 +100,11 @@ class AssessmentManager extends Component
      * ================================================================*/
     protected array $languages = [];
 
+    // Image upload
+    public $cover_image_file = null;        // Livewire temp upload
+    public string $cover_image_path  = '';  // Stored path from DB
+    public bool $removeCoverImage    = false;
+
     /* ================================================================
      |  MOUNT
      * ================================================================*/
@@ -161,7 +169,9 @@ class AssessmentManager extends Component
         $this->admin_note         = $assessment->admin_note ?? '';
         $this->has_negative_mark  = (bool) $assessment->has_negative_mark;
         $this->status             = $assessment->status;
-
+        $this->cover_image_path  = $assessment->cover_image ?? '';
+        $this->cover_image_file  = null;
+        $this->removeCoverImage  = false;
         $this->view = 'form';
     }
 
@@ -222,6 +232,7 @@ class AssessmentManager extends Component
         $this->validate(
             [
                 'title'              => 'required|string|max:500',
+                'cover_image_file' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
                 'assessment_type_id' => 'required|string',
                 'age_group_id'       => 'required|integer',
                 'passing_marks'      => 'required|numeric|min:0',
@@ -229,16 +240,38 @@ class AssessmentManager extends Component
             ],
             [
                 'title.required'              => 'Assessment title is required.',
+                'cover_image_file.image'      => 'Cover image must be an image file.',
+                'cover_image_file.mimes'      => 'Accepted formats: jpg, jpeg, png, webp.',
+                'cover_image_file.max'        => 'Cover image must not exceed 2MB.',
                 'assessment_type_id.required' => 'Please select an assessment type.',
                 'age_group_id.required'       => 'Please select an age group.',
                 'passing_marks.required'      => 'Passing marks are required.',
+
             ]
         );
+        // ── Handle Cover Image ──────────────────────────────────────
+        $coverImagePath = $this->cover_image_path ?: null;
 
+        if ($this->removeCoverImage) {
+            // Delete old file if exists
+            if ($this->cover_image_path && Storage::disk('public')->exists($this->cover_image_path)) {
+                Storage::disk('public')->delete($this->cover_image_path);
+            }
+            $coverImagePath = null;
+        }
+
+        if ($this->cover_image_file) {
+            // Delete old file before storing new one
+            if ($this->cover_image_path && Storage::disk('public')->exists($this->cover_image_path)) {
+                Storage::disk('public')->delete($this->cover_image_path);
+            }
+            $coverImagePath = $this->cover_image_file->store('assessments/covers', 'public');
+        }
         try {
             $payload = [
                 'assessment_code'    => $this->assessment_code,
                 'title'              => $this->title,
+                'cover_image'        => $coverImagePath,
                 'instructions'       => $this->instructions,
                 'assessment_type_id' => $this->assessment_type_id,
                 'age_group_id'       => $this->age_group_id,
@@ -277,6 +310,12 @@ class AssessmentManager extends Component
         }
     }
 
+    public function removeCoverImage(): void
+    {
+        $this->removeCoverImage  = true;
+        $this->cover_image_file  = null;
+        $this->cover_image_path  = '';
+    }
     /* ================================================================
      |  BUILDER — Load existing groups + questions
      * ================================================================*/
@@ -746,9 +785,13 @@ class AssessmentManager extends Component
 
     private function resetForm(): void
     {
+
         $this->assessmentId       = null;
         $this->assessment_code    = '';
         $this->title              = '';
+        $this->cover_image_file  = null;
+        $this->cover_image_path  = '';
+        $this->removeCoverImage  = false;
         $this->instructions       = '';
         $this->assessment_type_id = '';
         $this->age_group_id       = null;

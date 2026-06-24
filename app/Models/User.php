@@ -6,6 +6,7 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use App\Models\Master\UserDetail;
 use App\Models\Master\Organisation;
+use App\Models\TestAttempt\TestAttempt;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
@@ -98,5 +99,10 @@ class User extends Authenticatable
     public function getIsPendingAttribute(): bool
     {
         return $this->status === 'pending';
+    }
+
+    public function testAttempts()
+    {
+        return $this->hasMany(TestAttempt::class, 'user_id');
     }
 }

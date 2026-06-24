@@ -9,26 +9,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Attributes\Unguarded;
 
+#[Unguarded]
 class Assessment extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = [
-        'assessment_code',
-        'title',
-        'instructions',
-        'assessment_type_id',
-        'age_group_id',
-        'total_marks',
-        'passing_marks',
-        'duration_minutes',
-        'admin_note',
-        'has_negative_mark',
-        'status',
-        'created_by',
-        'updated_by',
-    ];
 
     protected $casts = [
         'has_negative_mark' => 'boolean',

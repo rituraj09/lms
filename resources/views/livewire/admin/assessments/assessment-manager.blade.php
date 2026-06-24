@@ -338,7 +338,94 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
+                                {{-- ── Cover Image ─────────────────────────────────────── --}}
+                                <div class="col-12">
+                                    <label class="form-label fw-medium small">
+                                        Cover Image
+                                        <span class="text-muted fw-normal">(Optional)</span>
+                                    </label>
 
+                                    <div class="d-flex align-items-start gap-3 flex-wrap">
+
+                                        {{-- Preview Box --}}
+                                        <div class="border rounded d-flex align-items-center justify-content-center bg-light overflow-hidden"
+                                            style="width: 160px; height: 110px; flex-shrink: 0;">
+
+                                            @if ($cover_image_file)
+                                                {{-- Newly selected (not yet saved) --}}
+                                                <img src="{{ $cover_image_file->temporaryUrl() }}"
+                                                    alt="Preview"
+                                                    class="img-fluid w-100 h-100 object-fit-cover">
+
+                                            @elseif ($cover_image_path && !$removeCoverImage)
+                                                {{-- Existing image from DB --}}
+
+                                                 <img src="{{ Storage::url($cover_image_path) }}" alt="ICovermage"
+                                                      class="w-100 h-100 object-fit-cover" />
+                                            @else
+                                                {{-- Placeholder --}}
+                                                <div class="text-center text-muted small px-2">
+                                                    <i class="ri-image-add-line fs-2 d-block mb-1"></i>
+                                                    No image
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        {{-- Controls --}}
+                                        <div class="d-flex flex-column gap-2 justify-content-center">
+
+                                            {{-- Upload input --}}
+                                            <div>
+                                                <input type="file"
+                                                    wire:model="cover_image_file"
+                                                    id="coverImageInput"
+                                                    accept="image/jpg,image/jpeg,image/png,image/webp"
+                                                    class="d-none">
+
+                                                <label for="coverImageInput"
+                                                    class="btn btn-sm btn-outline-primary mb-0"
+                                                    style="cursor: pointer;">
+                                                    <i class="ri-upload-2-line me-1"></i>
+                                                    {{ ($cover_image_path && !$removeCoverImage) || $cover_image_file
+                                                        ? 'Change Image'
+                                                        : 'Upload Image' }}
+                                                </label>
+                                            </div>
+
+                                            {{-- Remove button — only show when there is an image --}}
+                                            @if (($cover_image_path && !$removeCoverImage) || $cover_image_file)
+                                                <button type="button"
+                                                        wire:click="removeCoverImage"
+                                                        class="btn btn-sm btn-outline-danger">
+                                                    <i class="ri-delete-bin-6-line me-1"></i>
+                                                    Remove
+                                                </button>
+                                            @endif
+
+                                            {{-- Upload progress spinner --}}
+                                            <div wire:loading wire:target="cover_image_file"
+                                                class="text-primary small">
+                                                <span class="spinner-border spinner-border-sm me-1"
+                                                    role="status" aria-hidden="true"></span>
+                                                Uploading...
+                                            </div>
+
+                                            {{-- Hint text --}}
+                                            <small class="text-muted">
+                                                JPG, PNG, WEBP &bull; Max 2 MB
+                                            </small>
+
+                                            {{-- Validation error --}}
+                                            @error('cover_image_file')
+                                                <div class="text-danger small">
+                                                    <i class="ri-error-warning-line me-1"></i>{{ $message }}
+                                                </div>
+                                            @enderror
+                                        </div>
+
+                                    </div>
+                                </div>
+                                {{-- ── End Cover Image ──────────────────────────────────── --}}
                                 <div class="col-12">
                                     <label class="form-label fw-medium small">
                                         Title

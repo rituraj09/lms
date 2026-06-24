@@ -8,20 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Attributes\Unguarded;
 
+#[Unguarded]
 class AssessmentQuestion extends Model
 {
     use HasFactory, SoftDeletes;
-
-    protected $fillable = [
-        'assessment_group_id',
-        'question_id',
-        'negative_mark',
-        'question_timer',
-        'question_type_id',
-        'created_by',
-        'updated_by',
-    ];
 
     protected $casts = [
         'negative_mark' => 'decimal:2',

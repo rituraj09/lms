@@ -8,23 +8,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Attributes\Unguarded;
 
+#[Unguarded]
 class AssessmentGroup extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = [
-        'assessment_id',
-        'question_group_id',
-        'instructions',
-        'suffle_question',
-        'allow_back_to_group_question',
-        'allow_back_to_previous_question',
-        'group_timer',
-        'admin_note',
-        'created_by',
-        'updated_by',
-    ];
 
     protected $casts = [
         'suffle_question'                => 'boolean',
