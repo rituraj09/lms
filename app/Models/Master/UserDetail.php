@@ -3,6 +3,7 @@
 // app/Models/Master/UserDetail.php
 namespace App\Models\Master;
 
+use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
