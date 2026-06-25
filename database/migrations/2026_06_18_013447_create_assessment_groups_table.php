@@ -19,8 +19,8 @@ return new class extends Migration
                   ->restrictOnDelete();
             $table->text('instructions')->nullable();
             $table->boolean('suffle_question')->default(false);
-            $table->boolean('allow_back_to_group_question')->default(false);
-            $table->boolean('allow_back_to_previous_question')->default(false);
+            $table->boolean('allow_back_to_group_question')->default(true);
+            $table->boolean('allow_back_to_previous_question')->default(true);
             $table->integer('group_timer')->default(0);
             $table->text('admin_note')->nullable();
             $table->foreignId('created_by')

@@ -11,7 +11,7 @@
     @if (session()->has('success'))
         <div class="alert alert-success alert-dismissible fade show
                     d-flex align-items-center gap-2 mb-4"
-            role="alert">
+             role="alert">
             <i class="ri ri-checkbox-circle-line fs-5"></i>
             <div>{{ session('success') }}</div>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -21,7 +21,7 @@
     @if (session()->has('error'))
         <div class="alert alert-danger alert-dismissible fade show
                     d-flex align-items-center gap-2 mb-4"
-            role="alert">
+             role="alert">
             <i class="ri ri-error-warning-line fs-5"></i>
             <div>{{ session('error') }}</div>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -56,15 +56,15 @@
                     Assessments
                 </h4>
                 <p class="text-muted small mb-0">
-                    Manage all assessments and their question groups.
+                    Manage all assessments and their Sections.
                 </p>
             </div>
             @can('assessment.create')
-            <button type="button" wire:click="createAssessment" class="btn btn-primary btn-sm shadow-sm">
-                <i class="ri ri-add-large-line me-1"></i>
-                New Assessment
-            </button>
-                @endcan
+                <button type="button" wire:click="createAssessment" class="btn btn-primary btn-sm shadow-sm">
+                    <i class="ri ri-add-large-line me-1"></i>
+                    New Assessment
+                </button>
+            @endcan
         </div>
 
         {{-- Filters --}}
@@ -77,7 +77,7 @@
                                 <i class="ri ri-search-line text-muted"></i>
                             </span>
                             <input type="text" wire:model.live.debounce.300ms="search" class="form-control"
-                                placeholder="Search by title or code...">
+                                   placeholder="Search by title or code...">
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -189,23 +189,23 @@
 
                             <div class="d-flex gap-2 flex-shrink-0">
                                 <button type="button" wire:click="openBuilder({{ $assessment->id }})"
-                                    class="btn btn-sm btn-outline-info">
+                                        class="btn btn-sm btn-outline-info">
                                     <i class="ri ri-tools-line me-1"></i>
                                     Builder
                                 </button>
                                 <button type="button" wire:click="editAssessment({{ $assessment->id }})"
-                                    class="btn btn-sm btn-outline-primary">
+                                        class="btn btn-sm btn-outline-primary">
                                     <i class="ri ri-pencil-line"></i>
                                 </button>
                                 <button type="button" wire:click="toggleStatus({{ $assessment->id }})"
-                                    class="btn btn-sm {{ $assessment->status === 'publish' ? 'btn-outline-warning' : 'btn-outline-success' }}">
+                                        class="btn btn-sm {{ $assessment->status === 'publish' ? 'btn-outline-warning' : 'btn-outline-success' }}">
                                     <i
                                         class="ri {{ $assessment->status === 'publish' ? 'ri-eye-off-line' : 'ri-eye-line' }}"></i>
                                 </button>
                                 @if ($assessment->status !== 'publish')
                                     <button type="button" wire:click="deleteAssessment({{ $assessment->id }})"
-                                        wire:confirm="Delete this assessment permanently?"
-                                        class="btn btn-sm btn-outline-danger">
+                                            wire:confirm="Delete this assessment permanently?"
+                                            class="btn btn-sm btn-outline-danger">
                                         <i class="ri ri-delete-bin-line"></i>
                                     </button>
                                 @endif
@@ -218,11 +218,11 @@
                         <h6 class="mt-3 fw-semibold">No Assessments Found</h6>
                         <p class="small mb-4">Click "New Assessment" to get started.</p>
                         @can('assessment.create')
-                        <button type="button" wire:click="createAssessment" class="btn btn-primary btn-sm">
-                            <i class="ri ri-add-large-line me-1"></i>
-                            New Assessment
-                        </button>
-                            @endcan
+                            <button type="button" wire:click="createAssessment" class="btn btn-primary btn-sm">
+                                <i class="ri ri-add-large-line me-1"></i>
+                                New Assessment
+                            </button>
+                        @endcan
                     </div>
                 @endforelse
 
@@ -264,7 +264,7 @@
                     <i class="ri ri-arrow-left-line me-1"></i> Cancel
                 </button>
                 <button type="button" wire:click="saveAssessment" wire:loading.attr="disabled"
-                    class="btn btn-primary btn-sm shadow-sm">
+                        class="btn btn-primary btn-sm shadow-sm">
                     <span wire:loading wire:target="saveAssessment">
                         <span class="spinner-border spinner-border-sm me-1"></span>
                         Saving…
@@ -311,14 +311,14 @@
                                         <span class="text-danger">*</span>
                                     </label>
                                     <select wire:model="assessment_type_id"
-                                        class="form-select @error('assessment_type_id') is-invalid @enderror">
+                                            class="form-select @error('assessment_type_id') is-invalid @enderror">
                                         <option value="">— Select Type —</option>
                                         @foreach ($assessmentTypes as $key => $label)
                                             <option value="{{ $key }}">{{ $label }}</option>
                                         @endforeach
                                     </select>
                                     @error('assessment_type_id')
-                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
 
@@ -328,14 +328,14 @@
                                         <span class="text-danger">*</span>
                                     </label>
                                     <select wire:model="age_group_id"
-                                        class="form-select @error('age_group_id') is-invalid @enderror">
+                                            class="form-select @error('age_group_id') is-invalid @enderror">
                                         <option value="">— Select Age Group —</option>
                                         @foreach ($ageGroups as $ag)
                                             <option value="{{ $ag['id'] }}">{{ $ag['name'] }}</option>
                                         @endforeach
                                     </select>
                                     @error('age_group_id')
-                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 {{-- ── Cover Image ─────────────────────────────────────── --}}
@@ -349,19 +349,19 @@
 
                                         {{-- Preview Box --}}
                                         <div class="border rounded d-flex align-items-center justify-content-center bg-light overflow-hidden"
-                                            style="width: 160px; height: 110px; flex-shrink: 0;">
+                                             style="width: 160px; height: 110px; flex-shrink: 0;">
 
                                             @if ($cover_image_file)
                                                 {{-- Newly selected (not yet saved) --}}
                                                 <img src="{{ $cover_image_file->temporaryUrl() }}"
-                                                    alt="Preview"
-                                                    class="img-fluid w-100 h-100 object-fit-cover">
+                                                     alt="Preview"
+                                                     class="img-fluid w-100 h-100 object-fit-cover">
 
                                             @elseif ($cover_image_path && !$removeCoverImage)
                                                 {{-- Existing image from DB --}}
 
-                                                 <img src="{{ Storage::url($cover_image_path) }}" alt="ICovermage"
-                                                      class="w-100 h-100 object-fit-cover" />
+                                                <img src="{{ Storage::url($cover_image_path) }}" alt="ICovermage"
+                                                     class="w-100 h-100 object-fit-cover" />
                                             @else
                                                 {{-- Placeholder --}}
                                                 <div class="text-center text-muted small px-2">
@@ -377,14 +377,14 @@
                                             {{-- Upload input --}}
                                             <div>
                                                 <input type="file"
-                                                    wire:model="cover_image_file"
-                                                    id="coverImageInput"
-                                                    accept="image/jpg,image/jpeg,image/png,image/webp"
-                                                    class="d-none">
+                                                       wire:model="cover_image_file"
+                                                       id="coverImageInput"
+                                                       accept="image/jpg,image/jpeg,image/png,image/webp"
+                                                       class="d-none">
 
                                                 <label for="coverImageInput"
-                                                    class="btn btn-sm btn-outline-primary mb-0"
-                                                    style="cursor: pointer;">
+                                                       class="btn btn-sm btn-outline-primary mb-0"
+                                                       style="cursor: pointer;">
                                                     <i class="ri-upload-2-line me-1"></i>
                                                     {{ ($cover_image_path && !$removeCoverImage) || $cover_image_file
                                                         ? 'Change Image'
@@ -404,9 +404,9 @@
 
                                             {{-- Upload progress spinner --}}
                                             <div wire:loading wire:target="cover_image_file"
-                                                class="text-primary small">
+                                                 class="text-primary small">
                                                 <span class="spinner-border spinner-border-sm me-1"
-                                                    role="status" aria-hidden="true"></span>
+                                                      role="status" aria-hidden="true"></span>
                                                 Uploading...
                                             </div>
 
@@ -417,9 +417,9 @@
 
                                             {{-- Validation error --}}
                                             @error('cover_image_file')
-                                                <div class="text-danger small">
-                                                    <i class="ri-error-warning-line me-1"></i>{{ $message }}
-                                                </div>
+                                            <div class="text-danger small">
+                                                <i class="ri-error-warning-line me-1"></i>{{ $message }}
+                                            </div>
                                             @enderror
                                         </div>
 
@@ -432,10 +432,10 @@
                                         <span class="text-danger">*</span>
                                     </label>
                                     <input type="text" wire:model="title"
-                                        class="form-control @error('title') is-invalid @enderror"
-                                        placeholder="Assessment title...">
+                                           class="form-control @error('title') is-invalid @enderror"
+                                           placeholder="Assessment title...">
                                     @error('title')
-                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
 
@@ -445,7 +445,7 @@
                                         <span class="text-muted fw-normal">(Optional)</span>
                                     </label>
                                     <textarea wire:model="instructions" class="form-control" rows="3"
-                                        placeholder="Instructions shown to students...">
+                                              placeholder="Instructions shown to students...">
                                     </textarea>
                                 </div>
 
@@ -482,20 +482,20 @@
                                         <span class="text-danger">*</span>
                                     </label>
                                     <input type="number" wire:model="passing_marks"
-                                        class="form-control @error('passing_marks') is-invalid @enderror"
-                                        min="0" step="0.5">
+                                           class="form-control @error('passing_marks') is-invalid @enderror"
+                                           min="0" step="0.5">
                                     @error('passing_marks')
-                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
 
                                 <div class="col-md-3">
                                     <label class="form-label fw-medium small">
-                                        Duration (minutes)
+                                        Duration (minutes) <span class="text-danger">*</span>
                                     </label>
                                     <div class="input-group">
                                         <input type="number" wire:model="duration_minutes" class="form-control"
-                                            min="1" placeholder="e.g. 60">
+                                               min="1" placeholder="e.g. 60">
                                     </div>
                                 </div>
                                 <div class="col-md-3">
@@ -503,7 +503,7 @@
                                     </label>
                                     <div class="form-check form-switch mt-2">
                                         <input class="form-check-input" type="checkbox"
-                                            wire:model.live="has_negative_mark" id="negMark" role="switch">
+                                               wire:model.live="has_negative_mark" id="negMark" role="switch">
                                         <label class="form-check-label small" for="negMark">
                                             {{ $has_negative_mark ? 'Enabled' : 'Disabled' }}
                                         </label>
@@ -512,12 +512,12 @@
 
 
 
+                            </div>
+
+                        </div>
+
+
                     </div>
-
-                </div>
-
-
-            </div>
                 </div>
                 <div class="col-lg-4">
 
@@ -607,10 +607,10 @@
                 </button>
                 <button type="button" wire:click="openGroupPicker" class="btn btn-outline-primary btn-sm">
                     <i class="ri ri-add-large-line me-1"></i>
-                    Add Question Group
+                    Add Sections
                 </button>
                 <button type="button" wire:click="saveBuilder" wire:loading.attr="disabled"
-                    class="btn btn-primary btn-sm shadow-sm">
+                        class="btn btn-primary btn-sm shadow-sm">
                     <span wire:loading wire:target="saveBuilder">
                         <span class="spinner-border spinner-border-sm me-1"></span>
                         Saving…
@@ -632,24 +632,24 @@
                     <div class="card shadow-sm border-0">
                         <div class="card-body text-center py-5 text-muted">
                             <i class="ri ri-layout-grid-line" style="font-size:3rem;opacity:.3;"></i>
-                            <h6 class="mt-3 fw-semibold">No Question Groups Added</h6>
+                            <h6 class="mt-3 fw-semibold">No Sections Added</h6>
                             <p class="small mb-4">
-                                Click "Add Question Group" to start building.
+                                Click "Add Section" to start building.
                             </p>
                             <button type="button" wire:click="openGroupPicker" class="btn btn-primary btn-sm">
                                 <i class="ri ri-add-large-line me-1"></i>
-                                Add Question Group
+                                Add Section
                             </button>
                         </div>
                     </div>
                 @else
                     @foreach ($assessmentGroups as $agIndex => $ag)
                         <div class="card shadow-sm border-0 mb-4"
-                            wire:key="ag-{{ $agIndex }}-{{ $ag['question_group_id'] }}">
+                             wire:key="ag-{{ $agIndex }}-{{ $ag['question_group_id'] }}">
 
                             {{-- Group Card Header --}}
                             <div class="card-header py-3 border-bottom"
-                                style="background:linear-gradient(135deg,#f8f9ff,#eef1ff);">
+                                 style="background:linear-gradient(135deg,#D9D979,#FFFFEE);">
 
                                 <div
                                     class="d-flex align-items-start
@@ -687,17 +687,13 @@
 
                                     <div class="d-flex gap-2">
                                         {{-- Add More Questions button --}}
-                                        <button type="button" wire:click="openAddMoreQuestions({{ $agIndex }})"
-                                            class="btn btn-sm btn-outline-success">
-                                            <i class="ri ri-add-large-line me-1"></i>
-                                            Add Questions
-                                        </button>
+
                                         <button type="button"
-                                            wire:click="removeAssessmentGroup({{ $agIndex }})"
-                                            wire:confirm="Remove this group from the assessment?"
-                                            class="btn btn-sm btn-outline-danger">
+                                                wire:click="removeAssessmentGroup({{ $agIndex }})"
+                                                wire:confirm="Remove this group from the assessment?"
+                                                class="btn btn-sm btn-outline-danger">
                                             <i class="ri ri-delete-bin-line me-1"></i>
-                                            Remove
+                                            Remove Group
                                         </button>
                                     </div>
                                 </div>
@@ -725,75 +721,75 @@
                                             </div>
                                         </div>
                                     @endif
-                                @endif
 
-                                {{-- Group Settings --}}
-                                <div class="p-4 border-bottom bg-light">
-                                    <div class="row g-3">
 
-                                        <div class="col-12">
-                                            <label class="form-label fw-medium small">
-                                                Group Instructions
-                                                <span class="text-muted fw-normal">(Optional)</span>
-                                            </label>
-                                            <textarea wire:model="assessmentGroups.{{ $agIndex }}.instructions" class="form-control form-control-sm"
-                                                rows="2" placeholder="Instructions shown before this group...">
+                                    {{-- Group Settings --}}
+                                    <div class="p-4 border-bottom bg-light">
+                                        <div class="row g-3">
+
+                                            <div class="col-12">
+                                                <label class="form-label fw-medium small">
+                                                    Group Instructions
+                                                    <span class="text-muted fw-normal">(Optional)</span>
+                                                </label>
+                                                <textarea wire:model="assessmentGroups.{{ $agIndex }}.instructions" class="form-control form-control-sm"
+                                                          rows="2" placeholder="Instructions shown before this group...">
                                             </textarea>
-                                        </div>
-
-                                        <div class="col-md-4">
-                                            <label class="form-label fw-medium small">
-                                                <i class="ri ri-timer-line me-1"></i>
-                                                Group Timer (sec)
-                                            </label>
-                                            <input type="number"
-                                                wire:model="assessmentGroups.{{ $agIndex }}.group_timer"
-                                                class="form-control form-control-sm" min="0"
-                                                placeholder="0 = no timer">
-                                        </div>
-
-                                        <div class="col-md-8">
-                                            <label class="form-label fw-medium small d-block">
-                                                Settings
-                                            </label>
-                                            <div class="d-flex flex-wrap gap-4 mt-1">
-
-                                                <div class="form-check form-switch">
-                                                    <input class="form-check-input" type="checkbox"
-                                                        wire:model="assessmentGroups.{{ $agIndex }}.suffle_question"
-                                                        id="shuffle-{{ $agIndex }}" role="switch">
-                                                    <label class="form-check-label small"
-                                                        for="shuffle-{{ $agIndex }}">
-                                                        Shuffle Questions
-                                                    </label>
-                                                </div>
-
-                                                <div class="form-check form-switch">
-                                                    <input class="form-check-input" type="checkbox"
-                                                        wire:model="assessmentGroups.{{ $agIndex }}.allow_back_to_group_question"
-                                                        id="backGroup-{{ $agIndex }}" role="switch">
-                                                    <label class="form-check-label small"
-                                                        for="backGroup-{{ $agIndex }}">
-                                                        Allow Back (Group)
-                                                    </label>
-                                                </div>
-
-                                                <div class="form-check form-switch">
-                                                    <input class="form-check-input" type="checkbox"
-                                                        wire:model="assessmentGroups.{{ $agIndex }}.allow_back_to_previous_question"
-                                                        id="backQ-{{ $agIndex }}" role="switch">
-                                                    <label class="form-check-label small"
-                                                        for="backQ-{{ $agIndex }}">
-                                                        Allow Back (Question)
-                                                    </label>
-                                                </div>
-
                                             </div>
+
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-medium small">
+                                                    <i class="ri ri-timer-line me-1"></i>
+                                                    Group Timer (sec)
+                                                </label>
+                                                <input type="number"
+                                                       wire:model="assessmentGroups.{{ $agIndex }}.group_timer"
+                                                       class="form-control form-control-sm" min="0"
+                                                       placeholder="0 = no timer">
+                                            </div>
+
+                                            <div class="col-md-8">
+                                                <label class="form-label fw-medium small d-block">
+                                                    Settings
+                                                </label>
+                                                <div class="d-flex flex-wrap gap-4 mt-1">
+
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input" type="checkbox"
+                                                               wire:model="assessmentGroups.{{ $agIndex }}.suffle_question"
+                                                               id="shuffle-{{ $agIndex }}" role="switch">
+                                                        <label class="form-check-label small"
+                                                               for="shuffle-{{ $agIndex }}">
+                                                            Shuffle Questions
+                                                        </label>
+                                                    </div>
+
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input" type="checkbox"
+                                                               wire:model="assessmentGroups.{{ $agIndex }}.allow_back_to_group_question"
+                                                               id="backGroup-{{ $agIndex }}" role="switch">
+                                                        <label class="form-check-label small"
+                                                               for="backGroup-{{ $agIndex }}">
+                                                            Allow Back to group Question
+                                                        </label>
+                                                    </div>
+
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input" type="checkbox"
+                                                               wire:model="assessmentGroups.{{ $agIndex }}.allow_back_to_previous_question"
+                                                               id="backQ-{{ $agIndex }}" role="switch">
+                                                        <label class="form-check-label small"
+                                                               for="backQ-{{ $agIndex }}">
+                                                            Allow Back (Question)
+                                                        </label>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
                                         </div>
-
                                     </div>
-                                </div>
-
+                                @endif
                                 {{-- Questions List --}}
                                 <div class="p-4">
 
@@ -808,7 +804,7 @@
                                     @else
                                         @foreach ($ag['questions'] as $qIndex => $question)
                                             <div class="border rounded-3 mb-3 overflow-hidden"
-                                                wire:key="aq-{{ $agIndex }}-{{ $qIndex }}-{{ $question['question_id'] }}">
+                                                 wire:key="aq-{{ $agIndex }}-{{ $qIndex }}-{{ $question['question_id'] }}">
 
                                                 {{-- Question Row Header --}}
                                                 <div
@@ -832,17 +828,17 @@
 
                                                             @if ($question['answer_category'] === 'single_optional')
                                                                 <span class="badge bg-primary-subtle text-primary"
-                                                                    style="font-size:.7rem;">Single</span>
+                                                                      style="font-size:.7rem;">Single</span>
                                                             @elseif ($question['answer_category'] === 'multi_optional')
                                                                 <span class="badge bg-info-subtle text-info"
-                                                                    style="font-size:.7rem;">Multi</span>
+                                                                      style="font-size:.7rem;">Multi</span>
                                                             @else
                                                                 <span class="badge bg-secondary-subtle text-secondary"
-                                                                    style="font-size:.7rem;">Open</span>
+                                                                      style="font-size:.7rem;">Open</span>
                                                             @endif
 
                                                             <span class="badge bg-success-subtle text-success"
-                                                                style="font-size:.7rem;">
+                                                                  style="font-size:.7rem;">
                                                                 {{ $question['marks'] }} Mark(s)
                                                             </span>
 
@@ -854,9 +850,9 @@
                                                     </div>
 
                                                     <button type="button"
-                                                        wire:click="removeQuestionFromGroup({{ $agIndex }}, {{ $qIndex }})"
-                                                        wire:confirm="Remove this question?"
-                                                        class="btn btn-sm btn-outline-danger flex-shrink-0">
+                                                            wire:click="removeQuestionFromGroup({{ $agIndex }}, {{ $qIndex }})"
+                                                            wire:confirm="Remove this question?"
+                                                            class="btn btn-sm btn-outline-danger flex-shrink-0">
                                                         <i class="ri ri-delete-bin-line"></i>
                                                     </button>
                                                 </div>
@@ -868,7 +864,7 @@
                                                         {{-- Question Type — MANDATORY --}}
                                                         <div class="col-md-5">
                                                             <label class="form-label fw-medium mb-1"
-                                                                style="font-size:.75rem;">
+                                                                   style="font-size:.75rem;">
                                                                 <i class="ri ri-list-check-2 me-1 text-primary"></i>
                                                                 Question Type
                                                                 <span class="text-danger">*</span>
@@ -887,38 +883,38 @@
                                                                 @endforeach
                                                             </select>
                                                             @error("assessmentGroups.{$agIndex}.questions.{$qIndex}.question_type_id")
-                                                                <div class="invalid-feedback" style="font-size:.7rem;">
-                                                                    {{ $message }}
-                                                                </div>
+                                                            <div class="invalid-feedback" style="font-size:.7rem;">
+                                                                {{ $message }}
+                                                            </div>
                                                             @enderror
                                                         </div>
 
                                                         {{-- Question Timer --}}
                                                         <div class="col-md-3">
                                                             <label class="form-label fw-medium mb-1"
-                                                                style="font-size:.75rem;">
+                                                                   style="font-size:.75rem;">
                                                                 <i class="ri ri-timer-line me-1"></i>
                                                                 Timer (sec)
                                                             </label>
                                                             <input type="number"
-                                                                wire:model="assessmentGroups.{{ $agIndex }}.questions.{{ $qIndex }}.question_timer"
-                                                                class="form-control form-control-sm" min="0"
-                                                                placeholder="0">
+                                                                   wire:model="assessmentGroups.{{ $agIndex }}.questions.{{ $qIndex }}.question_timer"
+                                                                   class="form-control form-control-sm" min="0"
+                                                                   placeholder="0">
                                                         </div>
 
                                                         {{-- Negative Mark --}}
                                                         @if ($has_negative_mark)
                                                             <div class="col-md-4">
                                                                 <label class="form-label fw-medium mb-1"
-                                                                    style="font-size:.75rem;">
+                                                                       style="font-size:.75rem;">
                                                                     <i
                                                                         class="ri ri-subtract-line me-1 text-danger"></i>
                                                                     Negative Mark
                                                                 </label>
                                                                 <input type="number"
-                                                                    wire:model="assessmentGroups.{{ $agIndex }}.questions.{{ $qIndex }}.negative_mark"
-                                                                    class="form-control form-control-sm border-danger"
-                                                                    min="0" step="0.5" placeholder="0">
+                                                                       wire:model="assessmentGroups.{{ $agIndex }}.questions.{{ $qIndex }}.negative_mark"
+                                                                       class="form-control form-control-sm border-danger"
+                                                                       min="0" step="0.5" placeholder="0">
                                                             </div>
                                                         @endif
 
@@ -933,14 +929,21 @@
                                 {{-- /questions --}}
 
                             </div>
+                       <div class="card-footer p-2">
+                           <button type="button" wire:click="openAddMoreQuestions({{ $agIndex }})"
+                                   class="btn btn-sm btn-outline-success">
+                               <i class="ri ri-add-large-line me-1"></i>
+                               Add More Questions to this section
+                           </button>
+                       </div>
                         </div>
                     @endforeach
 
                     <div class="text-center mb-4">
                         <button type="button" wire:click="openGroupPicker"
-                            class="btn btn-outline-primary btn-sm px-4">
+                                class="btn btn-outline-primary btn-sm px-4">
                             <i class="ri ri-add-large-line me-1"></i>
-                            Add Another Question Group
+                            Add Another Section
                         </button>
                     </div>
 
@@ -1097,7 +1100,7 @@
                     </div>
                     <div class="card-footer bg-white p-3">
                         <button type="button" wire:click="saveBuilder" wire:loading.attr="disabled"
-                            class="btn btn-primary w-100">
+                                class="btn btn-primary w-100">
                             <span wire:loading wire:target="saveBuilder">
                                 <span class="spinner-border spinner-border-sm me-1"></span>
                                 Saving…
@@ -1132,7 +1135,7 @@
 
                         {{-- ── Modal Header ──────────────────────────────── --}}
                         <div class="modal-header border-bottom py-3"
-                            style="background:linear-gradient(135deg,#f8f9ff,#eef1ff);">
+                             style="background:linear-gradient(135deg,#f8f9ff,#eef1ff);">
 
                             <div>
                                 <h6 class="modal-title fw-bold mb-0">
@@ -1175,18 +1178,18 @@
                                 @if ($pickerMode === 'new')
 
                                     <div class="border-end bg-light flex-shrink-0"
-                                        style="width:220px;overflow-y:auto;">
+                                         style="width:220px;overflow-y:auto;">
 
                                         {{-- Search --}}
                                         <div class="p-2 border-bottom sticky-top bg-light">
                                             <div class="input-group input-group-sm">
                                                 <span class="input-group-text bg-white">
                                                     <i class="ri ri-search-line text-muted"
-                                                        style="font-size:.8rem;"></i>
+                                                       style="font-size:.8rem;"></i>
                                                 </span>
                                                 <input type="text"
-                                                    wire:model.live.debounce.300ms="groupPickerSearch"
-                                                    class="form-control form-control-sm" placeholder="Search...">
+                                                       wire:model.live.debounce.300ms="groupPickerSearch"
+                                                       class="form-control form-control-sm" placeholder="Search...">
                                             </div>
                                         </div>
 
@@ -1207,17 +1210,17 @@
                                                 @endphp
 
                                                 <button type="button"
-                                                    wire:click="selectPickerGroup({{ $pg->id }})"
-                                                    wire:key="pg-{{ $pg->id }}"
-                                                    class="list-group-item list-group-item-action
+                                                        wire:click="selectPickerGroup({{ $pg->id }})"
+                                                        wire:key="pg-{{ $pg->id }}"
+                                                        class="list-group-item list-group-item-action
                                                        px-3 py-2 border-0
                                                        {{ $pickerGroupId === $pg->id ? 'active' : '' }}
                                                        {{ $isMultiUsed ? 'disabled opacity-50' : '' }}"
-                                                    style="font-size:.82rem;">
+                                                        style="font-size:.82rem;">
 
                                                     <div class="fw-semibold text-truncate mb-1
                                                         {{ $pickerGroupId === $pg->id ? 'text-white' : 'text-dark' }}"
-                                                        title="{{ $pgTitle }}">
+                                                         title="{{ $pgTitle }}">
                                                         {{ $pgTitle }}
                                                     </div>
 
@@ -1235,14 +1238,14 @@
 
                                                         {{-- Question count --}}
                                                         <span class="badge bg-light text-dark border"
-                                                            style="font-size:.6rem;">
+                                                              style="font-size:.6rem;">
                                                             {{ $pg->questions_count }}Q
                                                         </span>
 
                                                         {{-- Used lock --}}
                                                         @if ($isMultiUsed)
                                                             <span class="badge bg-warning-subtle text-warning"
-                                                                style="font-size:.6rem;">
+                                                                  style="font-size:.6rem;">
                                                                 <i class="ri ri-lock-line"></i>
                                                             </span>
                                                         @endif
@@ -1301,7 +1304,7 @@
                                                     Group Passage
                                                 </p>
                                                 <div class="bg-white rounded p-2 small border"
-                                                    style="max-height:100px;overflow-y:auto;">
+                                                     style="max-height:100px;overflow-y:auto;">
                                                     {!! $passageEn !!}
                                                 </div>
                                             </div>
@@ -1329,24 +1332,24 @@
                                             {{-- Question items --}}
                                             @forelse ($pickerQuestions as $pq)
                                                 <label wire:key="pq-{{ $pq['id'] }}"
-                                                    class="d-flex align-items-start gap-2
+                                                       class="d-flex align-items-start gap-2
                                                       p-2 rounded-3 mb-2 border
                                                       {{ $pq['already_used']
                                                           ? 'opacity-50 bg-light'
                                                           : (in_array($pq['id'], $pickerSelectedQIds)
                                                               ? 'bg-primary-subtle border-primary'
                                                               : 'bg-white') }}"
-                                                    style="cursor:{{ $pq['already_used'] ? 'not-allowed' : 'pointer' }};">
+                                                       style="cursor:{{ $pq['already_used'] ? 'not-allowed' : 'pointer' }};">
 
                                                     <input type="checkbox" class="form-check-input mt-1 flex-shrink-0"
-                                                        wire:click="togglePickerQuestion({{ $pq['id'] }})"
+                                                           wire:click="togglePickerQuestion({{ $pq['id'] }})"
                                                         {{ in_array($pq['id'], $pickerSelectedQIds) ? 'checked' : '' }}
                                                         {{ $pq['already_used'] ? 'disabled' : '' }}>
 
                                                     <div class="flex-1 min-w-0">
 
                                                         <p class="mb-1 small fw-medium text-dark text-truncate"
-                                                            title="{{ $pq['stem_en'] }}">
+                                                           title="{{ $pq['stem_en'] }}">
                                                             {{ Str::limit($pq['stem_en'] ?: '(No English stem)', 65) }}
                                                         </p>
 
@@ -1355,18 +1358,18 @@
                                                             {{-- Answer category --}}
                                                             @if ($pq['answer_category'] === 'single_optional')
                                                                 <span class="badge bg-primary-subtle text-primary"
-                                                                    style="font-size:.6rem;">Single</span>
+                                                                      style="font-size:.6rem;">Single</span>
                                                             @elseif ($pq['answer_category'] === 'multi_optional')
                                                                 <span class="badge bg-info-subtle text-info"
-                                                                    style="font-size:.6rem;">Multi</span>
+                                                                      style="font-size:.6rem;">Multi</span>
                                                             @else
                                                                 <span class="badge bg-secondary-subtle text-secondary"
-                                                                    style="font-size:.6rem;">Open</span>
+                                                                      style="font-size:.6rem;">Open</span>
                                                             @endif
 
                                                             {{-- Marks --}}
                                                             <span class="badge bg-success-subtle text-success"
-                                                                style="font-size:.6rem;">
+                                                                  style="font-size:.6rem;">
                                                                 {{ $pq['marks'] }}M
                                                             </span>
 
@@ -1378,7 +1381,7 @@
                                                             {{-- Already used --}}
                                                             @if ($pq['already_used'])
                                                                 <span class="badge bg-warning-subtle text-warning"
-                                                                    style="font-size:.6rem;">
+                                                                      style="font-size:.6rem;">
                                                                     <i class="ri ri-lock-line"></i>
                                                                     Added
                                                                 </span>
@@ -1430,13 +1433,13 @@
                             </div>
 
                             <button type="button" wire:click="closeGroupPicker"
-                                class="btn btn-outline-secondary btn-sm">
+                                    class="btn btn-outline-secondary btn-sm">
                                 <i class="ri ri-close-line me-1"></i>
                                 Cancel
                             </button>
 
                             <button type="button" wire:click="addGroupToAssessment" wire:loading.attr="disabled"
-                                class="btn btn-primary btn-sm" @if (!$pickerGroupId || empty($pickerSelectedQIds)) disabled @endif>
+                                    class="btn btn-primary btn-sm" @if (!$pickerGroupId || empty($pickerSelectedQIds)) disabled @endif>
                                 <span wire:loading wire:target="addGroupToAssessment">
                                     <span class="spinner-border spinner-border-sm me-1"></span>
                                 </span>

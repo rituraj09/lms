@@ -16,8 +16,8 @@ return new class extends Migration
             $table->text('instructions')->nullable();
             $table->enum('assessment_type_id', [
                 'iq', 'eq', 'lq',
-                'iq&eq', 'iq&lq', 'eq&lq',
-                'iq&eq&lq'
+                'iq+eq', 'iq+lq', 'eq+lq',
+                'iq+eq+lq'
             ]);
             $table->foreignId('age_group_id')
                   ->constrained('age_groups')
