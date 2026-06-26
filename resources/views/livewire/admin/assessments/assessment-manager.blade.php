@@ -45,8 +45,8 @@
 
 
     {{-- ══════════════════════════════════════════════════════════════
-         ██████  VIEW 0 — ASSESSMENT LIST
-    ══════════════════════════════════════════════════════════════ --}}
+       ██████  VIEW 0 — ASSESSMENT LIST
+  ══════════════════════════════════════════════════════════════ --}}
     @if ($view === 'list')
 
         <div class="d-flex align-items-center justify-content-between mb-4">
@@ -73,10 +73,12 @@
                 <div class="row g-3">
                     <div class="col-md-5">
                         <div class="input-group">
-                            <span class="input-group-text bg-light">
-                                <i class="ri ri-search-line text-muted"></i>
-                            </span>
-                            <input type="text" wire:model.live.debounce.300ms="search" class="form-control"
+                        <span class="input-group-text bg-light">
+                            <i class="ri ri-search-line text-muted"></i>
+                        </span>
+                            <input type="text"
+                                   wire:model.live.debounce.300ms="search"
+                                   class="form-control"
                                    placeholder="Search by title or code...">
                         </div>
                     </div>
@@ -89,12 +91,25 @@
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <select wire:model.live="statusFilter" class="form-select">
-                            <option value="">All Status</option>
-                            <option value="draft">Draft</option>
-                            <option value="publish">Published</option>
-                            <option value="unpublish">Unpublished</option>
-                        </select>
+                        {{-- ── Status Filter — Radio Toggle Bar ──────────── --}}
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" wire:model.live="statusFilter"
+                                   value="" id="sf-all" autocomplete="off">
+                            <label class="btn btn-outline-secondary btn-sm" for="sf-all">All</label>
+
+                            <input type="radio" class="btn-check" wire:model.live="statusFilter"
+                                   value="draft" id="sf-draft" autocomplete="off">
+                            <label class="btn btn-outline-warning btn-sm" for="sf-draft">Draft</label>
+
+                            <input type="radio" class="btn-check" wire:model.live="statusFilter"
+                                   value="publish" id="sf-publish" autocomplete="off">
+                            <label class="btn btn-outline-success btn-sm" for="sf-publish">Live</label>
+
+                            <input type="radio" class="btn-check" wire:model.live="statusFilter"
+                                   value="unpublish" id="sf-unpublish" autocomplete="off">
+                            <label class="btn btn-outline-danger btn-sm" for="sf-unpublish">Off</label>
+                        </div>
+                        {{-- ────────────────────────────────────────────────── --}}
                     </div>
                     <div class="col-md-2">
                         <select wire:model.live="perPage" class="form-select">
@@ -118,99 +133,235 @@
             <div class="card-body p-0">
 
                 @forelse ($assessments as $assessment)
-                    <div class="border-bottom px-4 py-3" wire:key="ass-{{ $assessment->id }}">
+                    <div class="border-bottom" wire:key="ass-{{ $assessment->id }}">
 
-                        <div
-                            class="d-flex align-items-start
-                                    justify-content-between gap-3">
-                            <div class="flex-1">
-                                <div
-                                    class="d-flex align-items-center
-                                            flex-wrap gap-2 mb-1">
-                                    <span class="fw-semibold text-dark">
+                        {{-- ── Main Row ──────────────────────────────────── --}}
+                        <div class="px-4 py-3">
+                            <div class="d-flex align-items-start justify-content-between gap-3">
+
+                                {{-- Left: Title + Meta --}}
+                                <div class="flex-1">
+
+                                    {{-- Title + Status Badges --}}
+                                    <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
+                                    <span class="fw-semibold text-dark fs-6">
                                         {{ $assessment->title }}
                                     </span>
 
-                                    @if ($assessment->status === 'publish')
-                                        <span
-                                            class="badge bg-success-subtle text-success
-                                                     border border-success-subtle">
-                                            <i class="ri ri-checkbox-circle-line me-1"></i>
-                                            Published
-                                        </span>
-                                    @elseif ($assessment->status === 'draft')
-                                        <span
-                                            class="badge bg-secondary-subtle text-secondary
-                                                     border border-secondary-subtle">
-                                            <i class="ri ri-draft-line me-1"></i>
-                                            Draft
-                                        </span>
-                                    @else
-                                        <span
-                                            class="badge bg-warning-subtle text-warning
-                                                     border border-warning-subtle">
-                                            <i class="ri ri-eye-off-line me-1"></i>
-                                            Unpublished
-                                        </span>
-                                    @endif
 
-                                    <span
-                                        class="badge bg-primary-subtle text-primary
-                                                 border border-primary-subtle">
+                                        {{-- Type Badge --}}
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
                                         {{ strtoupper($assessment->assessment_type_id) }}
                                     </span>
-                                </div>
+                                    </div>
 
-                                <div class="d-flex flex-wrap gap-3 mt-1">
-                                    <small class="text-muted">
-                                        <i class="ri ri-barcode-line me-1"></i>
-                                        {{ $assessment->assessment_code }}
-                                    </small>
-                                    <small class="text-muted">
-                                        <i class="ri ri-group-line me-1"></i>
-                                        {{ $assessment->assessment_groups_count }} Group(s)
-                                    </small>
-                                    <small class="text-muted">
-                                        <i class="ri ri-trophy-line me-1"></i>
-                                        {{ $assessment->total_marks }} Marks
-                                    </small>
-                                    @if ($assessment->duration_minutes)
+                                    {{-- Meta Row --}}
+                                    <div class="d-flex flex-wrap gap-3 mb-3">
                                         <small class="text-muted">
-                                            <i class="ri ri-timer-line me-1"></i>
-                                            {{ $assessment->duration_minutes }} min
+                                            <i class="ri ri-barcode-line me-1"></i>
+                                            {{ $assessment->assessment_code }}
                                         </small>
-                                    @endif
-                                    <small class="text-muted">
-                                        <i class="ri ri-user-line me-1"></i>
-                                        {{ $assessment->ageGroup?->name ?? '—' }}
-                                    </small>
-                                </div>
-                            </div>
+                                        <small class="text-muted">
+                                            <i class="ri ri-group-line me-1"></i>
+                                            {{ $assessment->assessment_groups_count }} Group(s)
+                                        </small>
+                                        <small class="text-muted">
+                                            <i class="ri ri-trophy-line me-1"></i>
+                                            {{ $assessment->total_marks }} Marks
+                                        </small>
+                                        <small class="text-muted">
+                                            <i class="ri ri-crosshair-line me-1"></i>
+                                            Pass: {{ $assessment->passing_marks }}
+                                        </small>
+                                        @if ($assessment->duration_minutes)
+                                            <small class="text-muted">
+                                                <i class="ri ri-timer-line me-1"></i>
+                                                {{ $assessment->duration_minutes }} min
+                                            </small>
+                                        @endif
+                                        <small class="text-muted">
+                                            <i class="ri ri-user-line me-1"></i>
+                                            {{ $assessment->ageGroup?->name ?? '—' }}
+                                        </small>
+                                    </div>
 
-                            <div class="d-flex gap-2 flex-shrink-0">
-                                <button type="button" wire:click="openBuilder({{ $assessment->id }})"
-                                        class="btn btn-sm btn-outline-info">
-                                    <i class="ri ri-tools-line me-1"></i>
-                                    Builder
-                                </button>
-                                <button type="button" wire:click="editAssessment({{ $assessment->id }})"
-                                        class="btn btn-sm btn-outline-primary">
-                                    <i class="ri ri-pencil-line"></i>
-                                </button>
-                                <button type="button" wire:click="toggleStatus({{ $assessment->id }})"
-                                        class="btn btn-sm {{ $assessment->status === 'publish' ? 'btn-outline-warning' : 'btn-outline-success' }}">
-                                    <i
-                                        class="ri {{ $assessment->status === 'publish' ? 'ri-eye-off-line' : 'ri-eye-line' }}"></i>
-                                </button>
-                                @if ($assessment->status !== 'publish')
-                                    <button type="button" wire:click="deleteAssessment({{ $assessment->id }})"
-                                            wire:confirm="Delete this assessment permanently?"
-                                            class="btn btn-sm btn-outline-danger">
-                                        <i class="ri ri-delete-bin-line"></i>
+                                    {{-- ── Assessment Settings Row ───────────────── --}}
+                                    <div class="d-flex flex-wrap gap-2">
+
+                                        {{-- Max Attempts --}}
+                                        <span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle"
+                                              data-bs-toggle="tooltip"
+                                              title="Max Attempts">
+                                        <i class="ri ri-repeat-line me-1"></i>
+                                        {{ $assessment->max_attempts ?? 1 }}x Attempt
+                                    </span>
+
+                                        {{-- Negative Marking --}}
+                                        @if ($assessment->has_negative_mark)
+                                            <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle"
+                                                  data-bs-toggle="tooltip"
+                                                  title="Negative Marking Enabled">
+                                            <i class="ri ri-subtract-line me-1"></i>
+                                            Negative Mark
+                                        </span>
+                                        @else
+                                            <span class="badge rounded-pill bg-secondary-subtle text-secondary border border-secondary-subtle"
+                                                  data-bs-toggle="tooltip"
+                                                  title="No Negative Marking">
+                                            <i class="ri ri-subtract-line me-1"></i>
+                                            No Negative
+                                        </span>
+                                        @endif
+
+                                        {{-- Shuffle Sections --}}
+                                        <span class="badge rounded-pill
+                                        {{ $assessment->shuffle_sections
+                                            ? 'bg-info-subtle text-info border border-info-subtle'
+                                            : 'bg-secondary-subtle text-secondary border border-secondary-subtle' }}"
+                                              data-bs-toggle="tooltip"
+                                              title="Shuffle Sections">
+                                        <i class="ri ri-shuffle-line me-1"></i>
+                                        {{ $assessment->shuffle_sections ? 'Shuffle On' : 'Shuffle Off' }}
+                                    </span>
+
+                                        {{-- Show Result --}}
+                                        <span class="badge rounded-pill
+                                        {{ $assessment->show_result_immediately
+                                            ? 'bg-success-subtle text-success border border-success-subtle'
+                                            : 'bg-secondary-subtle text-secondary border border-secondary-subtle' }}"
+                                              data-bs-toggle="tooltip"
+                                              title="Show Result Immediately">
+                                        <i class="ri ri-bar-chart-line me-1"></i>
+                                        {{ $assessment->show_result_immediately ? 'Instant Result' : 'Result Later' }}
+                                    </span>
+
+                                        {{-- Show Correct Answers --}}
+                                        @if ($assessment->show_result_immediately)
+                                            <span class="badge rounded-pill
+                                            {{ $assessment->show_correct_answers
+                                                ? 'bg-success-subtle text-success border border-success-subtle'
+                                                : 'bg-secondary-subtle text-secondary border border-secondary-subtle' }}"
+                                                  data-bs-toggle="tooltip"
+                                                  title="Show Correct Answers">
+                                            <i class="ri ri-checkbox-circle-line me-1"></i>
+                                            {{ $assessment->show_correct_answers ? 'Answers Shown' : 'Answers Hidden' }}
+                                        </span>
+
+                                            {{-- Show Explanations --}}
+                                            @if ($assessment->show_correct_answers)
+                                                <span class="badge rounded-pill
+                                                {{ $assessment->show_explainations
+                                                    ? 'bg-info-subtle text-info border border-info-subtle'
+                                                    : 'bg-secondary-subtle text-secondary border border-secondary-subtle' }}"
+                                                      data-bs-toggle="tooltip"
+                                                      title="Show Explanations">
+                                                <i class="ri ri-book-open-line me-1"></i>
+                                                {{ $assessment->show_explainations ? 'Explanations On' : 'Explanations Off' }}
+                                            </span>
+                                            @endif
+                                        @endif
+
+                                    </div>
+                                    {{-- ── End Settings Row ──────────────────────── --}}
+
+                                </div>
+
+                                {{-- Right: Action Buttons --}}
+                                <div class="d-flex gap-2 flex-shrink-0">
+
+                                    {{-- ── NEW: Lock Badge when has attempts ─────── --}}
+                                    @if ($assessment->attempts_count > 0)
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle d-flex align-items-center gap-1"
+                                              data-bs-toggle="tooltip"
+                                              title="{{ $assessment->attempts_count }} attempt(s) made. Edit & Builder are locked.">
+            <i class="ri ri-lock-line"></i>
+            {{ $assessment->attempts_count }} Attempts
+        </span>
+                                    @endif
+                                    {{-- ────────────────────────────────────────────── --}}
+                                    <a href="{{ route('admin.assessments.preview', encrypt($assessment->id)) }}"
+                                       class="btn btn-info btn-sm">
+                                        <i class="ri ri-eye-line"></i>
+                                    </a>
+                                    {{-- Builder Button — Disabled if locked --}}
+                                    <button type="button"
+                                            wire:click="openBuilder({{ $assessment->id }})"
+                                            class="btn btn-sm {{ $assessment->attempts_count > 0 ? 'btn-outline-secondary disabled' : 'btn-outline-info' }}"
+                                            data-bs-toggle="tooltip"
+                                            title="{{ $assessment->attempts_count > 0 ? 'Locked: Students have attempted this assessment' : 'Open Builder' }}"
+                                        {{ $assessment->attempts_count > 0 ? 'disabled' : '' }}>
+                                        <i class="ri {{ $assessment->attempts_count > 0 ? 'ri-lock-line' : 'ri-tools-line' }} me-1"></i>
+                                        Builder
                                     </button>
-                                @endif
+
+                                    {{-- Edit Button — Disabled if locked --}}
+                                    <button type="button"
+                                            wire:click="editAssessment({{ $assessment->id }})"
+                                            class="btn btn-sm {{ $assessment->attempts_count > 0 ? 'btn-outline-secondary disabled' : 'btn-outline-primary' }}"
+                                            data-bs-toggle="tooltip"
+                                            title="{{ $assessment->attempts_count > 0 ? 'Locked: Cannot edit after students have attempted' : 'Edit Assessment' }}"
+                                        {{ $assessment->attempts_count > 0 ? 'disabled' : '' }}>
+                                        <i class="ri {{ $assessment->attempts_count > 0 ? 'ri-lock-line' : 'ri-pencil-line' }}"></i>
+                                    </button>
+
+                                    {{-- Status Radio Toggle — ALWAYS AVAILABLE (only publish/unpublish when locked) --}}
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        @php
+                                            $statusOptions = [
+                                                'draft'     => ['warning',   'ri-draft-line',           'Draft'],
+                                                'publish'   => ['success',   'ri-checkbox-circle-line', 'Live'],
+                                                'unpublish' => ['secondary', 'ri-eye-off-line',         'off'],
+                                            ];
+                                            $isLocked = $assessment->attempts_count > 0;
+                                        @endphp
+
+                                        @foreach ($statusOptions as $val => [$color, $icon, $label])
+                                            @php
+                                                // When locked, Draft is disabled
+                                                $isDisabled = $isLocked && $val === 'draft';
+                                            @endphp
+                                            <input
+                                                type="radio"
+                                                class="btn-check"
+                                                name="status-{{ $assessment->id }}"
+                                                id="st-{{ $assessment->id }}-{{ $val }}"
+                                                value="{{ $val }}"
+                                                autocomplete="off"
+                                                @if(!$isDisabled) wire:click="changeStatus({{ $assessment->id }}, '{{ $val }}')" @endif
+                                                {{ $assessment->status === $val ? 'checked' : '' }}
+                                                {{ $isDisabled ? 'disabled' : '' }}
+                                            >
+                                            <label
+                                                class="btn btn-outline-{{ $color }} {{ $isDisabled ? 'opacity-50' : '' }}"
+                                                for="st-{{ $assessment->id }}-{{ $val }}"
+                                                data-bs-toggle="tooltip"
+                                                title="{{ $isDisabled ? 'Cannot set to Draft after attempts made' : $label }}"
+                                                style="font-size: .7rem; padding: .2rem .5rem;"
+                                            >
+                                                <i class="ri {{ $icon }}"></i>
+                                                {{ $label }}
+                                            </label>
+                                        @endforeach
+                                    </div>
+
+                                    {{-- Delete — Only if no attempts AND not published --}}
+                                    @if ($assessment->attempts_count === 0 && $assessment->status !== 'publish')
+                                        <button type="button"
+                                                wire:click="deleteAssessment({{ $assessment->id }})"
+                                                wire:confirm="Delete this assessment permanently?"
+                                                class="btn btn-sm btn-outline-danger"
+                                                data-bs-toggle="tooltip"
+                                                title="Delete Assessment">
+                                            <i class="ri ri-delete-bin-line"></i>
+                                        </button>
+                                    @endif
+
+                                </div>
+
                             </div>
                         </div>
+                        {{-- ── End Main Row ──────────────────────────────── --}}
+
                     </div>
                 @empty
                     <div class="text-center py-5 text-muted">
