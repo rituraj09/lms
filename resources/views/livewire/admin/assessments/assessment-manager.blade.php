@@ -520,7 +520,154 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
+                    {{-- Assessment Settings --}}
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-header bg-white border-bottom py-3">
+                            <h6 class="mb-0 fw-semibold text-dark">
+                                <i class="ri ri-settings-4-line text-primary me-2"></i>
+                                Assessment Settings
+                            </h6>
+                        </div>
+                        <div class="card-body p-3">
 
+                            {{-- Max Attempts --}}
+                            <div class="mb-3">
+                                <label class="form-label fw-medium small">
+                                    <i class="ri ri-repeat-line me-1 text-primary"></i>
+                                    Max Attempts
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="number"
+                                       wire:model="max_attempts"
+                                       class="form-control form-control-sm @error('max_attempts') is-invalid @enderror"
+                                       min="1"
+                                       placeholder="e.g. 1">
+                                @error('max_attempts')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <small class="text-muted">
+                                    Number of times a student can attempt this assessment.
+                                </small>
+                            </div>
+
+                            <hr class="my-3">
+
+                            {{-- Shuffle Sections --}}
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <p class="mb-0 small fw-medium">
+                                            <i class="ri ri-shuffle-line me-1 text-primary"></i>
+                                            Shuffle Sections
+                                        </p>
+                                        <small class="text-muted">
+                                            Randomize the order of sections for each attempt.
+                                        </small>
+                                    </div>
+                                    <div class="form-check form-switch ms-3 mb-0">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               role="switch"
+                                               wire:model="shuffle_sections"
+                                               id="shuffleSections">
+                                        <label class="form-check-label small" for="shuffleSections">
+                                            {{ $shuffle_sections ? 'Yes' : 'No' }}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-3">
+
+                            {{-- Show Result Immediately --}}
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <p class="mb-0 small fw-medium">
+                                            <i class="ri ri-bar-chart-line me-1 text-success"></i>
+                                            Show Result Immediately
+                                        </p>
+                                        <small class="text-muted">
+                                            Display result to student right after submission.
+                                        </small>
+                                    </div>
+                                    <div class="form-check form-switch ms-3 mb-0">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               role="switch"
+                                               wire:model.live="show_result_immediately"
+                                               id="showResult">
+                                        <label class="form-check-label small" for="showResult">
+                                            {{ $show_result_immediately ? 'Yes' : 'No' }}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Show Correct Answers — only if show_result_immediately --}}
+                            @if ($show_result_immediately)
+
+                                <hr class="my-3">
+
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <p class="mb-0 small fw-medium">
+                                                <i class="ri ri-checkbox-circle-line me-1 text-success"></i>
+                                                Show Correct Answers
+                                            </p>
+                                            <small class="text-muted">
+                                                Show the correct answer along with the result.
+                                            </small>
+                                        </div>
+                                        <div class="form-check form-switch ms-3 mb-0">
+                                            <input class="form-check-input"
+                                                   type="checkbox"
+                                                   role="switch"
+                                                   wire:model.live="show_correct_answers"
+                                                   id="showCorrectAnswers">
+                                            <label class="form-check-label small" for="showCorrectAnswers">
+                                                {{ $show_correct_answers ? 'Yes' : 'No' }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Show Explanations — only if show_correct_answers --}}
+                                @if ($show_correct_answers)
+
+                                    <hr class="my-3">
+
+                                    <div class="mb-3">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div>
+                                                <p class="mb-0 small fw-medium">
+                                                    <i class="ri ri-book-open-line me-1 text-info"></i>
+                                                    Show Explanations
+                                                </p>
+                                                <small class="text-muted">
+                                                    Show answer explanations with correct answers.
+                                                </small>
+                                            </div>
+                                            <div class="form-check form-switch ms-3 mb-0">
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       role="switch"
+                                                       wire:model="show_explainations"
+                                                       id="showExplainations">
+                                                <label class="form-check-label small" for="showExplainations">
+                                                    {{ $show_explainations ? 'Yes' : 'No' }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                @endif
+
+                            @endif
+
+                        </div>
+                    </div>
                     <div class="card shadow-sm border-0 mb-4">
                         <div class="card-header bg-white border-bottom py-3">
                             <h6 class="mb-0 fw-semibold text-dark">
@@ -1024,7 +1171,57 @@
                                     {{ $has_negative_mark ? 'Enabled' : 'Disabled' }}
                                 </span>
                             </li>
+                            <li class="list-group-item px-0 d-flex
+           justify-content-between align-items-center">
+                                <span class="small text-muted">Max Attempts</span>
+                                <span class="badge bg-primary-subtle text-primary">
+        {{ $max_attempts }}x
+    </span>
+                            </li>
 
+                            <li class="list-group-item px-0 d-flex
+           justify-content-between align-items-center">
+                                <span class="small text-muted">Shuffle Sections</span>
+                                <span class="badge {{ $shuffle_sections
+        ? 'bg-success-subtle text-success'
+        : 'bg-secondary-subtle text-secondary' }}">
+        {{ $shuffle_sections ? 'Yes' : 'No' }}
+    </span>
+                            </li>
+
+                            <li class="list-group-item px-0 d-flex
+           justify-content-between align-items-center">
+                                <span class="small text-muted">Show Result</span>
+                                <span class="badge {{ $show_result_immediately
+        ? 'bg-success-subtle text-success'
+        : 'bg-secondary-subtle text-secondary' }}">
+        {{ $show_result_immediately ? 'Immediately' : 'Later' }}
+    </span>
+                            </li>
+
+                            @if ($show_result_immediately)
+                                <li class="list-group-item px-0 d-flex
+               justify-content-between align-items-center">
+                                    <span class="small text-muted">Show Answers</span>
+                                    <span class="badge {{ $show_correct_answers
+            ? 'bg-success-subtle text-success'
+            : 'bg-secondary-subtle text-secondary' }}">
+            {{ $show_correct_answers ? 'Yes' : 'No' }}
+        </span>
+                                </li>
+
+                                @if ($show_correct_answers)
+                                    <li class="list-group-item px-0 d-flex
+                   justify-content-between align-items-center">
+                                        <span class="small text-muted">Show Explanations</span>
+                                        <span class="badge {{ $show_explainations
+                ? 'bg-info-subtle text-info'
+                : 'bg-secondary-subtle text-secondary' }}">
+                {{ $show_explainations ? 'Yes' : 'No' }}
+            </span>
+                                    </li>
+                                @endif
+                            @endif
                             <li
                                 class="list-group-item px-0 d-flex
                                        justify-content-between align-items-center">

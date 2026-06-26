@@ -11,11 +11,9 @@ use App\Http\Controllers\Api\TestAttemptController;
 |--------------------------------------------------------------------------
 */
 
-    Route::prefix('auth')->group(function () {
-        Route::post('/login',    [AuthController::class, 'login']);
-    });
-
-
+Route::prefix('auth')->group(function () {
+    Route::post('/login', [AuthController::class, 'login']);
+});
 
 Route::group(['middleware' => 'auth:sanctum'], function ($router) {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -28,6 +26,9 @@ Route::group(['middleware' => 'auth:sanctum'], function ($router) {
 
         // Get assessment detail (cover page)
         Route::get('/{assessmentId}', [TestAttemptController::class, 'getAssessmentDetail']);
+
+        // ── NEW: Get attempt status (attempts used, remaining, etc) ──
+        Route::get('/{assessmentId}/attempt-status', [TestAttemptController::class, 'getAttemptStatus']);
     });
 
     Route::prefix('attempts')->group(function () {

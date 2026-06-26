@@ -153,7 +153,87 @@ class TestAttemptController extends Controller
     }
 
     /**
+     * Get attempt status for an assessment (NEW)
+     * Shows: attempts used, remaining, can_attempt, current_attempt
+     */
+    public function getAttemptStatus(Request $request, int $assessmentId)
+    {
+        try {
+            $user = $request->user();
+
+            // Verify assessment exists and is accessible
+            $assessment = Assessment::whereHas('organisations', function ($query) use ($user) {
+                $query->where('organisations.id', $user->organisation_id)
+                    ->where('assessment_organisation.status', 'active');
+            })
+                ->where('id', $assessmentId)
+                ->where('status', 'publish')
+                ->first();
+
+            if (!$assessment) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Assessment not found or not accessible',
+                ], 404);
+            }
+
+            // Get max attempts
+            $maxAttempts = (int) $assessment->max_attempts ?? 1;
+
+            // Count completed attempts (submitted or evaluated)
+            $completedAttempts = TestAttempt::where('user_id', $user->id)
+                ->where('assessment_id', $assessmentId)
+                ->whereIn('status', ['submitted', 'evaluated'])
+                ->count();
+
+            // Check for in-progress attempt
+            $inProgressAttempt = TestAttempt::where('user_id', $user->id)
+                ->where('assessment_id', $assessmentId)
+                ->where('status', 'in_progress')
+                ->first();
+
+            // Calculate remaining attempts
+            $remainingAttempts = max(0, $maxAttempts - $completedAttempts);
+            $canAttempt        = $remainingAttempts > 0 && !$inProgressAttempt;
+
+            return response()->json([
+                'success' => true,
+                'data'    => [
+                    'can_attempt'       => $canAttempt,
+                    'attempts_used'     => $completedAttempts,
+                    'max_attempts'      => $maxAttempts,
+                    'remaining_attempts'=> $remainingAttempts,
+                    'current_attempt'   => $inProgressAttempt ? [
+                        'id'        => $inProgressAttempt->id,
+                        'ack_no'    => $inProgressAttempt->ack_no,
+                        'status'    => $inProgressAttempt->status,
+                        'started_at'=> $inProgressAttempt->started_at,
+                    ] : null,
+                    'message'           => !$canAttempt && !$inProgressAttempt
+                        ? "You have used all {$maxAttempts} attempts. You cannot attempt this assessment anymore."
+                        : null,
+                ],
+            ]);
+
+        } catch (\Throwable $e) {
+            Log::error('getAttemptStatus failed', [
+                'error'         => $e->getMessage(),
+                'trace'         => $e->getTraceAsString(),
+                'assessment_id' => $assessmentId,
+                'user_id'       => $request->user()->id,
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch attempt status',
+                'debug'   => config('app.debug') ? $e->getMessage() : null,
+            ], 500);
+        }
+    }
+
+    /**
      * Initialize/Start a new test attempt
+     * ✅ UPDATED: Now checks max_attempts before creating new attempt
      */
     public function startAttempt(Request $request)
     {
@@ -185,21 +265,48 @@ class TestAttemptController extends Controller
                 ], 404);
             }
 
+            // ── NEW: Check max_attempts ──────────────────────────────
+            $maxAttempts = (int) ($assessment->max_attempts ?? 1);
+
+            // Count completed attempts
+            $completedAttempts = TestAttempt::where('user_id', $user->id)
+                ->where('assessment_id', $assessmentId)
+                ->whereIn('status', ['submitted', 'evaluated'])
+                ->count();
+
             // Check for existing in-progress attempt
             $existingAttempt = TestAttempt::where('user_id', $user->id)
                 ->where('assessment_id', $assessmentId)
                 ->where('status', 'in_progress')
                 ->first();
 
+            // If in-progress exists, resume it
             if ($existingAttempt) {
                 return response()->json([
                     'success' => false,
                     'message' => 'You already have an in-progress attempt for this assessment',
                     'data'    => new TestAttemptResource(
-                        $existingAttempt->load(['assessment.assessmentGroups.assessmentQuestions.question', 'assessment.assessmentGroups.questionGroup', 'responses'])
+                        $existingAttempt->load([
+                            'assessment.assessmentGroups.assessmentQuestions.question',
+                            'assessment.assessmentGroups.questionGroup',
+                            'responses'
+                        ])
                     ),
                 ], 409);
             }
+
+            // Check if max attempts exceeded
+            if ($completedAttempts >= $maxAttempts) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Maximum attempts reached. You have completed {$completedAttempts}/{$maxAttempts} attempts.",
+                    'data'    => [
+                        'attempts_used' => $completedAttempts,
+                        'max_attempts'  => $maxAttempts,
+                    ],
+                ], 403);
+            }
+            // ──────────────────────────────────────────────────────────
 
             DB::beginTransaction();
 

@@ -104,7 +104,14 @@ class AssessmentManager extends Component
     public $cover_image_file = null;        // Livewire temp upload
     public string $cover_image_path  = '';  // Stored path from DB
     public bool $removeCoverImage    = false;
-
+    /* ================================================================
+     |  NEW ASSESSMENT SETTINGS (from migration)
+     * ================================================================*/
+    public int  $max_attempts            = 1;
+    public bool $shuffle_sections        = false;
+    public bool $show_result_immediately = true;
+    public bool $show_correct_answers    = false;
+    public bool $show_explainations      = false;
     /* ================================================================
      |  MOUNT
      * ================================================================*/
@@ -157,21 +164,28 @@ class AssessmentManager extends Component
     {
         $assessment = Assessment::findOrFail($id);
 
-        $this->assessmentId       = $id;
-        $this->assessment_code    = $assessment->assessment_code;
-        $this->title              = $assessment->title;
-        $this->instructions       = $assessment->instructions ?? '';
-        $this->assessment_type_id = $assessment->assessment_type_id;
-        $this->age_group_id       = $assessment->age_group_id;
-        $this->total_marks        = (float) $assessment->total_marks;
-        $this->passing_marks      = (float) $assessment->passing_marks;
-        $this->duration_minutes   = $assessment->duration_minutes;
-        $this->admin_note         = $assessment->admin_note ?? '';
-        $this->has_negative_mark  = (bool) $assessment->has_negative_mark;
-        $this->status             = $assessment->status;
-        $this->cover_image_path  = $assessment->cover_image ?? '';
-        $this->cover_image_file  = null;
-        $this->removeCoverImage  = false;
+        $this->assessmentId          = $id;
+        $this->assessment_code       = $assessment->assessment_code;
+        $this->title                 = $assessment->title;
+        $this->instructions          = $assessment->instructions ?? '';
+        $this->assessment_type_id    = $assessment->assessment_type_id;
+        $this->age_group_id          = $assessment->age_group_id;
+        $this->total_marks           = (float) $assessment->total_marks;
+        $this->passing_marks         = (float) $assessment->passing_marks;
+        $this->duration_minutes      = $assessment->duration_minutes;
+        $this->admin_note            = $assessment->admin_note ?? '';
+        $this->has_negative_mark     = (bool) $assessment->has_negative_mark;
+        $this->status                = $assessment->status;
+        $this->cover_image_path      = $assessment->cover_image ?? '';
+        $this->cover_image_file      = null;
+        $this->removeCoverImage      = false;
+        // ── New fields ──
+        $this->max_attempts            = (int)  $assessment->max_attempts;
+        $this->shuffle_sections        = (bool) $assessment->shuffle_sections;
+        $this->show_result_immediately = (bool) $assessment->show_result_immediately;
+        $this->show_correct_answers    = (bool) $assessment->show_correct_answers;
+        $this->show_explainations      = (bool) $assessment->show_explainations;
+        // ────────────────
         $this->view = 'form';
     }
 
@@ -180,23 +194,28 @@ class AssessmentManager extends Component
         // Load assessment info first
         $assessment = Assessment::findOrFail($id);
 
-        $this->assessmentId       = $id;
-        $this->assessment_code    = $assessment->assessment_code;
-        $this->title              = $assessment->title;
-        $this->instructions       = $assessment->instructions ?? '';
-        $this->assessment_type_id = $assessment->assessment_type_id;
-        $this->age_group_id       = $assessment->age_group_id;
-        $this->total_marks        = (float) $assessment->total_marks;
-        $this->passing_marks      = (float) $assessment->passing_marks;
-        $this->duration_minutes   = $assessment->duration_minutes;
-        $this->admin_note         = $assessment->admin_note ?? '';
-        $this->has_negative_mark  = (bool) $assessment->has_negative_mark;
-        $this->status             = $assessment->status;
-
-        // Load builder groups + questions
+        $this->assessmentId          = $id;
+        $this->assessment_code       = $assessment->assessment_code;
+        $this->title                 = $assessment->title;
+        $this->instructions          = $assessment->instructions ?? '';
+        $this->assessment_type_id    = $assessment->assessment_type_id;
+        $this->age_group_id          = $assessment->age_group_id;
+        $this->total_marks           = (float) $assessment->total_marks;
+        $this->passing_marks         = (float) $assessment->passing_marks;
+        $this->duration_minutes      = $assessment->duration_minutes;
+        $this->admin_note            = $assessment->admin_note ?? '';
+        $this->has_negative_mark     = (bool) $assessment->has_negative_mark;
+        $this->status                = $assessment->status;
+        // ── New fields ──
+        $this->max_attempts            = (int)  $assessment->max_attempts;
+        $this->shuffle_sections        = (bool) $assessment->shuffle_sections;
+        $this->show_result_immediately = (bool) $assessment->show_result_immediately;
+        $this->show_correct_answers    = (bool) $assessment->show_correct_answers;
+        $this->show_explainations      = (bool) $assessment->show_explainations;
+        // ────────────────
         $this->loadBuilder($id);
-
         $this->view = 'builder';
+
     }
 
     public function deleteAssessment(int $id): void
@@ -231,13 +250,19 @@ class AssessmentManager extends Component
     {
         $this->validate(
             [
-                'title'              => 'required|string|max:500',
-                'cover_image_file' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-                'assessment_type_id' => 'required|string',
-                'age_group_id'       => 'required|integer',
-                'passing_marks'      => 'required|numeric|min:0',
-                'duration_minutes'    => 'required|numeric|min:0',
-                'status'             => 'required|in:draft,publish,unpublish',
+                'title'                  => 'required|string|max:500',
+                'cover_image_file'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+                'assessment_type_id'     => 'required|string',
+                'age_group_id'           => 'required|integer',
+                'passing_marks'          => 'required|numeric|min:0',
+                'duration_minutes'       => 'required|numeric|min:0',
+                'status'                 => 'required|in:draft,publish,unpublish',
+                // ── New fields ──
+                'max_attempts'           => 'required|integer|min:1',
+                'shuffle_sections'       => 'boolean',
+                'show_result_immediately'=> 'boolean',
+                'show_correct_answers'   => 'boolean',
+                'show_explainations'     => 'boolean',
             ],
             [
                 'title.required'              => 'Assessment title is required.',
@@ -247,7 +272,8 @@ class AssessmentManager extends Component
                 'assessment_type_id.required' => 'Please select an assessment type.',
                 'age_group_id.required'       => 'Please select an age group.',
                 'passing_marks.required'      => 'Passing marks are required.',
-
+                'max_attempts.required'       => 'Max attempts is required.',
+                'max_attempts.min'            => 'Max attempts must be at least 1.',
             ]
         );
         // ── Handle Cover Image ──────────────────────────────────────
@@ -270,21 +296,28 @@ class AssessmentManager extends Component
         }
         try {
             $payload = [
-                'assessment_code'    => $this->assessment_code,
-                'title'              => $this->title,
-                'cover_image'        => $coverImagePath,
-                'instructions'       => $this->instructions,
-                'assessment_type_id' => $this->assessment_type_id,
-                'age_group_id'       => $this->age_group_id,
-                'total_marks'        => $this->total_marks,
-                'passing_marks'      => $this->passing_marks,
-                'duration_minutes'   => !empty($this->duration_minutes)
-                                            ? (int) $this->duration_minutes
-                                            : null,
-                'admin_note'         => $this->admin_note,
-                'has_negative_mark'  => (bool) $this->has_negative_mark,
-                'status'             => $this->status,
-                'updated_by'         => auth()->id(),
+                'assessment_code'        => $this->assessment_code,
+                'title'                  => $this->title,
+                'cover_image'            => $coverImagePath,
+                'instructions'           => $this->instructions,
+                'assessment_type_id'     => $this->assessment_type_id,
+                'age_group_id'           => $this->age_group_id,
+                'total_marks'            => $this->total_marks,
+                'passing_marks'          => $this->passing_marks,
+                'duration_minutes'       => !empty($this->duration_minutes)
+                    ? (int) $this->duration_minutes
+                    : null,
+                'admin_note'             => $this->admin_note,
+                'has_negative_mark'      => (bool) $this->has_negative_mark,
+                'status'                 => $this->status,
+                // ── New fields ──
+                'max_attempts'           => (int)  $this->max_attempts,
+                'shuffle_sections'       => (bool) $this->shuffle_sections,
+                'show_result_immediately'=> (bool) $this->show_result_immediately,
+                'show_correct_answers'   => (bool) $this->show_correct_answers,
+                'show_explainations'     => (bool) $this->show_explainations,
+                // ────────────────
+                'updated_by'             => auth()->id(),
             ];
 
             if ($this->assessmentId) {
@@ -787,22 +820,29 @@ class AssessmentManager extends Component
     private function resetForm(): void
     {
 
-        $this->assessmentId       = null;
-        $this->assessment_code    = '';
-        $this->title              = '';
-        $this->cover_image_file  = null;
-        $this->cover_image_path  = '';
-        $this->removeCoverImage  = false;
-        $this->instructions       = '';
-        $this->assessment_type_id = '';
-        $this->age_group_id       = null;
-        $this->total_marks        = 0;
-        $this->passing_marks      = 0;
-        $this->duration_minutes   = null;
-        $this->admin_note         = '';
-        $this->has_negative_mark  = false;
-        $this->status             = 'draft';
-        $this->assessmentGroups   = [];
+        $this->assessmentId          = null;
+        $this->assessment_code       = '';
+        $this->title                 = '';
+        $this->cover_image_file      = null;
+        $this->cover_image_path      = '';
+        $this->removeCoverImage      = false;
+        $this->instructions          = '';
+        $this->assessment_type_id    = '';
+        $this->age_group_id          = null;
+        $this->total_marks           = 0;
+        $this->passing_marks         = 0;
+        $this->duration_minutes      = null;
+        $this->admin_note            = '';
+        $this->has_negative_mark     = false;
+        $this->status                = 'draft';
+        // ── New fields ──
+        $this->max_attempts            = 1;
+        $this->shuffle_sections        = false;
+        $this->show_result_immediately = true;
+        $this->show_correct_answers    = false;
+        $this->show_explainations      = false;
+        // ────────────────
+        $this->assessmentGroups      = [];
         $this->resetErrorBag();
     }
 
