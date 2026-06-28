@@ -257,7 +257,7 @@
                                                 <div class="p-3 bg-white">
                                                     <div class="row g-2 align-items-end">
 
-                                                    
+
 
                                                         <div class="col-md-3">
                                                             <label class="form-label fw-medium mb-1" style="font-size:.75rem;">
@@ -674,23 +674,36 @@
 
                                     @foreach ($pickerQuestions as $pq)
                                         @php
-                                            $content = $pq->question_content ?? [];
-                                            $stemEn  = $content['stem'][array_key_first($languages)] ?? '(No stem)';
+                                            $content    = $pq->question_content ?? [];
+                                            $stemEn     = $content['stem'][array_key_first($languages)] ?? '(No stem)';
+
+                                            // Check if this question is already in the current group
+                                            $alreadyInGroup = $pickerMode === 'existing'
+                                                && in_array($pq->id, $currentGroupQuestionIds);
+
+                                            $isSelected = in_array($pq->id, $pickerSelectedQIds);
                                         @endphp
 
                                         <label wire:key="pq-{{ $pq->id }}"
                                                class="d-flex align-items-start gap-3 p-3 rounded-3 mb-2 border
-                                                      {{ in_array($pq->id, $pickerSelectedQIds) ? 'bg-primary-subtle border-primary' : 'bg-white' }}"
-                                               style="cursor:pointer;">
+                          {{ $alreadyInGroup
+                              ? 'bg-secondary-subtle border-secondary opacity-60'
+                              : ($isSelected
+                                  ? 'bg-primary-subtle border-primary'
+                                  : 'bg-white') }}"
+                                               style="{{ $alreadyInGroup ? 'cursor:not-allowed;' : 'cursor:pointer;' }}">
 
                                             <input type="checkbox"
                                                    class="form-check-input mt-1 flex-shrink-0"
-                                                   wire:click="togglePickerQuestion({{ $pq->id }})"
-                                                {{ in_array($pq->id, $pickerSelectedQIds) ? 'checked' : '' }}>
+                                                   @if(!$alreadyInGroup)
+                                                       wire:click="togglePickerQuestion({{ $pq->id }})"
+                                                @endif
+                                                {{ $isSelected ? 'checked' : '' }}
+                                                {{ $alreadyInGroup ? 'disabled' : '' }}>
 
                                             <div class="flex-1 min-w-0">
-                                                <p class="mb-1 small fw-medium text-dark">
-                                                    {!! Str::limit($stemEn, 100)  !!}
+                                                <p class="mb-1 small fw-medium {{ $alreadyInGroup ? 'text-muted' : 'text-dark' }}">
+                                                    {!! Str::limit($stemEn, 100) !!}
                                                 </p>
                                                 <div class="d-flex flex-wrap gap-2 align-items-center">
                                                     @if ($pq->answer_category === 'single_optional')
@@ -702,13 +715,21 @@
                                                     @endif
 
                                                     <span class="badge bg-success-subtle text-success" style="font-size:.7rem;">
-                                                        {{ $pq->marks }} Mark(s)
-                                                    </span>
+                            {{ $pq->marks }} Mark(s)
+                        </span>
 
                                                     <code style="font-size:.7rem;color:#6c757d;">{{ $pq->question_code }}</code>
+
+                                                    {{-- Already added badge --}}
+                                                    @if ($alreadyInGroup)
+                                                        <span class="badge bg-secondary text-white" style="font-size:.7rem;">
+                                <i class="ri ri-check-double-line me-1"></i>Already in this section
+                            </span>
+                                                    @endif
                                                 </div>
                                             </div>
 
+                                            {{-- Preview button - always available --}}
                                             <button type="button"
                                                     wire:click.stop="viewQuestion({{ $pq->id }})"
                                                     class="btn btn-sm btn-outline-info flex-shrink-0"

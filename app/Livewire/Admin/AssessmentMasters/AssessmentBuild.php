@@ -514,23 +514,41 @@ class AssessmentBuild extends Component
             return collect();
         }
 
-        $usedQuestionIds = collect($this->assessmentGroups)
+        // All question IDs already used across ALL groups
+        $allUsedQuestionIds = collect($this->assessmentGroups)
             ->flatMap(fn($ag) => collect($ag['questions'])->pluck('question_id'))
             ->toArray();
 
         if ($this->pickerMode === 'existing' && $this->pickerAgIndex !== null) {
+            // Questions already in THIS specific group (show as disabled)
             $currentGroupQIds = collect(
                 $this->assessmentGroups[$this->pickerAgIndex]['questions']
             )->pluck('question_id')->toArray();
 
-            $usedQuestionIds = array_diff($usedQuestionIds, $currentGroupQIds);
+            // Questions used in OTHER groups (exclude completely)
+            $otherGroupsUsedIds = array_diff($allUsedQuestionIds, $currentGroupQIds);
+
+            return Question::where('question_group_id', $this->pickerGroupId)
+                ->whereNotIn('id', $otherGroupsUsedIds)
+                ->paginate(15);
         }
 
+        // For 'new' mode: exclude all already-used questions
         return Question::where('question_group_id', $this->pickerGroupId)
-            ->whereNotIn('id', $usedQuestionIds)
+            ->whereNotIn('id', $allUsedQuestionIds)
             ->paginate(15);
     }
 
+    public function getCurrentGroupQuestionIdsProperty(): array
+    {
+        if ($this->pickerMode !== 'existing' || $this->pickerAgIndex === null) {
+            return [];
+        }
+
+        return collect($this->assessmentGroups[$this->pickerAgIndex]['questions'])
+            ->pluck('question_id')
+            ->toArray();
+    }
     /* ================================================================
      |  NAVIGATION
      * ================================================================*/
@@ -553,11 +571,12 @@ class AssessmentBuild extends Component
     public function render()
     {
         return view('livewire.admin.assessment-masters.assessment-build', [
-            'languages'      => Globals::LANGUAGES,
-            'pickerGroups'   => $this->view === 'group-picker' ? $this->pickerGroups : collect(),
-            'pickerQuestions' => $this->view === 'group-picker' && $this->pickerGroupId
+            'languages'               => Globals::LANGUAGES,
+            'pickerGroups'            => $this->view === 'group-picker' ? $this->pickerGroups : collect(),
+            'pickerQuestions'         => $this->view === 'group-picker' && $this->pickerGroupId
                 ? $this->pickerQuestions
                 : null,
+            'currentGroupQuestionIds' => $this->currentGroupQuestionIds, // ADD THIS
         ]);
     }
 }
