@@ -3,11 +3,14 @@
 use App\Livewire\Admin\Questions\QuestionGroupIndex;
 use App\Livewire\Admin\Questions\QuestionGroupForm;
 use App\Livewire\Admin\Assessments\AssessmentManager;
-use App\Livewire\Admin\Assessments\AssessmentList;
+use App\Livewire\Admin\Assessments\AssessmentList  as OldAssessmentList; // ← alias old one
 use App\Livewire\Admin\Assessments\AssignAssessment;
 use App\Livewire\Admin\Assessments\PreviewAssessment;
 use App\Livewire\Admin\Auth\Login;
 use App\Services\OrganisationContext;
+use App\Livewire\Admin\AssessmentMasters\AssessmentList;
+use App\Livewire\Admin\AssessmentMasters\AssessmentManage;
+use App\Livewire\Admin\AssessmentMasters\AssessmentBuild;
 
 // ── Guest Routes (not logged in) ──────────────────────────────────
 Route::middleware('redirect.auth:admin')->group(function ($router) {
@@ -39,12 +42,24 @@ Route::group(['middleware' => ['redirect.notauth:admin','auth:admin']], function
     // SYSTEM LEVEL - ASSESSMENTS
     // ────────────────────────────────────────────────────────────
 
-    Route::prefix('assessments')->name('assessments.')->group(function ($router) {
-        $router->get('/view', AssessmentManager::class)
-            ->name('view')
+    Route::prefix('assessment-masters')->name('assessment-masters.')->group(function ($router) {
+        $router->get('/list', AssessmentList::class)
+            ->name('list')
             ->middleware('can:system.assessment.view');
 
-        $router->get('/assessment_list', AssessmentList::class)
+        $router->get('/manage/{id?}', AssessmentManage::class)
+            ->name('manage')
+            ->middleware('can:system.assessment.create');
+
+        $router->get('/build/{id}', AssessmentBuild::class)
+            ->name('build')
+            ->middleware('can:system.assessment.create');
+    });
+
+    Route::prefix('assessments')->name('assessments.')->group(function ($router) {
+
+
+        $router->get('/assessment_list', OldAssessmentList::class)
             ->name('assessment_list')
             ->middleware('can:system.assessment.assign_view');
 

@@ -22,7 +22,7 @@
             </div>
         @endif
 
-        <a href="{{ route('admin.assessments.view') }}" class="btn btn-outline-secondary">
+        <a href="{{ route('admin.assessment-masters.list') }}" class="btn btn-outline-secondary">
             <i class="ri ri-close-line"></i> Close
         </a>
     </div>

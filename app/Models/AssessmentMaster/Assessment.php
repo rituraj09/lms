@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 #[Unguarded]
 class Assessment extends Model
@@ -95,7 +96,17 @@ class Assessment extends Model
             }
         ]);
     }
-
+    public function assessmentQuestions(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            AssessmentQuestion::class,
+            AssessmentGroup::class,
+            'assessment_id',       // Foreign key on assessment_groups
+            'assessment_group_id', // Foreign key on assessment_questions
+            'id',                  // Local key on assessments
+            'id'                   // Local key on assessment_groups
+        );
+    }
     // ─── Accessors ────────────────────────────────────────────────
 
     public function getOrganisationsCountAttribute(): int

@@ -19,9 +19,7 @@ return new class extends Migration
                   ->restrictOnDelete();
             $table->decimal('negative_mark', 8, 2)->default(0);
             $table->integer('question_timer')->default(0);
-            $table->foreignId('question_type_id')
-                  ->constrained('question_types')
-                  ->restrictOnDelete();
+
             $table->foreignId('created_by')
                   ->nullable()
                   ->constrained('admins')

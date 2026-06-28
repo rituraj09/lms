@@ -312,7 +312,7 @@ new class extends Component {
                             </a>
                             <ul class="menu-sub">
                                 <li class="menu-item">
-                                    <a href="{{ route('admin.assessments.view') }}" class="menu-link">
+                                    <a href="{{ route('admin.assessment-masters.list') }}" class="menu-link">
                                         <div>Manage Assessments</div>
                                     </a>
                                 </li>
