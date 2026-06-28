@@ -703,7 +703,14 @@
 
                                             <div class="flex-1 min-w-0">
                                                 <p class="mb-1 small fw-medium {{ $alreadyInGroup ? 'text-muted' : 'text-dark' }}">
-                                                    {!! Str::limit($stemEn, 100) !!}
+                                                    @php
+                                                        // Strip tags, decode HTML entities, then limit
+                                                        $stemPreview = Str::limit(
+                                                            html_entity_decode(strip_tags($stemEn), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+                                                            120
+                                                        );
+                                                    @endphp
+                                                    {{ $stemPreview }}
                                                 </p>
                                                 <div class="d-flex flex-wrap gap-2 align-items-center">
                                                     @if ($pq->answer_category === 'single_optional')
@@ -715,16 +722,16 @@
                                                     @endif
 
                                                     <span class="badge bg-success-subtle text-success" style="font-size:.7rem;">
-                            {{ $pq->marks }} Mark(s)
-                        </span>
+                                                        {{ $pq->marks }} Mark(s)
+                                                    </span>
 
                                                     <code style="font-size:.7rem;color:#6c757d;">{{ $pq->question_code }}</code>
 
                                                     {{-- Already added badge --}}
                                                     @if ($alreadyInGroup)
                                                         <span class="badge bg-secondary text-white" style="font-size:.7rem;">
-                                <i class="ri ri-check-double-line me-1"></i>Already in this section
-                            </span>
+                                                            <i class="ri ri-check-double-line me-1"></i>Already in this section
+                                                        </span>
                                                     @endif
                                                 </div>
                                             </div>
