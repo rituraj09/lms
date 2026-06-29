@@ -27,7 +27,7 @@ class OrganisationDashboard extends Component
         if (!$organisationId) {
             abort(404, 'Organisation not found');
         }
-
+        $organisationId=  decrypt($organisationId);
         $orgId = (int) $organisationId;
         $admin = auth('admin')->user();
 

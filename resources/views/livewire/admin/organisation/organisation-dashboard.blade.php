@@ -15,11 +15,7 @@
                 </ol>
             </nav>
         </div>
-        @can('organisation.edit')
-            <a href="{{ route('admin.organisations.edit', $organisation->id) }}" class="btn btn-primary">
-                <i class="ri ri-edit-line me-2"></i>Edit Organisation
-            </a>
-        @endcan
+
     </div>
 
     {{-- Organisation Info Card --}}

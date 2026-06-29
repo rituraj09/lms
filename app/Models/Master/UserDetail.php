@@ -1,17 +1,15 @@
 <?php
-
 // app/Models/Master/UserDetail.php
+
 namespace App\Models\Master;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 #[Unguarded]
 class UserDetail extends Model
 {
-
-
     protected $casts = [
         'date_of_birth' => 'date',
         'extra_data'  => 'array',
@@ -23,7 +21,7 @@ class UserDetail extends Model
     {
         static::creating(function ($detail) {
             if (empty($detail->student_id)) {
-                $detail->student_id = self::generateStudentId();
+                $detail->student_id = self::generateStudentId($detail->user->organisation_id);
             }
         });
     }
@@ -37,12 +35,12 @@ class UserDetail extends Model
 
     public function state()
     {
-        return $this->belongsTo(State::class);
+        return $this->belongsTo(State::class, 'state_id');
     }
 
     public function district()
     {
-        return $this->belongsTo(District::class);
+        return $this->belongsTo(District::class, 'district_id');
     }
 
     // ─── Accessors ────────────────────────────────────────────────
@@ -73,16 +71,29 @@ class UserDetail extends Model
 
     // ─── Helpers ──────────────────────────────────────────────────
 
-    public static function generateStudentId(): string
+    public static function generateStudentId(?int $organisationId = null): string
     {
-        $prefix = 'STU';
-        $year   = date('Y');
+        $orgPart = str_pad($organisationId ?? 0, 5, '0', STR_PAD_LEFT);
+        $year = date('Y');
 
-        do {
-            $random = strtoupper(Str::random(6));
-            $id     = "{$prefix}{$year}{$random}";
-        } while (self::where('student_id', $id)->exists());
+        // Get last serial number for this org and year
+        $lastStudent = self::whereHas('user', function($q) use ($organisationId) {
+            $q->where('organisation_id', $organisationId);
+        })
+            ->where('student_id', 'LIKE', "STUD-{$orgPart}-{$year}-%")
+            ->orderByDesc('student_id')
+            ->first();
 
-        return $id;
+        if ($lastStudent) {
+            // Extract serial and increment
+            $parts = explode('-', $lastStudent->student_id);
+            $serial = intval($parts[3] ?? 0) + 1;
+        } else {
+            $serial = 1;
+        }
+
+        $serialPart = str_pad($serial, 5, '0', STR_PAD_LEFT);
+
+        return "STUD-{$orgPart}-{$year}-{$serialPart}";
     }
 }

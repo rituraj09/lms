@@ -128,7 +128,7 @@ class Login extends Component
             OrganisationContext::set($organisation->id);
 
             // Redirect to organisation dashboard
-            return route('admin.org.dashboard', $organisation->id);
+            return route('admin.org.dashboard', encrypt($organisation->id));
         }
 
         // If user has system-level permissions, go to home

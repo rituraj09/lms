@@ -11,6 +11,10 @@ use App\Services\OrganisationContext;
 use App\Livewire\Admin\AssessmentMasters\AssessmentList;
 use App\Livewire\Admin\AssessmentMasters\AssessmentManage;
 use App\Livewire\Admin\AssessmentMasters\AssessmentBuild;
+use App\Livewire\Admin\Student\ManageStudents;
+use App\Livewire\Admin\Student\StudentForm;
+use App\Livewire\Admin\Student\StudentDetails;
+use App\Livewire\Admin\Reports\StudentList;
 
 // ── Guest Routes (not logged in) ──────────────────────────────────
 Route::middleware('redirect.auth:admin')->group(function ($router) {
@@ -116,9 +120,18 @@ Route::group(['middleware' => ['redirect.notauth:admin','auth:admin']], function
             ->middleware('can:system.organisation.edit');
 
 
-        $router->get('/{organisationId}/dashboard', \App\Livewire\Admin\Organisation\OrganisationDashboard::class)
+        $router->get('/dashboard/{organisationId}', \App\Livewire\Admin\Organisation\OrganisationDashboard::class)
             ->name('dashboard')
             ->middleware('can:system.organisation.view');
+
+
+
+    });
+    // Reports
+    Route::prefix('reports')->name('reports.')->group(function ($router) {
+    // student list
+        $router->get('student-list', StudentList::class)
+            ->name('reports.student-list');
     });
 
     // ────────────────────────────────────────────────────────────
@@ -128,11 +141,20 @@ Route::group(['middleware' => ['redirect.notauth:admin','auth:admin']], function
     Route::prefix('org')->name('org.')->group(function ($router) {
 
         //  Remove middleware from route, handle in component
-        $router->get('/{organisationId}/dashboard', \App\Livewire\Admin\Organisation\OrganisationDashboard::class)
+        $router->get('/dashboard/{organisationId}', \App\Livewire\Admin\Organisation\OrganisationDashboard::class)
             ->name('dashboard');
 
         $router->get('/{organisationId}/edit', \App\Livewire\Admin\Organisation\OrganisationForm::class)
             ->name('edit');
+
+        $router->get('/students/{organisationId}', ManageStudents::class)
+            ->name('students');
+        $router->get('/students/create/{organisationId}', StudentForm::class)
+            ->name('students.create');
+        $router->get('/students/edit/{organisationId}/{studentId}', StudentForm::class)
+            ->name('students.edit');
+        $router->get('/students/view/{organisationId}/{studentId}', StudentDetails::class)
+            ->name('students.view');
 
         // Route::prefix('{organisationId}/students')->name('students.')->group(function () {
         //     Route::get('/', \App\Livewire\Admin\Student\StudentList::class)

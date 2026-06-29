@@ -146,43 +146,60 @@ new class extends Component {
                 {{-- Org Dashboard --}}
                 @if ($canOrg('org.dashboard.view'))
                     <li class="menu-item">
-                        <a href="{{ route('admin.org.dashboard', $activeOrg->id) }}" class="menu-link">
+                        <a href="{{ route('admin.org.dashboard', encrypt($activeOrg->id)) }}" class="menu-link">
                             <i class="menu-icon icon-base ri ri-dashboard-line"></i>
                             <div>Dashboard</div>
+                        </a>
+                    </li>
+                @endif
+                @if ($canOrg('org.student.view'))
+                    <li class="menu-item">
+                        <a href="{{ route('admin.org.students', encrypt($activeOrg->id)) }}" class="menu-link ">
+                            <i class="menu-icon icon-base ri ri-graduation-cap-line"></i>
+                            <div>Students</div>
+                        </a>
+
+                    </li>
+                @endif
+                @if ($canOrg('org.course.view'))
+                    <li class="menu-item">
+                        <a href="javascript:void(0);" class="menu-link">
+                            <i class="menu-icon icon-base ri ri-book-open-line"></i>
+                            <div>All Courses</div>
+                        </a>
+                    </li>
+                @endif
+                @if ($canOrg('org.module.view'))
+                    <li class="menu-item">
+                        <a href="javascript:void(0);" class="menu-link">
+                            <i class="menu-icon icon-base ri ri-layout-masonry-line"></i>
+                            <div>Modules & Lessons</div>
+                        </a>
+                    </li>
+                @endif
+                @if ($canOrg('org.assessment.view'))
+                    <li class="menu-item">
+                        <a href="javascript:void(0);" class="menu-link ">
+                            <i class="menu-icon icon-base ri ri-file-list-3-line"></i>
+                            <div>Assessments</div>
                         </a>
                     </li>
                 @endif
                 {{-- Side bar can be add here ritz from sidebar_orgMode.txt file- --}}
                 @if ($canOrg('org.settings.view'))
                     <li class="menu-item">
-                        <a href="javascript:void(0);" class="menu-link menu-toggle">
+                        <a href="{{ route('admin.org.edit', $activeOrg->id) }}" class="menu-link">
                             <i class="menu-icon icon-base ri ri-settings-3-line"></i>
                             <div>Org Settings</div>
                         </a>
-                        <ul class="menu-sub">
-                            {{-- <li class="menu-item">
-                                <a href="{{ route('admin.org.settings.index', $activeOrg->id) }}" class="menu-link">
-                                    <div>General</div>
-                                </a>
-                            </li> --}}
-                            @if ($canOrg('org.settings.edit'))
-                                <li class="menu-item">
-                                    <a href="{{ route('admin.org.edit', $activeOrg->id) }}" class="menu-link">
-                                        <div>Edit Organisation</div>
-                                    </a>
-                                </li>
-                            @endif
-                        </ul>
                     </li>
                 @endif
-
                 {{-- Switch Organisation --}}
                 @if ($isSuperAdmin)
                     @php $adminOrgs = \App\Models\Master\Organisation::active()->limit(5)->get(); @endphp
                 @else
                     @php $adminOrgs = $authAdmin->organisations; @endphp
                 @endif
-
                 @if ($adminOrgs->count() > 1)
                     <li class="menu-header small mt-4">
                         <span class="menu-header-text text-uppercase"
@@ -193,7 +210,7 @@ new class extends Component {
                     @foreach ($adminOrgs as $org)
                         @if ($org->id !== $activeOrg->id)
                             <li class="menu-item">
-                                <a href="{{ route('admin.org.dashboard', $org->id) }}" class="menu-link">
+                                <a href="{{ route('admin.org.dashboard', encrypt($org->id)) }}" class="menu-link">
                                     <span class="menu-icon">
                                         <i class="ri ri-building-line"></i>
                                     </span>
@@ -342,21 +359,7 @@ new class extends Component {
                         </span>
                     </li>
 
-                    @if ($canSystem('system.student.view'))
-                        <li class="menu-item">
-                            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                                <i class="menu-icon icon-base ri ri-graduation-cap-line"></i>
-                                <div>Students</div>
-                            </a>
-                            <ul class="menu-sub">
-                                <li class="menu-item">
-                                    <a href="#" class="menu-link">
-                                        <div>All Students</div>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                    @endif
+
 
                     @if ($canSystem('system.admin.view'))
                         <li class="menu-item">
@@ -421,6 +424,12 @@ new class extends Component {
                             <div>Reports</div>
                         </a>
                         <ul class="menu-sub">
+
+                            <li class="menu-item">
+                                <a href="{{ route('admin.reports.reports.student-list') }}" class="menu-link">
+                                    <div>All Students</div>
+                                </a>
+                            </li>
                             <li class="menu-item">
                                 <a href="#" class="menu-link">
                                     <div>Overview</div>

@@ -54,7 +54,7 @@ class OrganisationList extends Component
         }
 
         OrganisationContext::set($id);
-        $this->redirect(route('admin.organisations.dashboard', $id), navigate: false);
+        $this->redirect(route('admin.organisations.dashboard', encrypt($id)), navigate: false);
     }
 
     public function deleteOrganisation(int $id): void

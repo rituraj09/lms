@@ -20,9 +20,9 @@ new class extends Component {
                         <script>
                             document.write(new Date().getFullYear());
                         </script>
-                        &nbsp;&mdash; Made with ❤️ by
-                        <a href="#" target="_blank" class="footer-link fw-semibold text-primary">
-                            {{ config('app.name') }}
+                        &nbsp;&mdash; Powered by
+                        <a href="https://www.mindshiksha.com" target="_blank" class="footer-link fw-semibold text-primary">
+                            {{ config('app.name') }} EdTech Pvt. Ltd.
                         </a>
                     </span>
                     <span class="badge bg-label-success ms-1" style="font-size: 0.62rem;">
