@@ -9,7 +9,8 @@ Route::view('/cognitive', 'website.cognitive')
 
 Route::view('/life-skill', 'website.life-skill')
     ->name('life-skill');
-
+Route::view('/leadership-skill', 'website.leadership')
+    ->name('leadership-skill');
 Route::view('/solutions', 'website.solutions')
     ->name('solutions');
 

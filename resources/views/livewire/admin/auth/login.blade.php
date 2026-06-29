@@ -275,7 +275,7 @@
 
                     {{-- Buttons --}}
                     <div class="col-12 d-flex justify-content-around my-8">
-                        <a class="btn btn-secondary waves-effect waves-light" href="{{ route('home') }}">
+                        <a class="btn btn-secondary waves-effect waves-light" href="https://www.mindshiksha.com">
                             <span class="icon-base ri ri-arrow-left-long-line me-1"></span>
                             Cancel
                         </a>

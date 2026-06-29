@@ -19,11 +19,15 @@
                 <div class="nav-dropdown-menu">
                     <a href="{{ route('cognitive') }}"
                         class="nav-dropdown-item {{ request()->routeIs('cognitive') ? 'active' : '' }}">
-                        <i class="fas fa-brain"></i> Cognitive Skill Framework
+                    Cognitive Skill Framework
                     </a>
                     <a href="{{ route('life-skill') }}"
                         class="nav-dropdown-item  {{ request()->routeIs('life-skill') ? 'active' : '' }}">
-                        <i class="fas fa-heart"></i> Life Skill Framework
+                         Life Skill Framework
+                    </a>
+                    <a href="{{ route('leadership-skill') }}"
+                       class="nav-dropdown-item  {{ request()->routeIs('leadership-skill') ? 'active' : '' }}">
+                         Leadership Skill Framework
                     </a>
                 </div>
             </div>
@@ -59,6 +63,8 @@
         Cognitive Framework</a>
     <a href="{{ route('life-skill') }}" class="mobile-nav-link" onclick="navigateTo('lifeskill');toggleMobileMenu()">
         Life Skill Framework</a>
+    <a href="{{ route('leadership-skill') }}" class="mobile-nav-link" onclick="navigateTo('lifeskill');toggleMobileMenu()">
+        Leadership Skill Framework</a>
     <a href="{{ route('solutions') }}" class="mobile-nav-link" onclick="navigateTo('solutions');toggleMobileMenu()">
         Solutions</a>
     <a href="{{ route('use-cases') }}" class="mobile-nav-link" onclick="navigateTo('usecases');toggleMobileMenu()">

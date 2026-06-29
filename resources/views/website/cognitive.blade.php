@@ -125,7 +125,7 @@
     <section>
         <div class="container">
             <div class="center reveal"><span class="eyebrow">Skill by Skill</span>
-                <h2>Explore Each Cognitive Domain</h2>
+                <h2>The Skill We Access & Develops</h2>
             </div>
             <div style="margin-top:36px;max-width:860px;margin-inline:auto">
                 <!-- Repeatable accordion block -->
@@ -222,7 +222,7 @@
     <section style="background:var(--secondary);color:#cbd5e1">
         <div class="container">
             <div class="center reveal"><span class="eyebrow">In the Platform</span>
-                <h2 style="color:#fff">How MindShiksha Implements This Framework</h2>
+                <h2 style="color:#fff">How MindShiksha Framework Works</h2>
             </div>
             <div class="steps reveal" style="margin-top:48px">
                 <div class="step">

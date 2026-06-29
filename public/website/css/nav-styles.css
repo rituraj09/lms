@@ -3,13 +3,29 @@
    NAVIGATION
 ============================================================ */
 .nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-  background: rgba(255,255,255,0.92); backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--gray-100);
-  transition: var(--transition);
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    transition: var(--transition);
+
+    /* Subtle bottom shade */
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.04),
+        0 4px 16px rgba(0, 0, 0, 0.06),
+        0 1px 0 rgba(255, 255, 255, 0.8) inset;
 }
+
 .nav.scrolled {
-  box-shadow: var(--shadow-md); background: rgba(255,255,255,0.98);
+    background: rgba(255, 255, 255, 0.98);
+    border-bottom: 1px solid rgba(203, 213, 225, 0.9);
+
+    /* Deeper shade when scrolled */
+    box-shadow:
+        0 1px 4px rgba(0, 0, 0, 0.06),
+        0 8px 24px rgba(0, 0, 0, 0.08),
+        0 1px 0 rgba(255, 255, 255, 0.9) inset;
 }
 
 .nav-inner {
@@ -56,9 +72,16 @@
   box-shadow: var(--shadow-xl); border: 1px solid var(--gray-100);
   padding: 0.75rem; min-width: 220px; opacity: 0; visibility: hidden;
   transition: var(--transition); z-index: 100;
+
+
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.04),
+        0 8px 24px rgba(0, 0, 0, 0.08),
+        0 20px 40px rgba(0, 0, 0, 0.06),
+        0 1px 0 rgba(255, 255, 255, 0.9) inset;
 }
 .nav-dropdown:hover .nav-dropdown-menu {
-  opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0);
+    opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0);
 }
 .nav-dropdown-item {
   display: flex; align-items: center; gap: 0.6rem;
