@@ -6,13 +6,12 @@
         <div class="container hero-grid">
             <div>
                 <span class="eyebrow">⚡ Smarter Minds. Stronger Futures.</span>
-                <h1>AI-Powered Learning Management for Cognitive &amp; Life Skills</h1>
-                <p>MindShiksha turns research-backed cognitive science and life-skill frameworks into personalized,
-                    age-aware digital learning journeys — built for India's schools, colleges, and skilling programs.
+                <h1>AI- Powered Learning Management System for Cognitive, Life & Leadership Skills Development</h1>
+                <p>MindShiksha provides personalized learning & assessment framework for continuous development of Intelligent Quotient (IQ), Emotional Quotient (EQ) and Leadership Quotient (LQ).
                 </p>
                 <div class="hero-actions">
                     <a href="{{ route('contact') }}" class="btn btn-primary">Request a Demo →</a>
-                    <a href="{{ route('cognitive') }}" class="btn btn-ghost">Explore Cognitive Framework</a>
+                    <a href="{{ route('cognitive') }}" class="btn btn-ghost">Explore the Framework</a>
                 </div>
             </div>
             <div class="hero-visual">

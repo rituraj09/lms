@@ -41,7 +41,7 @@
         </div>
 
         <div class="nav-actions">
-            <a href="/admin/login" class="btn btn-secondary demo-btn">
+            <a href="https://hub.mindshiksha.com/admin/login" class="btn btn-secondary demo-btn">
                 <i class="fas fa-sign-in"></i>
                 Login</a>
             <a href="{{ route('contact') }}" class="btn btn-primary demo-btn">
@@ -54,23 +54,27 @@
 
 <!-- Mobile Menu -->
 <div class="mobile-menu" id="mobileMenu">
-    <a href="{{ route('home') }}" class="mobile-nav-link" onclick="navigateTo('home');toggleMobileMenu()">🏠 Home</a>
-    <a href="{{ route('cognitive') }}" class="mobile-nav-link" onclick="navigateTo('cognitive');toggleMobileMenu()">🧠
+    <a href="{{ route('home') }}" class="mobile-nav-link" onclick="navigateTo('home');toggleMobileMenu()">Home</a>
+    <a href="{{ route('cognitive') }}" class="mobile-nav-link" onclick="navigateTo('cognitive');toggleMobileMenu()">
         Cognitive Framework</a>
-    <a href="{{ route('life-skill') }}" class="mobile-nav-link" onclick="navigateTo('lifeskill');toggleMobileMenu()">💚
+    <a href="{{ route('life-skill') }}" class="mobile-nav-link" onclick="navigateTo('lifeskill');toggleMobileMenu()">
         Life Skill Framework</a>
-    <a href="{{ route('solutions') }}" class="mobile-nav-link" onclick="navigateTo('solutions');toggleMobileMenu()">💡
+    <a href="{{ route('solutions') }}" class="mobile-nav-link" onclick="navigateTo('solutions');toggleMobileMenu()">
         Solutions</a>
-    <a href="{{ route('use-cases') }}" class="mobile-nav-link" onclick="navigateTo('usecases');toggleMobileMenu()">👥
+    <a href="{{ route('use-cases') }}" class="mobile-nav-link" onclick="navigateTo('usecases');toggleMobileMenu()">
         For Whom</a>
-    <a href="{{ route('about') }}" class="mobile-nav-link" onclick="navigateTo('about');toggleMobileMenu()">ℹ️
+    <a href="{{ route('about') }}" class="mobile-nav-link" onclick="navigateTo('about');toggleMobileMenu()">
         About</a>
-    <a href="{{ route('resources') }}" class="mobile-nav-link" onclick="navigateTo('resources');toggleMobileMenu()">📚
+    <a href="{{ route('resources') }}" class="mobile-nav-link" onclick="navigateTo('resources');toggleMobileMenu()">
         Resources</a>
-    <a href="{{ route('contact') }}" class="mobile-nav-link" onclick="navigateTo('contact');toggleMobileMenu()">📞
+    <a href="{{ route('contact') }}" class="mobile-nav-link" onclick="navigateTo('contact');toggleMobileMenu()">
         Contact</a>
     <div style="margin-top:1rem;">
-        <button class="btn btn-primary" style="width:100%;justify-content:center;"
+
+        <a href="https://hub.mindshiksha.com/admin/login" class="btn btn-secondary  " style="width:100%;justify-content:center;">
+                <i class="fas fa-sign-in"></i> Login
+        </a>
+        <button class="btn btn-primary" style="margin-top:10px;width:100%;justify-content:center;"
             onclick="navigateTo('contact');toggleMobileMenu()">
             <i class="fas fa-calendar-alt"></i> Request a Demo
         </button>

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <link rel="icon" type="image/x-icon" href="{{ asset('brand-logo/logo-alt/favicon.ico') }}">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>MindShiksha – Smarter Minds. Stronger Futures.</title>
+    <title>MindShiksha EdTech– Smarter Minds. Stronger Futures.</title>
     <meta name="description"
         content="AI-powered LMS for Cognitive & Life Skills development in the Indian education ecosystem.">
 
