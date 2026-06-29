@@ -15,6 +15,7 @@ use App\Livewire\Admin\Student\ManageStudents;
 use App\Livewire\Admin\Student\StudentForm;
 use App\Livewire\Admin\Student\StudentDetails;
 use App\Livewire\Admin\Reports\StudentList;
+use App\Livewire\Admin\Dashboard;
 
 // ── Guest Routes (not logged in) ──────────────────────────────────
 Route::middleware('redirect.auth:admin')->group(function ($router) {
@@ -24,7 +25,9 @@ Route::middleware('redirect.auth:admin')->group(function ($router) {
 // ── Authenticated Routes ──────────────────────────────────────────
 
 Route::group(['middleware' => ['redirect.notauth:admin','auth:admin']], function ($router) {
-    $router->livewire('home', 'admin.home')->name('home');
+
+    $router->get('/home', Dashboard::class)
+        ->name('home');
     // ────────────────────────────────────────────────────────────
     // SYSTEM LEVEL - QUESTION BANK
     // ────────────────────────────────────────────────────────────
