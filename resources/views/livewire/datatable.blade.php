@@ -50,8 +50,149 @@
                                 <span class="icon-base ri ri-file-excel-2-fill"></span>
                                 Export
                             </button>
-
                         @endif
+
+                        {{-- ✅ ADD THIS --}}
+                        <button
+                            x-data
+                            @click="
+                                        $wire.getPrintData().then(data => {
+                                            const win = window.open('', '_blank');
+                                            win.document.write(`
+                                                <!DOCTYPE html>
+                                                <html>
+                                                <head>
+                                                    <title>${data.title}</title>
+                                                    <style>
+                                                        * { box-sizing: border-box; margin: 0; padding: 0; }
+                                                        body {
+                                                            font-family: 'Segoe UI', Arial, sans-serif;
+                                                            font-size: 12px;
+                                                            color: #1a1a2e;
+                                                            padding: 32px;
+                                                            background: #fff;
+                                                        }
+                                                        .print-header {
+                                                            display: flex;
+                                                            justify-content: space-between;
+                                                            align-items: flex-end;
+                                                            border-bottom: 2px solid #4361ee;
+                                                            padding-bottom: 12px;
+                                                            margin-bottom: 20px;
+                                                        }
+                                                        .print-header h1 {
+                                                            font-size: 20px;
+                                                            font-weight: 700;
+                                                            color: #4361ee;
+                                                            letter-spacing: .5px;
+                                                        }
+                                                        .print-meta {
+                                                            font-size: 11px;
+                                                            color: #6c757d;
+                                                            text-align: right;
+                                                            line-height: 1.6;
+                                                        }
+                                                        table {
+                                                            width: 100%;
+                                                            border-collapse: collapse;
+                                                            margin-top: 4px;
+                                                        }
+                                                        thead tr {
+                                                            background: #4361ee;
+                                                            color: #fff;
+                                                        }
+                                                        thead th {
+                                                            padding: 9px 12px;
+                                                            text-align: left;
+                                                            font-size: 11px;
+                                                            font-weight: 600;
+                                                            letter-spacing: .5px;
+                                                            text-transform: uppercase;
+                                                            white-space: nowrap;
+                                                        }
+                                                        tbody tr:nth-child(even) { background: #f4f6fb; }
+                                                        tbody tr:nth-child(odd)  { background: #ffffff; }
+                                                        tbody tr:last-child td   { border-bottom: 2px solid #4361ee; }
+                                                        tbody td {
+                                                            padding: 8px 12px;
+                                                            border-bottom: 1px solid #e9ecef;
+                                                            vertical-align: middle;
+                                                        }
+                                                        .print-footer {
+                                                            margin-top: 20px;
+                                                            font-size: 10px;
+                                                            color: #adb5bd;
+                                                            text-align: center;
+                                                            border-top: 1px solid #e9ecef;
+                                                            padding-top: 10px;
+                                                        }
+                                                        .total-badge {
+                                                            display: inline-block;
+                                                            background: #e8ecfd;
+                                                            color: #4361ee;
+                                                            border-radius: 99px;
+                                                            padding: 2px 10px;
+                                                            font-size: 11px;
+                                                            font-weight: 600;
+                                                            margin-top: 4px;
+                                                        }
+                                                        @media print {
+                                                            body { padding: 16px; }
+                                                            .no-print { display: none !important; }
+                                                        }
+                                                    </style>
+                                                </head>
+                                                <body>
+                                                    <div class='print-header'>
+                                                        <div>
+                                                            <h1>${data.title}</h1>
+                                                            <span class='total-badge'>${data.rows.length} record${data.rows.length !== 1 ? 's' : ''}</span>
+                                                        </div>
+                                                        <div class='print-meta'>
+                                                            Printed by: {{ auth()->user()->name ?? 'System' }}<br>
+                                                            Date: ${new Date().toLocaleDateString('en-GB', {
+                                                                day: '2-digit', month: 'short', year: 'numeric'
+                                                            })}<br>
+                                                            Time: ${new Date().toLocaleTimeString()}
+                                                        </div>
+                                                    </div>
+
+                                                    <table>
+                                                        <thead>
+                                                            <tr>
+                                                                <th style='width:36px'>#</th>
+                                                                ${data.headers.map(h => `<th>${h}</th>`).join('')}
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            ${data.rows.map((row, i) =>
+                                                                `<tr>
+                                                                    <td style='color:#adb5bd;font-size:11px'>${i + 1}</td>
+                                                                    ${data.keys.map(k =>
+                                                                        `<td>${row[k] ?? '—'}</td>`
+                                                                    ).join('')}
+                                                                </tr>`
+                                                            ).join('')}
+                                                        </tbody>
+                                                    </table>
+
+                                                    <div class='print-footer'>
+                                                        Generated from {{ config('app.name') }} &bull; ${new Date().toISOString()}
+                                                    </div>
+                                                </body>
+                                                </html>
+                                            `);
+                                            win.document.close();
+                                            win.focus();
+                                            setTimeout(() => { win.print(); }, 400);
+                                        })
+                                    "
+                            class="btn btn-danger btn-fab btn-sm demo waves-effect waves-light"
+                            title="Print Table"
+                        >
+                            <span class="icon-base ri ri-printer-line"></span>
+                            Print
+                        </button>
                         @if($newEntry)
                             <button class="btn btn-primary btn-fab btn-sm demo waves-effect waves-light ms-1" wire:click="dispatchEntry">
                                     <span class="icon-base ri ri-add-line">

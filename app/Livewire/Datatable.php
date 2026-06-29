@@ -289,7 +289,77 @@ class Datatable extends Component
     {
         return view('livewire.datatable');
     }
+// ─────────────────────────────────────────────────────────
+// Print
+// ─────────────────────────────────────────────────────────
 
+    public function getPrintData(): array
+    {
+        $printable = collect($this->columns)
+            ->where('type', '!=', 'actions')
+            ->where('hidden', '!=', true)
+            ->toArray();
+
+        $headers = collect($printable)->pluck('label')->toArray();
+        $keys    = collect($printable)->pluck('key')->toArray();
+        $types   = collect($printable)->pluck('type', 'key')->toArray();
+
+        /** @var Builder $query */
+        $query = ($this->model)::query();
+
+        if ($this->search !== '') {
+            $searchable = collect($this->columns)->where('searchable', true)->pluck('key');
+            $query->where(function (Builder $q) use ($searchable) {
+                foreach ($searchable as $col) {
+                    $q->orWhere($col, 'like', '%' . $this->search . '%');
+                }
+            });
+        }
+
+        foreach ($this->activeFilters as $key => $value) {
+            if ($value !== '' && $value !== null) {
+                $query->where($key, $value);
+            }
+        }
+
+        if ($this->sortBy) {
+            $query->orderBy($this->sortBy, $this->sortDir);
+        }
+
+        $records = $query->get();
+
+        $rows = $records->map(function ($record) use ($keys, $printable) {
+            $row = [];
+            foreach ($printable as $col) {
+                $key   = $col['key'];
+                $type  = $col['type'] ?? 'text';
+                $value = data_get($record, $key, '');
+
+                $row[$key] = match ($type) {
+                    'boolean' => $value ? 'Yes' : 'No',
+                    'switch'  => $value ? ($col['onLabel'] ?? 'Active') : ($col['offLabel'] ?? 'Inactive'),
+                    'date'    => $value
+                        ? \Carbon\Carbon::parse($value)->format($col['format'] ?? 'd-m-Y')
+                        : '—',
+                    'datetime' => $value
+                        ? \Carbon\Carbon::parse($value)->format($col['format'] ?? 'd-m-Y H:i')
+                        : '—',
+                    'currency' => ($col['currency'] ?? '₹') . number_format((float)$value, 2),
+                    'badge'    => $value,
+                    'image'    => '(image)',
+                    default    => $value ?? '—',
+                };
+            }
+            return $row;
+        })->toArray();
+
+        return [
+            'title'   => $this->title,
+            'headers' => $headers,
+            'keys'    => $keys,
+            'rows'    => $rows,
+        ];
+    }
     #[On('refresh-table')]
     public function refreshTable(): void
     {
