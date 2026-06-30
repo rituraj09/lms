@@ -13,35 +13,33 @@
     <div class="container">
         <div class="footer-grid">
             <div>
-                <a href="index" class="logo" style="color:#fff;margin-bottom:14px;display:flex;align-items:center;gap:12px">
-                    <img src="{{ asset('brand-logo/logo-alt/logo-only.png') }}" alt="MindShiksha EdTech Logo" style="width:40px;height:auto;object-fit:contain;flex-shrink:0">
-                    <span>MindShiksha EdTech Private Limited</span>
-
-                </a>
-                <span>CIN-U62011AS2026PTC030649</span>
-                <p style="font-size:.9rem">Smarter Minds. Stronger Futures. AI-powered learning solution for cognitive &amp; life and leadership
-                    skills.</p>
+                <a href="#" class="logo" style="color:#fff;margin-bottom:14px"><span
+                        class="logo-mark"></span>MindShiksha EdTech Private Limited</a>
+                <p>CIN: U62011AS2026PTC030649</p>
+                <p style="font-size:.9rem">Smarter Minds, Stronger Future. AI Powered Learning Solution for Cognitive, Life and Leadership Skills</p>
                 <div class="socials" style="margin-top:18px">
                     <a href="#">in</a><a href="#">𝕏</a><a href="#">f</a><a href="#">▶</a>
                 </div>
             </div>
             <div>
-                <h4>Frameworks</h4><a href="cognitive-framework">Cognitive Skills</a><a href="life-skill-framework">Life
-                    Skills</a><a href="{{ route('leadership-skill') }}">Leadership Skills</a>
+                <h4>Frameworks</h4><a href="{{route('cognitive')}}">Cognitive Skills</a><a href="{{route('life-skill')}}">Life
+                    Skills</a><a href="{{route('solutions')}}">Leadership Skills</a>
             </div>
             <div>
-                <h4>Company</h4><a href="about">About</a><a href="use-cases">Blogs</a><a
-                    href="resources">Resources</a>
+                <h4>Company</h4><a href="{{route('about')}}">About</a><a href="{{route('use-cases')}}">Blogs</a><a
+                    href="{{route('resources')}}">Resources</a>
             </div>
             <div>
-                <h4>Get Started</h4><a href="contact">Request a Demo</a><a href="contact">Contact</a>
+                <h4>Get Started</h4><a href="{{route('contact')}}">Request a Demo</a><a href="{{route('contact')}}">Contact</a>
             </div>
         </div>
         <div class="footer-bottom">
             <span>© {{ date('Y') }} MindShiksha EdTech Private Limited. All rights reserved.</span>
+            <span>Powered by research-backed Cognitive &amp; Life Skill Development Frameworks.</span>
         </div>
     </div>
 </footer>
+
 <script src="{{ asset('website/js/main.js') }}"></script>
 <script>
     // ============================================================
