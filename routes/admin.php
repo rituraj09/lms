@@ -211,7 +211,7 @@ Route::group(['middleware' => ['redirect.notauth:admin','auth:admin']], function
     });
     // Logout
     $router->post('/logout', function () {
-        OrganisationContext::clear();
+//        OrganisationContext::clear();
         Auth::guard('admin')->logout();
         request()->session()->invalidate();
         request()->session()->regenerateToken();

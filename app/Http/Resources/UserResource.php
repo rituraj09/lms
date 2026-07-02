@@ -25,7 +25,7 @@ class UserResource extends JsonResource
             'full_name'       => $this->full_name,
             'student_id'      => $this->student_id,
             'organisation_id' => $this->organisation_id,
-            'details'         => $this->whenLoaded('details'),
+            'details'         =>new UserDetailResource($this->whenLoaded('details')),
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
         ];
     }
