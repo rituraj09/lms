@@ -3,30 +3,18 @@
 
 namespace App\Models\QuestionMaster;
 
+use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+#[Unguarded]
 class Question extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = [
-        'question_group_id',
-        'question_code',
-        'primary_skill_id',
-        'sub_skill_id',
-        'difficulty_level_id',
-        'age_group_id',
-        'answer_category',
-        'question_content',
-        'explaination',
-        'admin_notes',
-        'created_by',
-        'updated_by',
-    ];
 
     protected $casts = [
         'question_content' => 'array',

@@ -5,7 +5,7 @@
     <div class="mb-4">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('admin.assessments.view') }}">Assessments</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('admin.assessments.assessment_list') }}">Assessments</a></li>
                 <li class="breadcrumb-item active">Assign to Organisations</li>
             </ol>
         </nav>
@@ -30,18 +30,50 @@
         </div>
         <div class="card-body">
             <div class="row g-3 mt-3">
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <small class="text-muted d-block mb-1">Code</small>
                     <span class="badge bg-secondary fs-6">{{ $assessment->assessment_code }}</span>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <small class="text-muted d-block mb-1">Title</small>
                     <strong>{{ $assessment->title }}</strong>
                 </div>
-                <div class="col-md-3">
-                    <small class="text-muted d-block mb-1">Age Group</small>
-                    <span class="badge bg-info-subtle text-info">{{ $assessment->ageGroup->name ?? 'N/A' }}</span>
+                <div class="col-md-2">
+                    <small class="text-muted d-block mb-1">Assessment Type</small>
+                    <span class="badge bg-info-subtle text-info">{{ strtoupper($assessment->assessment_type_id ?? '_') }}</span>
                 </div>
+                <div class="col-md-2">
+                    <small class="text-muted d-block mb-1">Age Group</small>
+                    <span class="badge bg-warning-subtle text-warning">{{ $assessment->ageGroup->name ?? 'N/A' }}</span>
+                </div>
+                <div class="col-md-2">
+                    <small class="text-muted d-block mb-1">Difficulty Level</small>
+                    <span class="badge bg-danger-subtle text-danger">{{ $assessment->difficultyLevel->level ?? 'N/A' }}</span>
+                </div>
+                <div class="col-md-2">
+                    <small class="text-dark d-block mb-1">Total Questions</small>
+                    {{ $assessment->assessment_questions_count  }}
+                </div>
+                <div class="col-md-2">
+                    <small class="text-dark d-block mb-1">Total Marks</small>
+                    {{ $assessment->total_marks ?? 0 }}
+                </div>
+                <div class="col-md-2">
+                    <small class="text-dark d-block mb-1">Passing Marks</small>
+
+                    {{ $assessment->passing_marks  }}
+                </div>
+                @if ($assessment->has_negative_mark)
+                    <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle"
+                      data-bs-toggle="tooltip" title="Negative Marking Enabled">
+                        <i class="ri ri-subtract-line me-1"></i>Negative Mark
+                    </span>
+                @endif
+                <div class="col-md-2">
+                    <small class="text-dark d-block mb-1">Duration</small>
+                    {{ $assessment->duration_minutes }} min
+                </div>
+
             </div>
         </div>
     </div>
@@ -127,14 +159,14 @@
                         </div>
 
                         {{-- Select All Checkbox --}}
-                        <div class="form-check mb-3 p-3 bg-light rounded">
+                        <div class="form-check mb-3 pb-3 pt-3 ps-3 bg-light rounded">
                             <input
-                                class="form-check-input"
+                                class="form-check-input  ms-0"
                                 type="checkbox"
                                 id="selectAll"
                                 wire:model.live="selectAll"
                             >
-                            <label class="form-check-label fw-semibold" for="selectAll">
+                            <label class="form-check-label fw-semibold  ms-2" for="selectAll">
                                 Select All Organisations ({{ $organisations->total() }} total)
                             </label>
                         </div>
@@ -170,14 +202,7 @@
                                         </td>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <div class="avatar avatar-sm me-2">
-                                                    <img
-                                                        src="{{ $organisation->logo_url }}"
-                                                        alt="{{ $organisation->name }}"
-                                                        class="avatar-img rounded-circle"
-                                                        onerror="this.src='{{ asset('assets/images/default-org.png') }}'"
-                                                    >
-                                                </div>
+
                                                 <div>
                                                     <div class="fw-semibold">{{ $organisation->name }}</div>
                                                     @if($organisation->email)

@@ -30,7 +30,12 @@ class StudentList extends Component
         $this->selectedUser = User::with(['details', 'organisation'])->findOrFail($id);
         $this->view = 1;
     }
-
+    #[On('report_card')]
+    public function viewUserReport(int $id): void
+    {
+        $this->redirect(
+            route('admin.reports.detailed-report', ['studentId' => $id]),   navigate: false);
+    }
     public function backToList(): void
     {
         $this->view = 0;

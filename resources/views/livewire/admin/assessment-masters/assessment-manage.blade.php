@@ -94,9 +94,12 @@
                                 <select wire:model="assessment_type_id"
                                         class="form-select @error('assessment_type_id') is-invalid @enderror">
                                     <option value="">— Select Type —</option>
-                                    @foreach ($assessmentTypes as $key => $label)
-                                        <option value="{{ $key }}">{{ $label }}</option>
+                                    @foreach (\App\Helper\Globals::ASSESSMENT_TYPES as $type)
+                                        <option value="{{ $type }}">
+                                            {{ strtoupper($type) }}
+                                        </option>
                                     @endforeach
+
                                 </select>
                                 @error('assessment_type_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -119,6 +122,22 @@
                                 @enderror
                             </div>
 
+                            <div class="col-md-4">
+                                <label class="form-label fw-medium small">
+                                    Difficulty Level
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <select wire:model="difficulty_level_id"
+                                        class="form-select @error('difficulty_level_id') is-invalid @enderror">
+                                    <option value="">— Select Difficulty Level —</option>
+                                    @foreach ($difficultyLevels as $dl)
+                                        <option value="{{ $dl['id'] }}">{{ $dl['name'] }}</option>
+                                    @endforeach
+                                </select>
+                                @error('difficulty_level_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
                             {{-- Cover Image --}}
                             <div class="col-12">
                                 <label class="form-label fw-medium small">

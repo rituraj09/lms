@@ -2,11 +2,12 @@
 
 use App\Livewire\Admin\Questions\QuestionGroupIndex;
 use App\Livewire\Admin\Questions\QuestionGroupForm;
-use App\Livewire\Admin\Assessments\AssessmentManager;
 use App\Livewire\Admin\Assessments\AssessmentList  as OldAssessmentList; // ← alias old one
 use App\Livewire\Admin\Assessments\AssignAssessment;
 use App\Livewire\Admin\Assessments\PreviewAssessment;
 use App\Livewire\Admin\Auth\Login;
+use App\Livewire\Admin\Reports\StudentDetailedReport;
+use App\Livewire\Admin\Reports\StudentReportCard;
 use App\Services\OrganisationContext;
 use App\Livewire\Admin\AssessmentMasters\AssessmentList;
 use App\Livewire\Admin\AssessmentMasters\AssessmentManage;
@@ -135,6 +136,8 @@ Route::group(['middleware' => ['redirect.notauth:admin','auth:admin']], function
     // student list
         $router->get('student-list', StudentList::class)
             ->name('reports.student-list');
+        $router->get('/student-report-cards', StudentReportCard::class)->name('report-cards');
+        $router->get('/student-detailed-report/{studentId}', StudentDetailedReport::class)->name('detailed-report');
     });
 
     // ────────────────────────────────────────────────────────────

@@ -489,6 +489,7 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
+
                                 {{-- ── Cover Image ─────────────────────────────────────── --}}
                                 <div class="col-12">
                                     <label class="form-label fw-medium small">

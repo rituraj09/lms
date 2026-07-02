@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\TestAttempt\UserPromotionDetail;
 
  #[Unguarded]
 class User extends Authenticatable
@@ -105,4 +106,27 @@ class User extends Authenticatable
     {
         return $this->hasMany(TestAttempt::class, 'user_id');
     }
+     public function completedTestAttempts()
+     {
+         return $this->hasMany(TestAttempt::class)->where('status', 'submitted');
+     }
+
+     /**
+      * Relationship with UserPromotions
+      */
+     public function userPromotions()
+     {
+         return $this->hasMany(UserPromotionDetail::class, 'user_id');
+     }
+
+     /**
+      * Get active promotion for specific assessment type
+      */
+     public function activePromotion($assessmentType)
+     {
+         return $this->userPromotions()
+             ->active()
+             ->ofAssessmentType($assessmentType)
+             ->first();
+     }
 }

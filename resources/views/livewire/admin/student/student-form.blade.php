@@ -650,7 +650,7 @@
                         </div>
                     </div>
                     <div class="modal-footer border-0 pt-0">
-                        <a href="{{ route('admin.org.students') }}"
+                        <a href="{{ route('admin.org.students',['organisationId' => Crypt::encrypt($organisationId)]) }}"
                                 class="btn btn-primary btn-lg w-100">
                             <i class="ri ri-check-line me-1"></i>
                             Got it, Go to Student List

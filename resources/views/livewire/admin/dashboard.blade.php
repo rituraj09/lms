@@ -33,18 +33,16 @@
         {{-- ══════════════════════════════════════════════════════════ --}}
         <div class="row g-4 mb-5">
             {{-- Total Assessments --}}
-            <div class="col-sm-6 col-xl-3">
-                <div class="glass-card h-100 position-relative overflow-hidden">
-                    <div class="position-absolute top-0 end-0 opacity-10" style="font-size: 120px; line-height: 1; margin-top: -20px; margin-right: -20px;">
-                        <i class="ri ri-file-list-3-line"></i>
-                    </div>
+            <div class=" col-sm-6 col-xl-3">
+                <div class="card h-100 position-relative overflow-hidden" style="background: rgba(255,255,255,0.95);">
+
                     <div class="card-body p-4 position-relative" style="z-index: 1;">
                         <div class="d-flex align-items-start justify-content-between mb-3">
                             <div>
                                 <p class="text-white-50 text-uppercase mb-2" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 1px;">
                                     Total Assessments
                                 </p>
-                                <h2 class="text-white mb-0 fw-bold" style="font-size: 2.5rem;">
+                                <h2 class="text-dark mb-0 fw-bold" style="font-size: 2.5rem;">
                                     {{ number_format($this->totalAssessments) }}
                                 </h2>
                             </div>
@@ -66,17 +64,15 @@
 
             {{-- Total Questions --}}
             <div class="col-sm-6 col-xl-3">
-                <div class="glass-card h-100 position-relative overflow-hidden">
-                    <div class="position-absolute top-0 end-0 opacity-10" style="font-size: 120px; line-height: 1; margin-top: -20px; margin-right: -20px;">
-                        <i class="ri ri-question-line"></i>
-                    </div>
-                    <div class="card-body p-4 position-relative" style="z-index: 1;">
+                <div class="card h-100 position-relative overflow-hidden" style="background: rgba(255,255,255,0.95);">
+
+                <div class="card-body p-4 position-relative" style="z-index: 1;">
                         <div class="d-flex align-items-start justify-content-between mb-3">
                             <div>
                                 <p class="text-white-50 text-uppercase mb-2" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 1px;">
                                     Total Questions
                                 </p>
-                                <h2 class="text-white mb-0 fw-bold" style="font-size: 2.5rem;">
+                                <h2 class="text-dark mb-0 fw-bold" style="font-size: 2.5rem;">
                                     {{ number_format($this->totalQuestions) }}
                                 </h2>
                             </div>
@@ -97,17 +93,15 @@
 
             {{-- Total Students --}}
             <div class="col-sm-6 col-xl-3">
-                <div class="glass-card h-100 position-relative overflow-hidden">
-                    <div class="position-absolute top-0 end-0 opacity-10" style="font-size: 120px; line-height: 1; margin-top: -20px; margin-right: -20px;">
-                        <i class="ri ri-user-line"></i>
-                    </div>
-                    <div class="card-body p-4 position-relative" style="z-index: 1;">
+                <div class="card h-100 position-relative overflow-hidden" style="background: rgba(255,255,255,0.95);">
+
+                <div class="card-body p-4 position-relative" style="z-index: 1;">
                         <div class="d-flex align-items-start justify-content-between mb-3">
                             <div>
                                 <p class="text-white-50 text-uppercase mb-2" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 1px;">
                                     Total Students
                                 </p>
-                                <h2 class="text-white mb-0 fw-bold" style="font-size: 2.5rem;">
+                                <h2 class="text-dark mb-0 fw-bold" style="font-size: 2.5rem;">
                                     {{ number_format($this->totalStudents) }}
                                 </h2>
                             </div>
@@ -129,17 +123,15 @@
 
             {{-- Total Attempts --}}
             <div class="col-sm-6 col-xl-3">
-                <div class="glass-card h-100 position-relative overflow-hidden">
-                    <div class="position-absolute top-0 end-0 opacity-10" style="font-size: 120px; line-height: 1; margin-top: -20px; margin-right: -20px;">
-                        <i class="ri ri-file-edit-line"></i>
-                    </div>
-                    <div class="card-body p-4 position-relative" style="z-index: 1;">
+                <div class="card h-100 position-relative overflow-hidden" style="background: rgba(255,255,255,0.95);">
+
+                <div class="card-body p-4 position-relative" style="z-index: 1;">
                         <div class="d-flex align-items-start justify-content-between mb-3">
                             <div>
                                 <p class="text-white-50 text-uppercase mb-2" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 1px;">
                                     Total Attempts
                                 </p>
-                                <h2 class="text-white mb-0 fw-bold" style="font-size: 2.5rem;">
+                                <h2 class="text-dark mb-0 fw-bold" style="font-size: 2.5rem;">
                                     {{ number_format($this->totalAttempts) }}
                                 </h2>
                             </div>
@@ -167,7 +159,7 @@
                 <div class="glass-card-sm">
                     <div class="card-body p-3 d-flex align-items-center justify-content-between">
                         <div>
-                            <p class="text-white-50 mb-1 small text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Organisations</p>
+                            <p class="text-white mb-1 small text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Organisations</p>
                             <h4 class="text-white mb-0 fw-bold">{{ number_format($this->totalOrganisations) }}</h4>
                         </div>
                         <div class="icon-circle bg-primary bg-opacity-25">
@@ -180,7 +172,7 @@
                 <div class="glass-card-sm">
                     <div class="card-body p-3 d-flex align-items-center justify-content-between">
                         <div>
-                            <p class="text-white-50 mb-1 small text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Evaluated</p>
+                            <p class="text-white mb-1 small text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Evaluated</p>
                             <h4 class="text-white mb-0 fw-bold">{{ number_format($this->evaluatedAttempts) }}</h4>
                         </div>
                         <div class="icon-circle bg-success bg-opacity-25">
@@ -193,7 +185,7 @@
                 <div class="glass-card-sm">
                     <div class="card-body p-3 d-flex align-items-center justify-content-between">
                         <div>
-                            <p class="text-white-50 mb-1 small text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Avg Score</p>
+                            <p class="text-white mb-1 small text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Avg Score</p>
                             <h4 class="text-white mb-0 fw-bold">{{ $this->averageScore }}</h4>
                         </div>
                         <div class="icon-circle bg-warning bg-opacity-25">
@@ -206,7 +198,7 @@
                 <div class="glass-card-sm">
                     <div class="card-body p-3 d-flex align-items-center justify-content-between">
                         <div>
-                            <p class="text-white-50 mb-1 small text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Accuracy</p>
+                            <p class="text-white mb-1 small text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Accuracy</p>
                             <h4 class="text-white mb-0 fw-bold">{{ $this->accuracyRate }}%</h4>
                         </div>
                         <div class="icon-circle bg-info bg-opacity-25">

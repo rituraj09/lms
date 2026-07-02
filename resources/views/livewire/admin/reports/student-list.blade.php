@@ -50,6 +50,7 @@
                     ]"
                     :actions="[
                         ['label'=>'View','icon'=>'icon-base ri ri-eye-line','event'=>'edit','class'=>'btn-outline-primary'],
+                          ['label'=>'Reports','icon'=>'icon-base ri ri-bar-chart-line','event'=>'report_card','class'=>'btn-primary'],
                     ]"
                 />
             </div>

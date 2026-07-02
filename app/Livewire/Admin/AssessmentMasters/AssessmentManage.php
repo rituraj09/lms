@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin\AssessmentMasters;
 
+use App\Models\EvaluationMaster\DifficultyLevel;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
@@ -26,6 +27,8 @@ class AssessmentManage extends Component
     public string $instructions       = '';
     public string $assessment_type_id = '';
     public ?int   $age_group_id       = null;
+    public ?int   $difficulty_level_id       = null;
+
     public float  $total_marks        = 0;
     public float  $passing_marks      = 0;
     public ?int   $duration_minutes   = null;
@@ -44,6 +47,7 @@ class AssessmentManage extends Component
     public bool $show_explainations      = false;
 
     public array $ageGroups       = [];
+    public array $difficultyLevels       = [];
     public array $assessmentTypes = [
         'iq'       => 'IQ',
         'eq'       => 'EQ',
@@ -62,7 +66,9 @@ class AssessmentManage extends Component
         $this->ageGroups = AgeGroup::orderBy('name')
             ->get(['id', 'name'])
             ->toArray();
-
+        $this->difficultyLevels = DifficultyLevel::orderBy('name')
+            ->get(['id', 'name'])
+            ->toArray();
         if ($id) {
             $decryptedId = decrypt($id);
             $assessment  = Assessment::findOrFail($decryptedId);
@@ -82,6 +88,7 @@ class AssessmentManage extends Component
             $this->instructions            = $assessment->instructions ?? '';
             $this->assessment_type_id      = $assessment->assessment_type_id;
             $this->age_group_id            = $assessment->age_group_id;
+            $this->difficulty_level_id     = $assessment->difficulty_level_id;
             $this->total_marks             = (float) $assessment->total_marks;
             $this->passing_marks           = (float) $assessment->passing_marks;
             $this->duration_minutes        = $assessment->duration_minutes;
@@ -123,6 +130,7 @@ class AssessmentManage extends Component
                 'cover_image_file'        => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
                 'assessment_type_id'      => 'required|string',
                 'age_group_id'            => 'required|integer',
+                'difficulty_level_id'     => 'required|integer',
                 'passing_marks'           => 'required|numeric|min:0',
                 'duration_minutes'        => 'required|numeric|min:0',
                 'status'                  => 'required|in:draft,publish,unpublish',
@@ -139,6 +147,7 @@ class AssessmentManage extends Component
                 'cover_image_file.max'        => 'Cover image must not exceed 2MB.',
                 'assessment_type_id.required' => 'Please select an assessment type.',
                 'age_group_id.required'       => 'Please select an age group.',
+                'difficulty_level_id.required' => 'Please select an difficulty level.',
                 'passing_marks.required'      => 'Passing marks are required.',
                 'max_attempts.required'       => 'Max attempts is required.',
                 'max_attempts.min'            => 'Max attempts must be at least 1.',
@@ -170,6 +179,7 @@ class AssessmentManage extends Component
                 'instructions'            => $this->instructions,
                 'assessment_type_id'      => $this->assessment_type_id,
                 'age_group_id'            => $this->age_group_id,
+                'difficulty_level_id'     => $this->difficulty_level_id,
                 'total_marks'             => $this->total_marks,
                 'passing_marks'           => $this->passing_marks,
                 'duration_minutes'        => !empty($this->duration_minutes)

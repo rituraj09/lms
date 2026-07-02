@@ -95,11 +95,13 @@ class QuestionGroupForm extends Component
     public array $subSkillTypes     = [];
     public array $difficultyLevels  = [];
     public array $ageGroups         = [];
-
     /* ================================================================
      | INTERNAL
      * ================================================================*/
     public array $languages = [];
+
+    public bool  $showQuestionPreview = false;
+    public array $previewQuestion     = [];
 
     /* ================================================================
      | MOUNT
@@ -691,6 +693,29 @@ class QuestionGroupForm extends Component
         $this->optionImages = array_values($this->optionImages);
     }
 
+    /**
+     * Auto-calculate marks from total weightage
+     * whenever any option changes (weightage / is_correct).
+     */
+    /**
+     * Fired when ANY nested key inside activeQuestion changes.
+     */
+
+    public function updateWeightage(int $optIndex, float $value): void
+    {
+        $this->activeQuestion['options'][$optIndex]['weightage'] = $value;
+        $this->recalculateMarksFromWeightage();
+    }
+
+    private function recalculateMarksFromWeightage(): void
+    {
+        // Auto-calculate for both single_choice and multi_choice
+        $total = collect($this->activeQuestion['options'] ?? [])
+            ->where('is_correct', true)
+            ->sum(fn($opt) => (float) ($opt['weightage'] ?? 0));
+
+        $this->activeQuestion['marks'] = $total;
+    }
     public function toggleCorrect(int $optIndex): void
     {
         $category = $this->activeQuestion['answer_category'] ?? 'single_choice';
@@ -709,6 +734,11 @@ class QuestionGroupForm extends Component
             if ($current) {
                 $this->activeQuestion['options'][$optIndex]['weightage'] = 0;
             }
+        }
+
+        // Recalculate marks for both single_choice and multi_choice
+        if (in_array($category, ['single_choice', 'multi_choice'])) {
+            $this->recalculateMarksFromWeightage();
         }
     }
 
@@ -815,7 +845,91 @@ class QuestionGroupForm extends Component
             'stemImageUpload.max'                         => 'Image must not exceed 2 MB.',
         ]);
     }
+    public function viewQuestion(int $questionId): void
+    {
+        $question = Question::with('questionGroup')->findOrFail($questionId);
 
+        $raw    = $question->getRawOriginal('question_content');
+        $content = is_array($question->question_content)
+            ? $question->question_content
+            : (is_string($raw) ? json_decode($raw, true) : []);
+
+        if (empty($content)) {
+            $this->previewQuestion     = [];
+            $this->showQuestionPreview = true;
+            return;
+        }
+
+        $stems = [];
+        foreach ($this->languages as $lang) {
+            $stemHtml = $content['stem'][$lang] ?? '';
+            if (!empty(trim(strip_tags($stemHtml)))) {
+                $stems[$lang] = $stemHtml;
+            }
+        }
+
+        $marks = $content['marks'] ?? 0;
+
+        $passage = null;
+        if ($question->questionGroup &&
+            $question->questionGroup->questions_category === 'multiple') {
+
+            $rawGroup     = $question->questionGroup->getAttributes()['group_content'];
+            $groupContent = is_array($question->questionGroup->group_content)
+                ? $question->questionGroup->group_content
+                : json_decode($rawGroup, true);
+
+            $passageData = [];
+            foreach ($this->languages as $lang) {
+                $passageText = $groupContent['content'][$lang] ?? '';
+                if (!empty(trim(strip_tags($passageText)))) {
+                    $passageData[$lang] = $passageText;
+                }
+            }
+            if (!empty($passageData)) {
+                $passage = $passageData;
+            }
+        }
+
+        $formattedOptions = [];
+        $rawOptions       = $content['options'] ?? [];
+
+        foreach ($rawOptions as $index => $opt) {
+            $optionTexts = [];
+            foreach ($this->languages as $lang) {
+                $optText = $opt['text'][$lang] ?? '';
+                if (!empty(trim($optText))) {
+                    $optionTexts[$lang] = $optText;
+                }
+            }
+
+            $formattedOptions[] = [
+                'index'      => $index + 1,
+                'texts'      => $optionTexts,
+                'is_correct' => (bool) ($opt['is_correct'] ?? false),
+                'weightage'  => $opt['weightage'] ?? 0,
+                'type'       => $opt['option_type'] ?? 'text',
+            ];
+        }
+
+        $this->previewQuestion = [
+            'id'              => $question->id,
+            'code'            => $question->question_code,
+            'stems'           => $stems,
+            'passage'         => $passage,
+            'answer_category' => $question->answer_category ?? $content['answer_category'] ?? '',
+            'options'         => $formattedOptions,
+            'marks'           => $marks,
+        ];
+
+        $this->showQuestionPreview = true;
+    }
+
+    public function closeQuestionPreview(): void
+    {
+        $this->showQuestionPreview = false;
+        $this->previewQuestion     = [];
+    }
     /* ================================================================
      | RENDER
      * ================================================================*/

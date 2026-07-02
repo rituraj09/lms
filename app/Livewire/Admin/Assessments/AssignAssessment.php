@@ -47,6 +47,7 @@ class AssignAssessment extends Component
 
             // Load the assessment
             $this->assessment = Assessment::with(['ageGroup', 'createdBy'])
+                ->withCount('assessmentQuestions')
                 ->findOrFail($assessmentId);
 
             // Load already assigned organisations

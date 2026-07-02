@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::table('assessments', function (Blueprint $table) {
-            $table->string('cover_image')->nullable()->after('title');
-
-        });
-
+        Schema::table('assessments', function (Blueprint $table) {
+            $table->foreignId('difficulty_level_id')->nullable()->after('age_group_id')->references('id')->on('difficulty_levels');
+       });
     }
 
     /**

@@ -38,6 +38,8 @@ class AssessmentBuild extends Component
     public string $admin_note         = '';
     public bool   $has_negative_mark  = false;
     public string $status             = 'draft';
+    public string $difficultLevel         = '';
+    public string   $ageGroup               = '';
     public int    $max_attempts       = 1;
     public bool   $shuffle_sections   = false;
     public bool   $show_result_immediately = true;
@@ -95,6 +97,8 @@ class AssessmentBuild extends Component
         $this->show_result_immediately = (bool) $assessment->show_result_immediately;
         $this->show_correct_answers    = (bool) $assessment->show_correct_answers;
         $this->show_explainations      = (bool) $assessment->show_explainations;
+        $this->difficultLevel      =  $assessment->difficultyLevel->name;
+        $this->ageGroup      =  $assessment->ageGroup->name;
 
         $this->loadBuilder($decryptedId);
     }

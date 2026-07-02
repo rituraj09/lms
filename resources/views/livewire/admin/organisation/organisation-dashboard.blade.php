@@ -110,7 +110,7 @@
                             <div class="progress-bar {{ $percentage >= 90 ? 'bg-danger' : 'bg-primary' }}"
                                 role="progressbar" style="width: {{ $percentage }}%"
                                 aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100">
-                                {{ $percentage }}%
+                                {{  round($percentage)}}%
                             </div>
                         </div>
                         <small class="text-muted d-block mt-2">

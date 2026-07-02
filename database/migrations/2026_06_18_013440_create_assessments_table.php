@@ -13,6 +13,7 @@ return new class extends Migration
             $table->id();
             $table->string('assessment_code')->unique();
             $table->text('title');
+            $table->string('cover_image')->nullable();
             $table->text('instructions')->nullable();
             $table->enum('assessment_type_id', [
                 'iq', 'eq', 'lq',

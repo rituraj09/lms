@@ -49,7 +49,7 @@ class TestAttemptResource extends JsonResource
             'negative_score'     => (float) $this->negative_score,
             'total_score'        => (float) $this->total_score,
             'status'             => $this->status,
-
+            'assessment_type_id' => $this->assessment->assessment_type_id,
             // Computed
             'total_questions'    => $totalQuestions,
             'answered_questions' => $answeredQuestions,

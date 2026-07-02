@@ -112,7 +112,7 @@
                         <tr>
                             <th class="px-4 py-3 fw-semibold">#</th>
                             <th class="px-4 py-3 fw-semibold">Student ID</th>
-                            <th class="px-4 py-3 fw-semibold">Student Details</th>
+                            <th class="px-4 py-3 fw-semibold">Student Name</th>
                             <th class="px-4 py-3 fw-semibold">Contact</th>
                             <th class="px-4 py-3 fw-semibold">Status</th>
                             <th class="px-4 py-3 fw-semibold">Enrolled On</th>
@@ -121,6 +121,7 @@
                         </thead>
                         <tbody>
                         @forelse($students as $student)
+
                             <tr wire:key="student-{{ $student->id }}" class="student-row">
                                 <td class="px-4 py-3">
                                     {{ $students->firstItem() + $loop->index }}
@@ -131,24 +132,13 @@
                                         </span>
                                 </td>
                                 <td class="px-4 py-3">
-                                    @if($student->avatar && $student->avatar_url)
-                                        <img src="{{ $student->avatar_url }}"
-                                             alt="{{ $student->full_name }}"
-                                             class="rounded-circle shadow-sm border"
-                                             style="width: 45px; height: 45px; object-fit: cover;">
-                                    @else
-                                        <div class="rounded-circle shadow-sm border bg-primary bg-opacity-10
-                        d-flex align-items-center justify-content-center flex-shrink-0"
-                                             style="width: 45px; height: 45px;">
-                                            <i class="ri ri-user-line text-primary" style="font-size: 1.4rem;"></i>
-                                        </div>
-                                    @endif
-                                </td>
-                                <td class="px-4 py-3">
-                                    <div class="small">
-                                        <div class="text-dark mb-1">
-                                            <i class="ri ri-mail-line text-muted me-1"></i>
-                                            {{ $student->email }}
+                                    {{ $student->name }}
+            </td>
+            <td class="px-4 py-3">
+                <div class="small">
+                    <div class="text-dark mb-1">
+                        <i class="ri ri-mail-line text-muted me-1"></i>
+                        {{ $student->email }}
                                         </div>
                                         @if($student->phone)
                                             <div class="text-muted">

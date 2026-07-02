@@ -4,6 +4,7 @@
 namespace App\Models\AssessmentMaster;
 
 
+use App\Models\TestAttempt\TestAttemptResponse;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -42,5 +43,9 @@ class AssessmentQuestion extends Model
     public function updatedBy(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Admin::class, 'updated_by');
+    }
+    public function testAttemptResponses()
+    {
+        return $this->hasMany(TestAttemptResponse::class);
     }
 }

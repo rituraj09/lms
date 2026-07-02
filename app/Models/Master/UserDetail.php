@@ -3,7 +3,9 @@
 
 namespace App\Models\Master;
 
+use App\Models\EvaluationMaster\AgeGroup;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Model;
 
@@ -96,4 +98,17 @@ class UserDetail extends Model
 
         return "STUD-{$orgPart}-{$year}-{$serialPart}";
     }
+    public function currentAgeGroup()
+    {
+        return $this->belongsTo(AgeGroup::class, 'current_age_group_id');
+    }
+
+    public function getPhysicalAgeAttribute(): ?int
+    {
+        if (!$this->date_of_birth) {
+            return null;
+        }
+        return Carbon::parse($this->date_of_birth)->age;
+    }
+
 }

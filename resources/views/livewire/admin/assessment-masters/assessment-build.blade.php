@@ -65,12 +65,13 @@
             </div>
 
             <div class="d-flex gap-2">
-                <button type="button" wire:click="backToForm" class="btn btn-outline-secondary btn-sm">
+                <a  href="{{ route('admin.assessment-masters.list') }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="ri ri-arrow-left-line me-1"></i> Cancel
+                </a>
+                <button type="button" wire:click="backToForm" class="btn btn-outline-warning btn-sm">
                     <i class="ri ri-pencil-line me-1"></i>Edit Info
                 </button>
-                <button type="button" wire:click="openGroupPicker" class="btn btn-outline-primary btn-sm">
-                    <i class="ri ri-add-large-line me-1"></i>Add Sections
-                </button>
+
                 <button type="button" wire:click="saveBuilder" wire:loading.attr="disabled"
                         class="btn btn-primary btn-sm shadow-sm">
                     <span wire:loading wire:target="saveBuilder">
@@ -346,6 +347,20 @@
                             </li>
 
                             <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                                <span class="small text-muted">Age Group</span>
+                                <span class="badge bg-warning-subtle text-warning">
+                                             {{ $ageGroup }}
+                                </span>
+                            </li>
+                            <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                                <span class="small text-muted">Difficulty level</span>
+                                <span class="badge bg-danger-subtle text-danger">
+                                    {{ $difficultLevel }}
+                                </span>
+                            </li>
+
+
+                            <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
                                 <span class="small text-muted">Status</span>
                                 <span class="badge {{ $status === 'publish' ? 'bg-success' : ($status === 'draft' ? 'bg-secondary' : 'bg-warning text-dark') }}">
                                     {{ ucfirst($status) }}
@@ -483,8 +498,10 @@
                         <i class="ri ri-add-circle-line text-success me-2"></i>Add More Questions
                     @else
                         <i class="ri ri-layout-grid-line text-primary me-2"></i>Select Question Group & Questions
+
                     @endif
                 </h4>
+
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-0 small">
                         <li class="breadcrumb-item">
@@ -528,6 +545,24 @@
                 @endif
             </div>
         </div>
+    <div class="card mb-3">
+        <div class="card-body">
+                 <span class="small badge bg-secondary-subtle text-dark text-small">
+                               Code: {{ $assessment_code }}
+                            </span>
+           Title: {{ $title    }}
+              <span class="small badge bg-primary-subtle text-primary text-small">
+                                {{ strtoupper($assessment_type_id ?: '—') }}
+                            </span>
+            <span class="small badge bg-warning-subtle text-warning  text-small">
+                                                 {{ $ageGroup }}
+                            </span>
+            <span class="small badge bg-danger-subtle text-danger  text-small">
+                                    {{ $difficultLevel }}
+                            </span>
+        </div>
+
+    </div>
 
         <div class="row g-4">
 
@@ -701,7 +736,7 @@
                                                 {{ $isSelected ? 'checked' : '' }}
                                                 {{ $alreadyInGroup ? 'disabled' : '' }}>
 
-                                            <div class="flex-1 min-w-0">
+                                            <div class="flex-grow-1">
                                                 <p class="mb-1 small fw-medium {{ $alreadyInGroup ? 'text-muted' : 'text-dark' }}">
                                                     @php
                                                         // Strip tags, decode HTML entities, then limit
@@ -713,19 +748,32 @@
                                                     {{ $stemPreview }}
                                                 </p>
                                                 <div class="d-flex flex-wrap gap-2 align-items-center">
-                                                    @if ($pq->answer_category === 'single_optional')
+                                                    @if ($pq->answer_category === 'single_choice')
                                                         <span class="badge bg-primary-subtle text-primary" style="font-size:.7rem;">Single Choice</span>
-                                                    @elseif ($pq->answer_category === 'multi_optional')
+                                                    @elseif ($pq->answer_category === 'multi_choice')
                                                         <span class="badge bg-info-subtle text-info" style="font-size:.7rem;">Multiple Choice</span>
                                                     @else
                                                         <span class="badge bg-secondary-subtle text-secondary" style="font-size:.7rem;">Open Ended</span>
                                                     @endif
 
                                                     <span class="badge bg-success-subtle text-success" style="font-size:.7rem;">
-                                                        {{ $pq->marks }} Mark(s)
+
+                                                        {{ $pq->question_content['marks'] }}  Mark(s)
                                                     </span>
 
                                                     <code style="font-size:.7rem;color:#6c757d;">{{ $pq->question_code }}</code>
+                                                    <span class="badge bg-danger-subtle text-danger" style="font-size:.7rem;">
+                                                        {{ $pq->primarySkill->name }}
+                                                    </span>
+                                                    <span class="badge bg-warning-subtle text-warning" style="font-size:.7rem;">
+                                                        {{ $pq->subSkill->name }}
+                                                    </span>
+                                                    <span class="badge bg-secondary-subtle text-dark" style="font-size:.7rem;">
+                                                       Age-Group-{{ $pq->ageGroup->name }}
+                                                    </span>
+                                                    <span class="badge bg-info-subtle text-primary" style="font-size:.7rem;">
+                                                        Level-{{ $pq->difficultyLevel->level }}
+                                                    </span>
 
                                                     {{-- Already added badge --}}
                                                     @if ($alreadyInGroup)
@@ -737,13 +785,16 @@
                                             </div>
 
                                             {{-- Preview button - always available --}}
-                                            <button type="button"
+                                            <div class="ms-auto">
+                                                <button
+                                                    type="button"
                                                     wire:click.stop="viewQuestion({{ $pq->id }})"
-                                                    class="btn btn-sm btn-outline-info flex-shrink-0"
+                                                    class="btn btn-sm btn-outline-info"
                                                     data-bs-toggle="tooltip"
                                                     title="View Full Question">
-                                                <i class="ri ri-eye-line"></i>
-                                            </button>
+                                                    <i class="ri ri-eye-line"></i>
+                                                </button>
+                                            </div>
 
                                         </label>
                                     @endforeach

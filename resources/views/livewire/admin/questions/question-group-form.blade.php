@@ -765,8 +765,8 @@
                                             <i class="ri ri-delete-bin-line"></i>
                                         </button>
                                     @else
-                                        <button type="button" wire:click="editQuestion({{ $q['id'] }})"
-                                                class="btn btn-sm btn-outline-secondary" disabled
+                                        <button type="button"   wire:click.stop="viewQuestion({{ $q['id'] }})"
+                                                class="btn btn-sm btn-outline-secondary"
                                                 title="Used in assessment">
                                             <i class="ri ri-eye-line"></i>
                                         </button>
@@ -944,6 +944,155 @@
 {{-- ══════════════════════════════════════════════════════════════
   ██████  VIEW 3 — QUESTION FORM  (Add / Edit single question)
 ══════════════════════════════════════════════════════════════ --}}
+
+
+    {{-- ══════════════════════════════════════════════════════════════
+      QUESTION PREVIEW MODAL (Bootstrap)
+ ══════════════════════════════════════════════════════════════ --}}
+    @if ($showQuestionPreview && !empty($previewQuestion))
+
+
+        <div class="modal fade show d-block" tabindex="-1" style="z-index:1060;">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+
+                    {{-- Modal Header --}}
+                    <div class="modal-header border-bottom py-3"
+                         style="background:linear-gradient(135deg,#4f46e5,#7c3aed);">
+                        <h5 class="modal-title text-white">
+                            <i class="ri ri-eye-line me-2"></i>Question Preview
+                        </h5>
+                        <button type="button"
+                                wire:click="closeQuestionPreview"
+                                class="btn-close btn-close-white"></button>
+                    </div>
+
+                    {{-- Modal Body --}}
+                    <div class="modal-body p-4">
+
+                        {{-- Code & Marks --}}
+                        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                            <div class="d-flex align-items-center gap-2">
+                                <code class="fs-6 text-primary">{{ $previewQuestion['code'] }}</code>
+                                {{-- Answer Category Badge --}}
+                                @if ($previewQuestion['answer_category'] === 'single_optional')
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                                    Single Choice
+                                </span>
+                                @elseif ($previewQuestion['answer_category'] === 'multi_optional')
+                                    <span class="badge bg-info-subtle text-info border border-info-subtle">
+                                    Multiple Choice
+                                </span>
+                                @else
+                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">
+                                    Open Ended
+                                </span>
+                                @endif
+                            </div>
+                            <span class="badge bg-success fs-6 px-3 py-2">
+                            <i class="ri ri-trophy-line me-1"></i>{{ $previewQuestion['marks'] }} Mark(s)
+                        </span>
+                        </div>
+
+                        {{-- Passage (if exists) --}}
+
+
+                        {{-- Question Stems (All Languages) --}}
+                        @if (!empty($previewQuestion['stems']))
+                            <div class="mb-4">
+                                <h6 class="fw-semibold text-primary mb-3">
+                                    <i class="ri ri-question-line me-1"></i>Question
+                                </h6>
+
+                                @foreach ($previewQuestion['stems'] as $lang => $stem)
+                                    <div class="mb-3 p-3 bg-light rounded border">
+                                    <span class="badge bg-primary mb-2">
+                                        {{ strtoupper($lang) }}
+                                    </span>
+                                        <div class="small fw-medium text-dark">
+                                            {!! $stem !!}
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="alert alert-warning mb-4">
+                                <i class="ri ri-error-warning-line me-1"></i>
+                                No question stem found.
+                            </div>
+                        @endif
+
+                        {{-- Options --}}
+                        @if (!empty($previewQuestion['options']))
+                            <div class="mb-2">
+                                <h6 class="fw-semibold text-success mb-3">
+                                    <i class="ri ri-list-check me-1"></i>Options
+                                    <small class="text-muted fw-normal ms-1">
+                                        (correct answer highlighted in green)
+                                    </small>
+                                </h6>
+
+                                @foreach ($previewQuestion['options'] as $opt)
+                                    <div class="mb-3 rounded border overflow-hidden
+                                            {{ $opt['is_correct']
+                                                ? 'border-success'
+                                                : 'border-light' }}">
+
+                                        {{-- Option Header --}}
+                                        <div class="px-3 py-2 d-flex justify-content-between align-items-center
+                                                {{ $opt['is_correct']
+                                                    ? 'bg-success text-white'
+                                                    : 'bg-light text-muted' }}">
+                                        <span class="fw-semibold small">
+                                            Option {{ $opt['index'] }}
+                                        </span>
+                                            @if ($opt['is_correct'])
+                                                <span class="badge bg-white text-success">
+                                                <i class="ri ri-check-line me-1"></i>Correct Answer
+                                            </span>
+                                            @endif
+                                        </div>
+
+                                        {{-- Option Texts (all languages) --}}
+                                        <div class="p-3 {{ $opt['is_correct'] ? 'bg-success-subtle' : 'bg-white' }}">
+                                            @forelse ($opt['texts'] as $lang => $text)
+                                                <div class="d-flex align-items-start gap-2 mb-2">
+                                                <span class="badge bg-secondary flex-shrink-0"
+                                                      style="font-size:.65rem;margin-top:2px;">
+                                                    {{ strtoupper($lang) }}
+                                                </span>
+                                                    <span class="small">{{ $text }}</span>
+                                                </div>
+                                            @empty
+                                                <span class="text-muted small">No text available</span>
+                                            @endforelse
+                                        </div>
+
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+
+                    </div>
+
+                    {{-- Modal Footer --}}
+                    <div class="modal-footer border-top">
+                        <button type="button"
+                                wire:click="closeQuestionPreview"
+                                class="btn btn-secondary">
+                            <i class="ri ri-close-line me-1"></i>Close
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-backdrop fade show" style="z-index:1055;"></div>
+
+    @endif
+    {{-- /question preview modal --}}
+
 @if ($view === 'question_form' && !empty($activeQuestion))
 
     {{-- ── Page Header ─────────────────────────────────────── --}}
@@ -1098,22 +1247,51 @@
                                 <label class="form-label fw-medium small">
                                     Marks
                                     <span class="text-danger">*</span>
+                                    @if (in_array(($activeQuestion['answer_category'] ?? ''), ['single_choice', 'multi_choice']))
+                                        <span class="badge bg-info-subtle text-info border border-info-subtle ms-1"
+                                              style="font-size:.65rem;">
+                Auto from Weightage
+            </span>
+                                    @endif
                                 </label>
                                 <div class="input-group">
-                                        <span class="input-group-text bg-light">
-                                            <i class="ri ri-trophy-line text-muted"></i>
-                                        </span>
-                                    <input type="number" wire:model="activeQuestion.marks"
-                                           class="form-control
-                                                  @error('activeQuestion.marks')
-                                                      is-invalid
-                                                  @enderror"
-                                           min="0" step="0.5" placeholder="0">
+        <span class="input-group-text bg-light">
+            <i class="ri ri-trophy-line text-muted"></i>
+        </span>
+                                    <input type="number"
+                                           wire:model="activeQuestion.marks"
+                                           class="form-control @error('activeQuestion.marks') is-invalid @enderror
+                      {{ in_array(($activeQuestion['answer_category'] ?? ''), ['single_choice', 'multi_choice']) ? 'bg-light text-muted' : '' }}"
+                                           min="0"
+                                           step="0.5"
+                                           placeholder="0"
+                                           value="{{ $activeQuestion['marks'] ?? 0 }}"
+                                           @if (in_array(($activeQuestion['answer_category'] ?? ''), ['single_choice', 'multi_choice']))
+                                               readonly
+                                           title="Calculated automatically from option weightages"
+                                        @endif>
                                     @error('activeQuestion.marks')
-                                    <div class="invalid-feedback">
-                                        {{ $message }}
-                                    </div>
+                                    <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
+                                </div>
+                                {{-- Helper --}}
+                                <div class="mt-1">
+                                    @if (($activeQuestion['answer_category'] ?? '') === 'single_choice')
+                                        <small class="text-primary">
+                                            <i class="ri ri-information-line me-1"></i>
+                                            Marks = sum of correct option's weightage.
+                                        </small>
+                                    @elseif (($activeQuestion['answer_category'] ?? '') === 'multi_choice')
+                                        <small class="text-info">
+                                            <i class="ri ri-information-line me-1"></i>
+                                            Marks = sum of all correct options' weightages.
+                                        </small>
+                                    @else
+                                        <small class="text-secondary">
+                                            <i class="ri ri-text me-1"></i>
+                                            Manually enter marks for open text answer.
+                                        </small>
+                                    @endif
                                 </div>
                             </div>
 
@@ -1598,20 +1776,23 @@
                                                 </label>
                                                 @if ($optIsCorrect)
                                                     <input type="number"
-                                                           wire:model.live="activeQuestion.options.{{ $optIndex }}.weightage"
-                                                           class="form-control form-control-sm
-                                                                  text-center border-success"
-                                                           style="width:72px;" step="0.5" min="0"
-                                                           max="100" placeholder="0">
+                                                           wire:model="activeQuestion.options.{{ $optIndex }}.weightage"
+                                                           x-on:input.debounce.300ms="$wire.updateWeightage({{ $optIndex }}, parseFloat($event.target.value) || 0)"
+                                                           class="form-control form-control-sm text-center border-success"
+                                                           style="width:72px;"
+                                                           step="0.5"
+                                                           min="0"
+                                                           max="100"
+                                                           placeholder="0">
                                                 @else
                                                     <input type="number"
-                                                           class="form-control form-control-sm
-                                                                  text-center bg-light"
-                                                           style="width:72px;" placeholder="—" disabled
+                                                           class="form-control form-control-sm text-center bg-light"
+                                                           style="width:72px;"
+                                                           placeholder="—"
+                                                           disabled
                                                            title="Mark as correct to enable weightage">
                                                 @endif
                                             </div>
-
                                             {{-- Remove Option --}}
                                             <button type="button"
                                                     wire:click="removeOption({{ $optIndex }})"

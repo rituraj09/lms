@@ -7,6 +7,7 @@ use App\Http\Resources\TestAttempt\TestAttemptResponseResource;
 use App\Http\Resources\TestAttempt\TestAttemptResource;
 use App\Http\Resources\TestAttempt\TestAttemptListResource;
 use App\Http\Resources\Assessment\AssessmentDetailResource;
+use App\Services\PromotionService;
 use App\Models\TestAttempt\TestAttempt;
 use App\Models\TestAttempt\TestAttemptResponse;
 use App\Models\AssessmentMaster\Assessment;
@@ -32,28 +33,94 @@ class TestAttemptController extends Controller
                 ], 403);
             }
 
-            $assessments = Assessment::whereHas('organisations', function ($query) use ($user) {
-                $query->where('organisations.id', $user->organisation_id)
-                    ->where('assessment_organisation.status', 'active');
-            })
-                ->where('status', 'publish')
-                ->with([
-                    'ageGroup',
-                    'assessmentGroups.assessmentQuestions',
-                ])
-                ->get();
+            $promotionService  = app(PromotionService::class);
+            $currentPromotions = $promotionService->getAllCurrentPromotions($user->id);
+            $activePromotions  = array_filter($currentPromotions);
 
-            // Calculate total_questions for each assessment
-            $assessments->each(function ($assessment) {
-                $assessment->total_questions_count = $assessment->assessmentGroups
-                    ->sum(function ($group) {
-                        return $group->assessmentQuestions->count();
-                    });
-            });
+            if (empty($activePromotions)) {
+                return response()->json([
+                    'success' => true,
+                    'data'    => [
+                        'iq' => [],
+                        'eq' => [],
+                        'lq' => [],
+                    ],
+                    'promotion_status' => [],
+                    'message' => 'No active promotion levels found.',
+                ]);
+            }
+
+            $result          = [];
+            $promotionStatus = [];
+
+            foreach ($activePromotions as $assessmentType => $promotion) {
+
+                // ✅ Check if terminal level
+                $isTerminal = $promotionService->isTerminalPromotion($promotion->id);
+
+                $promotionStatus[$assessmentType] = [
+                    'is_terminal'      => $isTerminal,
+                    'current_level'    => [
+                        'promotion_id'      => $promotion->id,
+                        'promotion_name'    => $promotion->name,
+                        'age_group'         => $promotion->ageGroup->name,
+                        'difficulty_level'  => $promotion->difficultyLevel->level,
+                        'difficulty_name'   => $promotion->difficultyLevel->name,
+                        'badge'             => $promotion->badge
+                            ? asset('storage/' . $promotion->badge)
+                            : null,
+                    ],
+                ];
+
+                // ✅ Terminal level — no assessments to show
+                if ($isTerminal) {
+                    $result[$assessmentType] = [];
+                    continue;
+                }
+
+                // ✅ Fetch assessments matching current promotion
+                $assessments = Assessment::whereHas('organisations', function ($query) use ($user) {
+                    $query->where('organisations.id', $user->organisation_id)
+                        ->where('assessment_organisation.status', 'active');
+                })
+                    ->where('status', 'publish')
+                    ->where('assessment_type_id', $assessmentType)
+                    ->where('age_group_id', $promotion->age_group_id)
+                    ->where('difficulty_level_id', $promotion->difficulty_level_id)
+                    ->with([
+                        'ageGroup',
+                        'difficultyLevel',
+                        'assessmentGroups.assessmentQuestions',
+                    ])
+                    ->get();
+
+                // ✅ Calculate total_questions + filter already passed assessments
+                $assessments = $assessments->filter(function ($assessment) use ($user) {
+                    // Check if user has already passed this assessment
+                    // (i.e., it exists as a test_attempt_id in user_promotion_details)
+                    $alreadyPassed = \App\Models\TestAttempt\UserPromotionDetail
+                        ::where('user_id', $user->id)
+                        ->where('test_attempt_id', '!=', null)
+                        ->whereHas('testAttempt', function ($q) use ($assessment) {
+                            $q->where('assessment_id', $assessment->id);
+                        })
+                        ->exists();
+
+                    return !$alreadyPassed;
+                })->each(function ($assessment) {
+                    $assessment->total_questions_count = $assessment->assessmentGroups
+                        ->sum(fn($group) => $group->assessmentQuestions->count());
+                });
+
+                $result[$assessmentType] = AssessmentDetailResource::collection(
+                    $assessments->values()
+                );
+            }
 
             return response()->json([
-                'success' => true,
-                'data'    => AssessmentDetailResource::collection($assessments),
+                'success'          => true,
+                'data'             => $result,
+                'promotion_status' => $promotionStatus,
             ]);
 
         } catch (\Throwable $e) {
@@ -70,7 +137,6 @@ class TestAttemptController extends Controller
             ], 500);
         }
     }
-
     /**
      * Get user's test attempts (no pagination — flat array)
      */
@@ -504,6 +570,8 @@ class TestAttemptController extends Controller
     /**
      * Submit the test attempt
      */
+
+
     public function submitAttempt(Request $request, int $attemptId)
     {
         try {
@@ -535,9 +603,9 @@ class TestAttemptController extends Controller
 
             $totalScore    = 0;
             $negativeScore = 0;
+            $hasOpenText   = false; // ✅ Track if manual evaluation is pending
 
             foreach ($attempt->responses as $response) {
-                // Skip if no response
                 if (empty($response->response)) {
                     continue;
                 }
@@ -556,6 +624,7 @@ class TestAttemptController extends Controller
                 $obtainedMarks = 0;
 
                 if ($question->answer_category === 'single_choice') {
+                    // ... existing logic unchanged ...
                     $selectedOptionIndex = $userResponse['selected_option'] ?? null;
 
                     if ($selectedOptionIndex !== null &&
@@ -573,6 +642,7 @@ class TestAttemptController extends Controller
                     }
 
                 } elseif ($question->answer_category === 'multi_choice') {
+                    // ... existing logic unchanged ...
                     $selectedOptions = $userResponse['selected_options'] ?? [];
                     $correctOptions  = collect($questionContent['options'] ?? [])
                         ->filter(fn($opt) => $opt['is_correct'] ?? false)
@@ -590,7 +660,6 @@ class TestAttemptController extends Controller
                         $obtainedMarks  = (float) ($questionContent['marks'] ?? 0);
                         $totalScore    += $obtainedMarks;
                     } else {
-                        // Partial marks based on weightage
                         $partialMarks = 0;
                         foreach ($selectedOptions as $optIndex) {
                             if (isset($questionContent['options'][$optIndex])) {
@@ -603,8 +672,10 @@ class TestAttemptController extends Controller
                         $obtainedMarks  = $partialMarks;
                         $totalScore    += $obtainedMarks;
                     }
+
+                } elseif ($question->answer_category === 'open_text') {
+                    $hasOpenText = true; // ✅ Flag pending manual evaluation
                 }
-                // open_text: not auto-evaluated
 
                 $response->update([
                     'is_correct'     => $question->answer_category !== 'open_text'
@@ -614,12 +685,40 @@ class TestAttemptController extends Controller
                 ]);
             }
 
+            // ✅ Determine final status
+            $status = $hasOpenText ? 'submitted' : 'evaluated';
+
             $attempt->update([
-                'submitted_at'  => now(),
-                'total_score'   => $totalScore,
-                'negative_score'=> $negativeScore,
-                'status'        => 'submitted',
+                'submitted_at'   => now(),
+                'total_score'    => $totalScore,
+                'negative_score' => $negativeScore,
+                'status'         => $status,
             ]);
+
+            $promotionResult = null;
+
+            if ($status === 'evaluated') {
+                $finalScore = $totalScore - $negativeScore;
+                $totalMarks = (float) $attempt->assessment->total_marks;
+                $percentage = $totalMarks > 0
+                    ? round(($finalScore / $totalMarks) * 100, 2)
+                    : 0;
+
+                $assessmentType = $attempt->assessment->assessment_type_id;
+
+                $promotionService = app(PromotionService::class);
+
+                // Write promotion outcome to DB
+                $promotionService->checkAndPromote(
+                    userId: $user->id,
+                    assessmentType: $assessmentType,
+                    percentage: $percentage,
+                    testAttemptId: $attempt->id
+                );
+
+                // Read back formatted result for response
+                $promotionResult = $promotionService->getPromotionInfoForAttempt($attempt->id);
+            }
 
             DB::commit();
 
@@ -629,6 +728,7 @@ class TestAttemptController extends Controller
                 'data'    => new TestAttemptResource(
                     $attempt->fresh(['assessment', 'responses'])
                 ),
+                'promotion' => $promotionResult,
             ]);
 
         } catch (\Throwable $e) {
@@ -684,11 +784,15 @@ class TestAttemptController extends Controller
                 ? round(($finalScore / $totalMarks) * 100, 2)
                 : 0;
 
+            // ✅ Fetch promotion outcome (read-only, safe on refresh)
+            $promotionService = app(\App\Services\PromotionService::class);
+            $promotionInfo    = $promotionService->getPromotionInfoForAttempt($attempt->id);
+
             return response()->json([
                 'success' => true,
                 'data'    => [
-                    'attempt' => new TestAttemptResource($attempt),
-                    'summary' => [
+                    'attempt'   => new TestAttemptResource($attempt),
+                    'summary'   => [
                         'total_questions'    => $totalQuestions,
                         'answered_questions' => $answeredQuestions,
                         'correct_answers'    => $correctAnswers,
@@ -702,6 +806,7 @@ class TestAttemptController extends Controller
                         'percentage'         => $percentage,
                         'is_passed'          => $finalScore >= $passingMarks,
                     ],
+                    'promotion' => $promotionInfo, // ✅ New key
                 ],
             ]);
 

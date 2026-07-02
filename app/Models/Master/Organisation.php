@@ -222,5 +222,9 @@ class Organisation extends Model
             ->wherePivot('status', 'active')
             ->where('assessments.status', 'public');
     }
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
 }
 

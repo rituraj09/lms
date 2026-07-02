@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use App\Services\PromotionService;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 #[Layout('layouts.backend')]
 class StudentForm extends Component
@@ -262,36 +265,47 @@ class StudentForm extends Component
             $avatarPath = $this->avatar->store('avatars', 'public');
         }
 
+        // ✅ NO nested transaction - save() already handles the outer transaction
         $user = User::create([
-            'name' => $this->name,
-            'email' => $this->email,
-            'phone' => $this->phone,
-            'password' => Hash::make($this->generatedPassword),
-            'status' => $this->status,
-            'avatar' => $avatarPath,
+            'name'            => $this->name,
+            'email'           => $this->email,
+            'phone'           => $this->phone,
+            'password'        => Hash::make($this->generatedPassword),
+            'status'          => $this->status,
+            'avatar'          => $avatarPath,
             'organisation_id' => $this->organisationId,
         ]);
 
         $userDetail = UserDetail::create([
-            'user_id' => $user->id,
-            'first_name' => $this->first_name,
-            'last_name' => $this->last_name,
-            'gender' => $this->gender,
-            'date_of_birth' => $this->date_of_birth,
-            'address_line1' => $this->address_line1,
-            'address_line2' => $this->address_line2,
-            'city' => $this->city,
-            'state_id' => $this->state_id,
-            'district_id' => $this->district_id,
-            'country' => $this->country,
-            'postal_code' => $this->postal_code,
-            'emergency_contact_name' => $this->emergency_contact_name,
+            'user_id'                 => $user->id,
+            'first_name'              => $this->first_name,
+            'last_name'               => $this->last_name,
+            'gender'                  => $this->gender,
+            'date_of_birth'           => $this->date_of_birth,
+            'address_line1'           => $this->address_line1,
+            'address_line2'           => $this->address_line2,
+            'city'                    => $this->city,
+            'state_id'                => $this->state_id,
+            'district_id'             => $this->district_id,
+            'country'                 => $this->country,
+            'postal_code'             => $this->postal_code,
+            'emergency_contact_name'  => $this->emergency_contact_name,
             'emergency_contact_phone' => $this->emergency_contact_phone,
-            'bio' => $this->bio,
+            'bio'                     => $this->bio,
         ]);
+        // Initialize promotion records (iq, eq, lq at starting level)
+        $promotionService = app(PromotionService::class);
+        $initialized = $promotionService->initializeUserPromotion($user->id);
+
+
+        if (!$initialized) {
+            // ✅ Let this bubble up to save()'s catch block for proper rollback
+            throw new \RuntimeException('Failed to initialize user promotion details.');
+        }
 
         $this->generatedStudentId = $userDetail->student_id;
         $this->generatedEmail = $user->email;
+        $this->studentId= $userDetail->student_id;
     }
 
     protected function updateStudent()

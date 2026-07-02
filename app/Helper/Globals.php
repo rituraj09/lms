@@ -7,7 +7,9 @@ class Globals
     public const ORGANISATION_TYPES = [
         'School','College','University','Company','Government','Non-Profit','Other'
     ];
-
+    public const ASSESSMENT_TYPES = [
+        'iq','eq','lq'
+    ];
      public const LANGUAGES = [
         'en' => ['label' => 'English',    'flag' => '🇬🇧'],
         'as' => ['label' => 'Assamese',   'flag' => '🇮🇳'],

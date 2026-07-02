@@ -156,4 +156,9 @@ class TestAttempt extends Model
 
         return $ackNo;
     }
+
+    public function isPassed()
+    {
+        return $this->total_score >= $this->assessment->passing_marks;
+    }
 }

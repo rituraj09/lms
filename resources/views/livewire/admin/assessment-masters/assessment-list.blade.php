@@ -125,6 +125,12 @@
                                     <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
                                         {{ strtoupper($assessment->assessment_type_id) }}
                                     </span>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                        Age Group-{{ $assessment->ageGroup->name }}
+                                    </span>
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                                        Level-{{ $assessment->difficultyLevel->level }}
+                                    </span>
                                 </div>
 
                                 <div class="d-flex flex-wrap gap-3 mb-3">

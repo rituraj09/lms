@@ -21,12 +21,14 @@ return new class extends Migration
             $table->foreignId('sub_skill_id')
                   ->constrained('sub_skill_types')
                   ->restrictOnDelete();
-            $table->foreignId('difficulty_level_id')
-                  ->constrained('difficulty_levels')
-                  ->restrictOnDelete();
+
             $table->foreignId('age_group_id')
                   ->constrained('age_groups')
                   ->restrictOnDelete();
+            $table->foreignId('difficulty_level_id')
+                ->constrained('difficulty_levels')
+                ->restrictOnDelete();
+
             $table->enum('answer_category', ['single_choice', 'multi_choice', 'open_text']);
             $table->json('question_content')->nullable();
             $table->text('explaination')->nullable();

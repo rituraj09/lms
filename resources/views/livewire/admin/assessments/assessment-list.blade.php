@@ -68,8 +68,7 @@
                         <th class="px-4 py-3">Code</th>
                         <th class="py-3">Title</th>
                         <th class="py-3">Age Group</th>
-                        <th class="py-3 text-center">Questions</th>
-                        <th class="py-3 text-center">Total Marks</th>
+                        <th class="py-3">Difficulty Level</th>
                         <th class="py-3">Status</th>
                         <th class="py-3">Created By</th>
                         <th class="py-3">Created On</th>
@@ -101,14 +100,12 @@
                                     {{ $assessment->ageGroup->name ?? 'N/A' }}
                                 </span>
                             </td>
-                            <td class="text-center">
-                                <span class="badge bg-primary-subtle text-primary">
-                                    {{ $assessment->total_questions ?? 0 }}
+                            <td>
+                                <span class="badge bg-danger-subtle text-danger">
+                                    {{ $assessment->difficultyLevel->level ?? 'N/A' }}
                                 </span>
                             </td>
-                            <td class="text-center">
-                                <span class="fw-semibold">{{ $assessment->total_marks }}</span>
-                            </td>
+
                             <td>
                                 @php
                                     $statusColors = [
@@ -124,11 +121,7 @@
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <div class="avatar avatar-sm me-2">
-                                        <div class="avatar-initial bg-primary-subtle text-primary rounded-circle">
-                                            {{ substr($assessment->createdBy->name ?? 'N', 0, 1) }}
-                                        </div>
-                                    </div>
+
                                     <small>{{ $assessment->createdBy->name ?? 'N/A' }}</small>
                                 </div>
                             </td>

@@ -34,7 +34,10 @@ class Assessment extends Model
     {
         return $this->hasMany(AssessmentGroup::class, 'assessment_id');
     }
-
+    public function difficultyLevel(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\EvaluationMaster\DifficultyLevel::class, 'difficulty_level_id');
+    }
     public function ageGroup(): BelongsTo
     {
         return $this->belongsTo(\App\Models\EvaluationMaster\AgeGroup::class, 'age_group_id');
@@ -175,5 +178,20 @@ class Assessment extends Model
             'submitted'   => $attempts['submitted']   ?? 0,
             'evaluated'   => $attempts['evaluated']   ?? 0,
         ];
+    }
+    // Helper methods to check assessment type
+    public function hasIQ()
+    {
+        return in_array($this->assessment_type_id, ['iq', 'iq+eq', 'iq+lq', 'iq+eq+lq']);
+    }
+
+    public function hasEQ()
+    {
+        return in_array($this->assessment_type_id, ['eq', 'iq+eq', 'eq+lq', 'iq+eq+lq']);
+    }
+
+    public function hasLQ()
+    {
+        return in_array($this->assessment_type_id, ['lq', 'iq+lq', 'eq+lq', 'iq+eq+lq']);
     }
 }
