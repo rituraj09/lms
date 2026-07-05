@@ -14,6 +14,7 @@ use App\Models\AssessmentMaster\AssessmentQuestion;
 use App\Models\QuestionMaster\QuestionGroup;
 use App\Models\QuestionMaster\Question;
 use App\Helper\Globals;
+use App\Services\ActivityLogger;
 
 #[Layout('layouts.backend')]
 class AssessmentBuild extends Component
@@ -38,8 +39,8 @@ class AssessmentBuild extends Component
     public string $admin_note         = '';
     public bool   $has_negative_mark  = false;
     public string $status             = 'draft';
-    public string $difficultLevel         = '';
-    public string   $ageGroup               = '';
+    public string $difficultLevel     = '';
+    public string $ageGroup           = '';
     public int    $max_attempts       = 1;
     public bool   $shuffle_sections   = false;
     public bool   $show_result_immediately = true;
@@ -97,8 +98,8 @@ class AssessmentBuild extends Component
         $this->show_result_immediately = (bool) $assessment->show_result_immediately;
         $this->show_correct_answers    = (bool) $assessment->show_correct_answers;
         $this->show_explainations      = (bool) $assessment->show_explainations;
-        $this->difficultLevel      =  $assessment->difficultyLevel->name;
-        $this->ageGroup      =  $assessment->ageGroup->name;
+        $this->difficultLevel          = $assessment->difficultyLevel->name;
+        $this->ageGroup                = $assessment->ageGroup->name;
 
         $this->loadBuilder($decryptedId);
     }
@@ -188,6 +189,12 @@ class AssessmentBuild extends Component
             DB::transaction(function () {
                 $totalMarks = 0;
 
+                // ── Track changes across all groups & questions ────────
+                $createdGroups    = [];
+                $updatedGroups    = [];
+                $createdQuestions = [];
+                $updatedQuestions = [];
+
                 foreach ($this->assessmentGroups as $agIndex => $agData) {
                     $agId = $agData['assessment_group_id'] ?? null;
 
@@ -204,12 +211,19 @@ class AssessmentBuild extends Component
                     ];
 
                     if ($agId) {
+                        // ── Update Group ───────────────────────────────
                         AssessmentGroup::where('id', $agId)->update($agPayload);
                         $ag = AssessmentGroup::find($agId);
+
+                        $updatedGroups[] = $agData['group_code'];
+
                     } else {
+                        // ── Insert Group ───────────────────────────────
                         $agPayload['created_by'] = auth()->id();
                         $ag = AssessmentGroup::create($agPayload);
                         $this->assessmentGroups[$agIndex]['assessment_group_id'] = $ag->id;
+
+                        $createdGroups[] = $agData['group_code'];
                     }
 
                     foreach ($agData['questions'] as $qIndex => $qData) {
@@ -224,10 +238,17 @@ class AssessmentBuild extends Component
                         ];
 
                         if ($aqId) {
+                            // ── Update Question ────────────────────────
                             AssessmentQuestion::where('id', $aqId)->update($aqPayload);
+
+                            $updatedQuestions[] = $qData['question_code'];
+
                         } else {
+                            // ── Insert Question ────────────────────────
                             $aqPayload['created_by'] = auth()->id();
                             AssessmentQuestion::create($aqPayload);
+
+                            $createdQuestions[] = $qData['question_code'];
                         }
 
                         $totalMarks += (float) ($qData['marks'] ?? 0);
@@ -240,6 +261,39 @@ class AssessmentBuild extends Component
                     'total_marks' => $totalMarks,
                     'updated_by'  => auth()->id(),
                 ]);
+
+                // ── Build single summary description ──────────────────
+                $summaryParts = [];
+
+                if (! empty($createdGroups)) {
+                    $summaryParts[] = 'Added groups: ' . implode(', ', $createdGroups);
+                }
+                if (! empty($updatedGroups)) {
+                    $summaryParts[] = 'Updated groups: ' . implode(', ', $updatedGroups);
+                }
+                if (! empty($createdQuestions)) {
+                    $summaryParts[] = 'Added questions: ' . implode(', ', $createdQuestions);
+                }
+                if (! empty($updatedQuestions)) {
+                    $summaryParts[] = 'Updated questions: ' . implode(', ', $updatedQuestions);
+                }
+
+                $description = ! empty($summaryParts)
+                    ? implode(' | ', $summaryParts)
+                    : 'Builder saved with no changes.';
+
+                // ── Single activity log entry for entire save ──────────
+                ActivityLogger::log(
+                    userId:   auth('admin')->id(),
+                    userType: 'admin',
+                    action:   'update',
+                    extra: [
+                        'model_type'  => 'Assessment',
+                        'model_id'    => $this->assessmentId,
+                        'description' => "Update Assessment Builder: {$this->title} [{$this->assessment_code}] | {$description}",
+
+                    ]
+                );
             });
 
             session()->flash('success', 'Assessment builder saved successfully.');
@@ -377,23 +431,65 @@ class AssessmentBuild extends Component
         $this->closeGroupPicker();
     }
 
+    /* ================================================================
+     |  REMOVE GROUP  (Delete)
+     * ================================================================*/
     public function removeAssessmentGroup(int $agIndex): void
     {
         $ag = $this->assessmentGroups[$agIndex] ?? null;
 
         if ($ag && $ag['assessment_group_id']) {
             AssessmentGroup::where('id', $ag['assessment_group_id'])->delete();
+
+            // ── Activity Log: Delete Group ─────────────────────────
+            ActivityLogger::log(
+                userId:   auth('admin')->id(),
+                userType: 'admin',
+                action:   'delete',
+                extra: [
+                    'model_type'  => 'AssessmentGroup',
+                    'model_id'    => $ag['assessment_group_id'],
+                    'description' => "Removed group [{$ag['group_code']}] from assessment: {$this->title} [{$this->assessment_code}]",
+                    'properties'  => [
+                        'assessment_id'     => $this->assessmentId,
+                        'question_group_id' => $ag['question_group_id'],
+                        'group_code'        => $ag['group_code'],
+                    ],
+                ]
+            );
         }
 
         array_splice($this->assessmentGroups, $agIndex, 1);
     }
 
+    /* ================================================================
+     |  REMOVE QUESTION  (Delete)
+     * ================================================================*/
     public function removeQuestionFromGroup(int $agIndex, int $qIndex): void
     {
-        $q = $this->assessmentGroups[$agIndex]['questions'][$qIndex] ?? null;
+        $q  = $this->assessmentGroups[$agIndex]['questions'][$qIndex] ?? null;
+        $ag = $this->assessmentGroups[$agIndex] ?? null;
 
         if ($q && ($q['assessment_question_id'] ?? null)) {
             AssessmentQuestion::where('id', $q['assessment_question_id'])->delete();
+
+            // ── Activity Log: Delete Question ──────────────────────
+            ActivityLogger::log(
+                userId:   auth('admin')->id(),
+                userType: 'admin',
+                action:   'delete',
+                extra: [
+                    'model_type'  => 'AssessmentQuestion',
+                    'model_id'    => $q['assessment_question_id'],
+                    'description' => "Removed question [{$q['question_code']}] from group [{$ag['group_code']}] — assessment: {$this->title} [{$this->assessment_code}]",
+                    'properties'  => [
+                        'assessment_id'   => $this->assessmentId,
+                        'question_id'     => $q['question_id'],
+                        'question_code'   => $q['question_code'],
+                        'group_code'      => $ag['group_code'] ?? null,
+                    ],
+                ]
+            );
         }
 
         array_splice($this->assessmentGroups[$agIndex]['questions'], $qIndex, 1);
@@ -406,7 +502,7 @@ class AssessmentBuild extends Component
     {
         $question = Question::with('questionGroup')->findOrFail($questionId);
 
-        $raw    = $question->getRawOriginal('question_content');
+        $raw     = $question->getRawOriginal('question_content');
         $content = is_array($question->question_content)
             ? $question->question_content
             : (is_string($raw) ? json_decode($raw, true) : []);
@@ -518,18 +614,15 @@ class AssessmentBuild extends Component
             return collect();
         }
 
-        // All question IDs already used across ALL groups
         $allUsedQuestionIds = collect($this->assessmentGroups)
             ->flatMap(fn($ag) => collect($ag['questions'])->pluck('question_id'))
             ->toArray();
 
         if ($this->pickerMode === 'existing' && $this->pickerAgIndex !== null) {
-            // Questions already in THIS specific group (show as disabled)
             $currentGroupQIds = collect(
                 $this->assessmentGroups[$this->pickerAgIndex]['questions']
             )->pluck('question_id')->toArray();
 
-            // Questions used in OTHER groups (exclude completely)
             $otherGroupsUsedIds = array_diff($allUsedQuestionIds, $currentGroupQIds);
 
             return Question::where('question_group_id', $this->pickerGroupId)
@@ -537,7 +630,6 @@ class AssessmentBuild extends Component
                 ->paginate(15);
         }
 
-        // For 'new' mode: exclude all already-used questions
         return Question::where('question_group_id', $this->pickerGroupId)
             ->whereNotIn('id', $allUsedQuestionIds)
             ->paginate(15);
@@ -553,6 +645,7 @@ class AssessmentBuild extends Component
             ->pluck('question_id')
             ->toArray();
     }
+
     /* ================================================================
      |  NAVIGATION
      * ================================================================*/
@@ -580,7 +673,7 @@ class AssessmentBuild extends Component
             'pickerQuestions'         => $this->view === 'group-picker' && $this->pickerGroupId
                 ? $this->pickerQuestions
                 : null,
-            'currentGroupQuestionIds' => $this->currentGroupQuestionIds, // ADD THIS
+            'currentGroupQuestionIds' => $this->currentGroupQuestionIds,
         ]);
     }
 }

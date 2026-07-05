@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use App\Models\AssessmentMaster\Assessment;
 use App\Models\EvaluationMaster\AgeGroup;
 use App\Helper\Globals;
+use App\Services\ActivityLogger;
 
 #[Layout('layouts.backend')]
 class AssessmentManage extends Component
@@ -82,7 +83,7 @@ class AssessmentManage extends Component
                 return;
             }
 
-            $this->assessmentId            = $decryptedId;  // ← Now assigning int
+            $this->assessmentId            = $decryptedId;
             $this->assessment_code         = $assessment->assessment_code;
             $this->title                   = $assessment->title;
             $this->instructions            = $assessment->instructions ?? '';
@@ -141,16 +142,16 @@ class AssessmentManage extends Component
                 'show_explainations'      => 'boolean',
             ],
             [
-                'title.required'              => 'Assessment title is required.',
-                'cover_image_file.image'      => 'Cover image must be an image file.',
-                'cover_image_file.mimes'      => 'Accepted formats: jpg, jpeg, png, webp.',
-                'cover_image_file.max'        => 'Cover image must not exceed 2MB.',
-                'assessment_type_id.required' => 'Please select an assessment type.',
-                'age_group_id.required'       => 'Please select an age group.',
+                'title.required'               => 'Assessment title is required.',
+                'cover_image_file.image'       => 'Cover image must be an image file.',
+                'cover_image_file.mimes'       => 'Accepted formats: jpg, jpeg, png, webp.',
+                'cover_image_file.max'         => 'Cover image must not exceed 2MB.',
+                'assessment_type_id.required'  => 'Please select an assessment type.',
+                'age_group_id.required'        => 'Please select an age group.',
                 'difficulty_level_id.required' => 'Please select an difficulty level.',
-                'passing_marks.required'      => 'Passing marks are required.',
-                'max_attempts.required'       => 'Max attempts is required.',
-                'max_attempts.min'            => 'Max attempts must be at least 1.',
+                'passing_marks.required'       => 'Passing marks are required.',
+                'max_attempts.required'        => 'Max attempts is required.',
+                'max_attempts.min'             => 'Max attempts must be at least 1.',
             ]
         );
 
@@ -196,18 +197,75 @@ class AssessmentManage extends Component
                 'updated_by'              => auth()->id(),
             ];
 
+            // ── UPDATE ─────────────────────────────────────────────
             if ($this->assessmentId) {
+
+                // Capture old values before update for properties log
+                $oldAssessment = Assessment::find($this->assessmentId);
+                $oldValues     = $oldAssessment ? $oldAssessment->only([
+                    'title',
+                    'assessment_code',
+                    'assessment_type_id',
+                    'age_group_id',
+                    'difficulty_level_id',
+                    'total_marks',
+                    'passing_marks',
+                    'duration_minutes',
+                    'status',
+                    'max_attempts',
+                    'has_negative_mark',
+                    'shuffle_sections',
+                    'show_result_immediately',
+                    'show_correct_answers',
+                    'show_explainations',
+                ]) : [];
+
                 Assessment::where('id', $this->assessmentId)->update($payload);
                 $assessment = Assessment::find($this->assessmentId);
+
+                // ── Activity Log: Update ───────────────────────────
+                ActivityLogger::log(
+                    userId:   auth('admin')->id(),
+                    userType: 'admin',
+                    action:   'update',
+                    extra: [
+                        'model_type'  => 'Assessment',
+                        'model_id'    => $assessment->id,
+                        'description' => "Updated assessment: {$assessment->title} [{$assessment->assessment_code}]",
+                        'properties'  => [
+                            'old' => $oldValues,
+                            'new' => $assessment->only(array_keys($oldValues)),
+                        ],
+                    ]
+                );
+
+                // ── INSERT ─────────────────────────────────────────────
             } else {
+
                 $payload['created_by'] = auth()->id();
                 $assessment            = Assessment::create($payload);
                 $this->assessmentId    = $assessment->id;
+
+                // ── Activity Log: Create ───────────────────────────
+                ActivityLogger::log(
+                    userId:   auth('admin')->id(),
+                    userType: 'admin',
+                    action:   'create',
+                    extra: [
+                        'model_type'  => 'Assessment',
+                        'model_id'    => $assessment->id,
+                        'description' => "Created assessment: {$assessment->title} [{$assessment->assessment_code}]",
+                        'properties'  => [
+                            'title'              => $assessment->title,
+                            'assessment_code'    => $assessment->assessment_code
+                        ],
+                    ]
+                );
             }
 
             $this->redirect(
                 route('admin.assessment-masters.build', ['id' => encrypt($assessment->id)]),
-               navigate: false
+                navigate: false
             );
 
         } catch (\Throwable $e) {
@@ -226,8 +284,6 @@ class AssessmentManage extends Component
         $this->cover_image_file = null;
         $this->cover_image_path = '';
     }
-
-
 
     /* ================================================================
      |  HELPERS

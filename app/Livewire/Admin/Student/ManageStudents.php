@@ -4,6 +4,7 @@
 namespace App\Livewire\Admin\Student;
 
 use App\Models\User;
+use App\Services\ActivityLogger;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Layout;
@@ -87,7 +88,17 @@ class ManageStudents extends Component
             }
 
             $user->delete();
+            ActivityLogger::log(
+                userId:   auth('admin')->id(),
+                userType: 'admin',
+                action:   'delete',
+                extra: [
+                    'model_type'  => 'User',
+                    'model_id'    =>  $user->id,
+                    'description' => "Deleted Student: {$user->name}",
 
+                ]
+            );
             $this->dispatch('notify', [
                 'message' => 'Student deleted successfully',
                 'type' => 'success'

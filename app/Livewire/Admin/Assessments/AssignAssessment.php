@@ -11,7 +11,7 @@ use App\Models\Master\Organisation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Crypt;
-
+use App\Services\ActivityLogger;
 #[Layout('layouts.backend')]
 class AssignAssessment extends Component
 {
@@ -95,27 +95,32 @@ class AssignAssessment extends Component
         abort_unless(Gate::allows('system.assessment.assign'), 403);
 
         $this->validate([
-            'selectedOrganisations' => 'required|array|min:1',
+            'selectedOrganisations'   => 'required|array|min:1',
             'selectedOrganisations.*' => 'exists:organisations,id',
-            'expiryDate' => 'nullable|date|after:today',
+            'expiryDate'              => 'nullable|date|after:today',
         ], [
             'selectedOrganisations.required' => 'Please select at least one organisation.',
-            'selectedOrganisations.min' => 'Please select at least one organisation.',
+            'selectedOrganisations.min'      => 'Please select at least one organisation.',
         ]);
 
         try {
             DB::beginTransaction();
 
+            // Capture previously assigned organisation IDs before sync
+            $previousOrgIds = $this->assessment->organisations()
+                ->pluck('organisations.id')
+                ->toArray();
+
             $syncData = [];
 
             foreach ($this->selectedOrganisations as $orgId) {
                 $syncData[$orgId] = [
-                    'assigned_by' => auth()->id(),
-                    'status' => 'active',
-                    'assigned_date' => now(),
-                    'expiry_date' => $this->expiryDate,
+                    'assigned_by'     => auth()->id(),
+                    'status'          => 'active',
+                    'assigned_date'   => now(),
+                    'expiry_date'     => $this->expiryDate,
                     'assignment_note' => $this->assignmentNote,
-                    'updated_at' => now(),
+                    'updated_at'      => now(),
                 ];
             }
 
@@ -123,6 +128,34 @@ class AssignAssessment extends Component
             $this->assessment->organisations()->sync($syncData);
 
             DB::commit();
+
+            // Determine added and removed organisation IDs after sync
+            $newOrgIds     = array_map('intval', $this->selectedOrganisations);
+            $addedOrgIds   = array_values(array_diff($newOrgIds, $previousOrgIds));
+            $removedOrgIds = array_values(array_diff($previousOrgIds, $newOrgIds));
+
+            // Log the assignment activity
+            ActivityLogger::log(
+                userId:   auth('admin')->id(),
+                userType: 'admin',
+                action:   'assign_assessment_organisations',
+                extra: [
+                    'model_type'  => 'Assessment',
+                    'model_id'    => $this->assessment->id,
+                    'description' => "Assigned assessment '{$this->assessment->title}' to " . count($this->selectedOrganisations) . " organisation(s).",
+                    'properties'  => [
+                        'assessment_id'          => $this->assessment->id,
+                        'assessment_title'       => $this->assessment->title,
+                        'previous_org_ids'       => $previousOrgIds,
+                        'new_org_ids'            => $newOrgIds,
+                        'added_org_ids'          => $addedOrgIds,
+                        'removed_org_ids'        => $removedOrgIds,
+                        'expiry_date'            => $this->expiryDate,
+                        'assignment_note'        => $this->assignmentNote,
+                        'total_assigned'         => count($this->selectedOrganisations),
+                    ],
+                ]
+            );
 
             session()->flash('success', 'Assessment assigned successfully to ' . count($this->selectedOrganisations) . ' organisation(s).');
 
@@ -140,9 +173,40 @@ class AssignAssessment extends Component
         abort_unless(Gate::allows('system.assessment.assign'), 403);
 
         try {
+            // Capture organisation details before detaching for the log
+            $organisation = \App\Models\Master\Organisation::find($organisationId);
+
+            // Get assignment details before removal (if needed for detailed logging)
+            $assignmentDetails = $this->assessment->organisations()
+                ->where('organisations.id', $organisationId)
+                ->first();
+
+            // Detach the organisation
             $this->assessment->organisations()->detach($organisationId);
 
+            // Update UI state
             $this->selectedOrganisations = array_diff($this->selectedOrganisations, [$organisationId]);
+
+            // Log the removal activity
+            ActivityLogger::log(
+                userId:   auth('admin')->id(),
+                userType: 'admin',
+                action:   'remove_assessment_organisation',
+                extra: [
+                    'model_type'  => 'Assessment',
+                    'model_id'    => $this->assessment->id,
+                    'description' => "Removed organisation '{$organisation?->name}' from assessment '{$this->assessment->title}'",
+                    'properties'  => [
+                        'assessment_id'       => $this->assessment->id,
+                        'assessment_title'    => $this->assessment->title,
+                        'organisation_id'     => $organisationId,
+                        'organisation_name'   => $organisation?->name,
+                        'assigned_date'       => $assignmentDetails?->pivot?->assigned_date,
+                        'expiry_date'         => $assignmentDetails?->pivot?->expiry_date,
+                        'assignment_note'     => $assignmentDetails?->pivot?->assignment_note,
+                    ],
+                ]
+            );
 
             session()->flash('success', 'Organisation removed from assignment.');
 

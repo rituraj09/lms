@@ -8,6 +8,7 @@ use App\Models\Role;
 use App\Models\Permission;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
+use App\Services\ActivityLogger;
 
 #[Layout('layouts.backend')]
 class RoleManager extends Component
@@ -187,7 +188,20 @@ class RoleManager extends Component
             }
 
             DB::commit();
-
+            // Log: revoke system permission
+            ActivityLogger::log(
+                userId:   auth('admin')->id(),
+                userType: 'admin',
+                action:   'create',
+                extra: [
+                    'model_type'  => 'Role',
+                    'model_id'    => $role->id,
+                    'description' => "Create role: {$role->name}",
+                    'properties'  => [
+                        'name'   => $role->name,
+                    ],
+                ]
+            );
             session()->flash('success', "Role '{$role->display_name}' created successfully!");
             $this->backToList();
             $this->resetPage();
@@ -237,7 +251,19 @@ class RoleManager extends Component
             );
 
             DB::commit();
-
+            ActivityLogger::log(
+                userId:   auth('admin')->id(),
+                userType: 'admin',
+                action:   'update',
+                extra: [
+                    'model_type'  => 'Role',
+                    'model_id'    => $role->id,
+                    'description' => "Update role: {$role->name}",
+                    'properties'  => [
+                        'name'   => $role->name,
+                    ],
+                ]
+            );
             session()->flash('success', "Role '{$role->display_name}' updated successfully!");
             $this->backToList();
 
@@ -269,7 +295,19 @@ class RoleManager extends Component
             $role->permissions()->detach();
             $role->delete();
             DB::commit();
-
+            ActivityLogger::log(
+                userId:   auth('admin')->id(),
+                userType: 'admin',
+                action:   'delete',
+                extra: [
+                    'model_type'  => 'Role',
+                    'model_id'    => $role->id,
+                    'description' => "Delete role: {$role->name}",
+                    'properties'  => [
+                        'name'   => $role->name,
+                    ],
+                ]
+            );
             session()->flash('success', "Role '{$role->display_name}' deleted successfully!");
             $this->resetPage();
 

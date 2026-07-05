@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin\AssessmentMasters;
 
+use App\Services\ActivityLogger;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use App\Models\AssessmentMaster\Assessment;
@@ -147,7 +148,17 @@ class AssessmentList extends Component
                 return;
             }
         }
+        ActivityLogger::log(
+            userId:   auth('admin')->id(),
+            userType: 'admin',
+            action:   'change',
+            extra: [
+                'model_type'  => 'Assessment',
+                'model_id'    => $id,
+                'description' => "Change status of the assessment to $newStatus. Assessment code:  $assessment->assessment_code",
 
+            ]
+        );
         $assessment->status     = $newStatus;
         $assessment->updated_by = auth()->id();
         $assessment->save();

@@ -644,7 +644,7 @@
         }
 
         .breadcrumb-dots .breadcrumb-item::after {
-            content: "•";
+
             padding: 0 0.5rem;
         }
 

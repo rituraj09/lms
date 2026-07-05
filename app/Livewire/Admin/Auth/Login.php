@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use App\Services\ActivityLogger;
 
 #[Layout('layouts.auth')]
 class Login extends Component
@@ -60,6 +61,18 @@ class Login extends Component
 
         if (RateLimiter::tooManyAttempts($key, 3)) {
             $this->addError('email', 'Too many login attempts. Please try again later.');
+
+            // ✅ Log rate limit hit - we don't have user id so use 0
+            ActivityLogger::log(
+                userId:   0,
+                userType: 'admin',
+                action:   'login_rate_limited',
+                extra: [
+                    'description' => "Rate limit hit for: {$this->email}",
+                    'properties'  => ['email' => $this->email],
+                ]
+            );
+
             return;
         }
 
@@ -70,20 +83,47 @@ class Login extends Component
 
         // Find active admin
         $admin = Admin::where($this->field, $this->email)
-                      ->with('roles', 'organisations')
-                      ->active()
-                      ->first();
+            ->with('roles', 'organisations')
+            ->active()
+            ->first();
 
+        // ✅ Log account not found or inactive
         if (!$admin) {
             $this->addError('password', 'No account found or your account is not active.');
+
+            ActivityLogger::log(
+                userId:   0,
+                userType: 'admin',
+                action:   'login_failed',
+                extra: [
+                    'description' => "Login failed - account not found: {$this->email}",
+                    'properties'  => [
+                        'reason' => 'account_not_found',
+                        'email'  => $this->email,
+                    ],
+                ]
+            );
+
             return;
         }
 
         // Check role
         $role = $admin->roles->first();
 
+        // ✅ Log no role assigned
         if (!$role) {
             $this->addError('password', 'This account does not have access to any services.');
+
+            ActivityLogger::log(
+                userId:   $admin->id,
+                userType: 'admin',
+                action:   'login_failed',
+                extra: [
+                    'description' => "Login failed - no role assigned for: {$admin->email}",
+                    'properties'  => ['reason' => 'no_role_assigned'],
+                ]
+            );
+
             return;
         }
 
@@ -94,15 +134,87 @@ class Login extends Component
         )) {
             RateLimiter::clear($key);
 
-            // Get the authenticated user
             $authenticatedAdmin = Auth::guard('admin')->user();
-            $redirectUrl = $this->getRedirectUrl($authenticatedAdmin);
 
-            // ✅ Use redirect() with return
+            // ✅ Log successful login
+            ActivityLogger::log(
+                userId:   $authenticatedAdmin->id,
+                userType: 'admin',
+                action:   'login_success',
+                extra: [
+                    'description' => "Admin logged in: {$authenticatedAdmin->email}",
+                    'properties'  => [
+                        'login_via' => $this->field,   // 'email' or 'mobile'
+                        'role'      => $role->name,
+                        'remember'  => $this->remember,
+                    ],
+                ]
+            );
+
+            $redirectUrl = $this->getRedirectUrl($authenticatedAdmin);
             return redirect($redirectUrl);
         }
 
+        // ✅ Log wrong password
+        ActivityLogger::log(
+            userId:   $admin->id,
+            userType: 'admin',
+            action:   'login_failed',
+            extra: [
+                'description' => "Login failed - wrong password for: {$admin->email}",
+                'properties'  => ['reason' => 'invalid_password'],
+            ]
+        );
+
         $this->addError('password', 'Invalid credentials. Please try again.');
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // FORGOT PASSWORD — STEP 3 (Password Reset)
+    // ─────────────────────────────────────────────────────────
+
+    public function resetPassword(): void
+    {
+        $this->validate(
+            [
+                'pass' => [
+                    'required',
+                    'confirmed',
+                    'regex:/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,16}$/',
+                ],
+            ],
+            [
+                'pass.required'  => 'Password is required.',
+                'pass.confirmed' => 'Password and confirm password do not match.',
+                'pass.regex'     => 'Password must be 8-16 characters with uppercase, lowercase, number & special character.',
+            ]
+        );
+
+        if (!$this->official) {
+            $this->addError('pass', 'Session expired. Please start again.');
+            $this->createForm = 0;
+            return;
+        }
+
+        $this->official->update([
+            'password' => Hash::make($this->pass),
+        ]);
+
+        // ✅ Log password reset
+        ActivityLogger::log(
+            userId:   $this->official->id,
+            userType: 'admin',
+            action:   'password_reset',
+            extra: [
+                'description' => "Password reset successfully for: {$this->official->email}",
+                'properties'  => ['reset_via' => 'forgot_password'],
+            ]
+        );
+
+        $this->reset();
+        $this->createForm = 0;
+
+        session()->flash('success', 'Password reset successfully. Please login.');
     }
 
     /**
@@ -110,6 +222,8 @@ class Login extends Component
      */
     private function getRedirectUrl(Admin $admin): string
     {
+
+
         // Super admin goes to system home
         if ($admin->isSuperAdmin()) {
             return route('admin.home');
@@ -233,38 +347,7 @@ class Login extends Component
     // FORGOT PASSWORD — STEP 3
     // ─────────────────────────────────────────────────────────
 
-    public function resetPassword(): void
-    {
-        $this->validate(
-            [
-                'pass' => [
-                    'required',
-                    'confirmed',
-                    'regex:/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,16}$/',
-                ],
-            ],
-            [
-                'pass.required'  => 'Password is required.',
-                'pass.confirmed' => 'Password and confirm password do not match.',
-                'pass.regex'     => 'Password must be 8-16 characters with uppercase, lowercase, number & special character.',
-            ]
-        );
 
-        if (!$this->official) {
-            $this->addError('pass', 'Session expired. Please start again.');
-            $this->createForm = 0;
-            return;
-        }
-
-        $this->official->update([
-            'password' => Hash::make($this->pass),
-        ]);
-
-        $this->reset();
-        $this->createForm = 0;
-
-        session()->flash('success', 'Password reset successfully. Please login.');
-    }
 
     // ─────────────────────────────────────────────────────────
     // OTP EVENT LISTENERS

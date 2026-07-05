@@ -16,7 +16,9 @@ use App\Livewire\Admin\Student\ManageStudents;
 use App\Livewire\Admin\Student\StudentForm;
 use App\Livewire\Admin\Student\StudentDetails;
 use App\Livewire\Admin\Reports\StudentList;
+use App\Livewire\Admin\Reports\ActivityLogs;
 use App\Livewire\Admin\Dashboard;
+use App\Livewire\Admin\RolePermission\AdminPermissionManager;
 
 // ── Guest Routes (not logged in) ──────────────────────────────────
 Route::middleware('redirect.auth:admin')->group(function ($router) {
@@ -41,7 +43,7 @@ Route::group(['middleware' => ['redirect.notauth:admin','auth:admin']], function
             ->name('create')
             ->middleware('can:system.question.create');
 
-        $router->get('/{groupId}/edit', QuestionGroupForm::class)
+        $router->get('/edit/{groupId}', QuestionGroupForm::class)
             ->name('edit')
             ->middleware('can:system.question.edit');
     });
@@ -91,14 +93,15 @@ Route::group(['middleware' => ['redirect.notauth:admin','auth:admin']], function
             ->name('create')
             ->middleware('can:system.admin.create');
 
-        $router->get('/{id}/edit', \App\Livewire\Admin\AdminManagement\AdminForm::class)
+        $router->get('/edit/{id}', \App\Livewire\Admin\AdminManagement\AdminForm::class)
             ->name('edit')
             ->middleware('can:system.admin.edit');
 
         //  SYSTEM LEVEL - Permission Management
-        $router->get('/{admin}/permissions', \App\Livewire\Admin\RolePermission\AdminPermissionManager::class)
-            ->name('permissions')
+        $router->get('/check-permissions/{id}', \App\Livewire\Admin\RolePermission\AdminPermissionManager::class)
+            ->name('check-permissions')
             ->middleware(['can:system.admin.assign_permissions', 'protect.superadmin']);
+
     });
     // ────────────────────────────────────────────────────────────
     // SYSTEM LEVEL - ROLES MANAGEMENT
@@ -138,6 +141,8 @@ Route::group(['middleware' => ['redirect.notauth:admin','auth:admin']], function
             ->name('reports.student-list');
         $router->get('/student-report-cards', StudentReportCard::class)->name('report-cards');
         $router->get('/student-detailed-report/{studentId}', StudentDetailedReport::class)->name('detailed-report');
+        $router->get('/admin/activity-logs', ActivityLogs::class)
+            ->name('activity-logs');
     });
 
     // ────────────────────────────────────────────────────────────

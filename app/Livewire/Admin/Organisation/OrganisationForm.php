@@ -13,6 +13,7 @@ use App\Models\Master\OrganisationType;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use App\Traits\WithOrganisationAccess;
+use App\Services\ActivityLogger;
 
 #[Layout('layouts.backend')]
 class OrganisationForm extends Component
@@ -152,10 +153,33 @@ class OrganisationForm extends Component
 
         if ($this->isEditing) {
             $this->organisation->update($data);
-            $this->dispatch('notify', type: 'success', message: 'Organisation updated successfully!');
-        } else {
+            // Log update activity
+            ActivityLogger::log(
+                userId:   auth('admin')->id(),
+                userType: 'admin',
+                action:   'update',
+                extra: [
+                    'model_type'  => 'Organisation',
+                    'model_id'    => $this->organisation->id,
+                    'description' => "Updated organisation: {$this->organisation->name}",
 
-            Organisation::create($data);
+                ]
+            );
+            $this->dispatch('notify', type: 'success', message: 'Organisation updated successfully!');
+
+        } else {
+            $organisation = Organisation::create($data);
+            ActivityLogger::log(
+                userId:   auth('admin')->id(),
+                userType: 'admin',
+                action:   'create',
+                extra: [
+                    'model_type'  => 'Organisation',
+                    'model_id'    =>  $organisation->id,
+                    'description' => "Created organisation: {$organisation->name}",
+
+                ]
+            );
             $this->dispatch('notify', type: 'success', message: 'Organisation created successfully!');
             $this->redirect(route('admin.organisations.index'), navigate: false);
         }

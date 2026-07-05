@@ -3,6 +3,7 @@
 
 namespace App\Livewire\Admin\AdminManagement;
 
+use App\Services\ActivityLogger;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Admin;
@@ -99,7 +100,21 @@ class AdminList extends Component
         }
 
         $admin->delete();
+        ActivityLogger::log(
+            userId:   auth('admin')->id(),
+            userType: 'admin',
+            action:   'delete',
+            extra: [
+                'model_type'  => 'Admin',
+                'model_id'    => $admin->id,
+                'description' => "Deleted admin: {$admin->name}",
+                'properties'  => [
 
+                    'email'         => $admin->email,
+                    'mobile'        => $admin->mobile,
+                ],
+            ]
+        );
         // Close modal if viewing the deleted admin
         if ($this->viewingAdminId === $id) {
             $this->closeDetailModal();

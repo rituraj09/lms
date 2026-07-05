@@ -175,13 +175,13 @@
                                     </button>
 
                                     {{-- Edit --}}
-                                    <a href="{{ route('admin.admins.edit', $admin->id) }}"
+                                    <a href="{{ route('admin.admins.edit', encrypt($admin->id)) }}"
                                         class="btn btn-sm btn-outline-primary" title="Edit">
                                         <i class="ri ri-edit-2-line"></i>
                                     </a>
 
                                     {{-- Permissions --}}
-                                    <a href="{{ route('admin.admins.permissions', $admin->id) }}"
+                                    <a href="{{ route('admin.admins.check-permissions', encrypt($admin->id)) }}"
                                         class="btn btn-sm btn-outline-info" title="Manage Permissions">
                                         <i class="ri ri-shield-user-fill"></i>
                                     </a>
@@ -468,10 +468,10 @@
 
                 {{-- Modal Footer --}}
                 <div class="admin-modal-footer">
-                    <a href="{{ route('admin.admins.edit', $viewingAdmin->id) }}" class="btn btn-primary btn-sm">
+                    <a href="{{ route('admin.admins.edit', encrypt($viewingAdmin->id)) }}" class="btn btn-primary btn-sm">
                         <i class="ri ri-edit-2-line me-1"></i> Edit Admin
                     </a>
-                    <a href="{{ route('admin.admins.permissions', $viewingAdmin->id) }}"
+                    <a href="{{ route('admin.admins.check-permissions', encrypt($viewingAdmin->id)) }}"
                         class="btn btn-outline-info btn-sm">
                         <i class="ri ri-shield-user-fill me-1"></i> Manage Permissions
                     </a>

@@ -4,6 +4,7 @@
 namespace App\Livewire\Admin\Student;
 
 use App\Models\User;
+use App\Services\ActivityLogger;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Illuminate\Support\Facades\Crypt;
@@ -70,7 +71,17 @@ class StudentDetails extends Component
         $this->student->update([
             'password' => Hash::make($this->newPassword)
         ]);
+        ActivityLogger::log(
+            userId:   auth('admin')->id(),
+            userType: 'admin',
+            action:   'update',
+            extra: [
+                'model_type'  => 'User',
+                'model_id'    =>  $this->student->id,
+                'description' => "Password Changed Student: {$this->student->name}",
 
+            ]
+        );
         // Show modal with new password
         $this->showResetPasswordModal = true;
 

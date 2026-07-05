@@ -9,7 +9,7 @@ use Livewire\WithPagination;
 use App\Models\Master\Organisation;
 use App\Services\OrganisationContext;
 use Livewire\Attributes\Layout;
-
+use App\Services\ActivityLogger;
 
 #[Layout('layouts.backend')]
 class OrganisationList extends Component
@@ -63,7 +63,17 @@ class OrganisationList extends Component
 
         $org = Organisation::findOrFail($id);
         $org->delete();
+        ActivityLogger::log(
+            userId:   auth('admin')->id(),
+            userType: 'admin',
+            action:   'delete',
+            extra: [
+                'model_type'  => 'Organisation',
+                'model_id'    =>  $org->id,
+                'description' => "Deleted organisation: {$org->name}",
 
+            ]
+        );
         $this->dispatch('notify', type: 'success', message: 'Organisation deleted successfully!');
     }
 

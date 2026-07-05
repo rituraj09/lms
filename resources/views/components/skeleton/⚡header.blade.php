@@ -2,6 +2,7 @@
 //views/skeleton/header.blade.php
 use App\Traits\WithAdmin;
 use Livewire\Component;
+use App\Services\ActivityLogger;
 
 new class extends Component {
     use WithAdmin;
@@ -11,6 +12,17 @@ new class extends Component {
 
     public function logout()
     {
+        $admin = Auth::guard('admin')->user();
+        // ✅ Log before logout so we still have user id
+        ActivityLogger::log(
+            userId:   $admin->id,
+            userType: 'admin',
+            action:   'logout',
+            extra: [
+                'description' => "Admin logged out: {$admin->email}",
+            ]
+        );
+
         Auth::guard('admin')->logout();
         session()->invalidate();
         session()->regenerateToken();

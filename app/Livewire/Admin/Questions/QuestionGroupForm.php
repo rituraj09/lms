@@ -16,6 +16,7 @@ use App\Models\EvaluationMaster\PrimarySkillType;
 use App\Models\EvaluationMaster\SubSkillType;
 use App\Models\EvaluationMaster\DifficultyLevel;
 use App\Models\EvaluationMaster\AgeGroup;
+use App\Services\ActivityLogger;
 
 #[Layout('layouts.backend')]
 class QuestionGroupForm extends Component
@@ -34,7 +35,7 @@ class QuestionGroupForm extends Component
      | LOCKED
      * ================================================================*/
     #[Locked]
-    public ?int $groupId = null;
+    public ?string $groupId = null;
 
     #[Locked]
     public bool $isGroupLocked = false;
@@ -106,8 +107,9 @@ class QuestionGroupForm extends Component
     /* ================================================================
      | MOUNT
      * ================================================================*/
-    public function mount(?int $groupId = null): void
+    public function mount(?string $groupId = null): void
     {
+        $groupId = $groupId ? (int) decrypt($groupId) : null;
         $this->languages = array_keys(Globals::LANGUAGES);
         $this->groupId   = $groupId;
 
@@ -388,6 +390,7 @@ class QuestionGroupForm extends Component
             // Embed image path into the JSON payload
             $this->group_content['image'] = $imagePath;
             // ─────────────────────────────────────────────────────────
+            $isNew = is_null($this->groupId);
 
             $group = QuestionGroup::updateOrCreate(
                 ['id' => $this->groupId],
@@ -404,6 +407,23 @@ class QuestionGroupForm extends Component
             );
 
             $this->groupId = $group->id;
+            // ✅ Log create or update
+            ActivityLogger::log(
+                userId:   auth()->id(),
+                userType: 'admin',
+                action:   $isNew ? 'create' : 'update',
+                extra: [
+                    'model_type'  => 'QuestionGroup',
+                    'model_id'    => $group->id,
+                    'description' => $isNew
+                        ? "Created question group: {$group->group_code}"
+                        : "Updated question group: {$group->group_code}",
+                    'properties'  => [
+                        'group_code'         => $group->group_code,
+                        'questions_category' => $group->questions_category,
+                    ],
+                ]
+            );
             $this->loadQuestionsList();
             $this->view = 'group_view';
 
@@ -538,6 +558,7 @@ class QuestionGroupForm extends Component
         }
 
         try {
+            $isNew = is_null($this->activeQuestion['id'] ?? null);
             DB::transaction(function () {
                 $stemImagePath = $this->activeQuestion['existing_image'] ?? null;
 
@@ -602,6 +623,25 @@ class QuestionGroupForm extends Component
                 $this->activeQuestion['id'] = $question->id;
             });
 
+            ActivityLogger::log(
+                userId:   auth()->id(),
+                userType: 'admin',
+                action:   $isNew ? 'create' : 'update',
+                extra: [
+                    'model_type'  => 'Question',
+                    'model_id'    => $this->activeQuestion['id'],
+                    'description' => $isNew
+                        ? "Created question: {$this->activeQuestion['question_code']}"
+                        : "Updated question: {$this->activeQuestion['question_code']}",
+                    'properties'  => [
+                        'question_code'   => $this->activeQuestion['question_code'],
+                        'answer_category' => $this->activeQuestion['answer_category'],
+                        'marks'           => $this->activeQuestion['marks'],
+                        'group_id'        => $this->groupId,
+                    ],
+                ]
+            );
+
             $this->loadQuestionsList();
             $this->resetQuestionForm();
             $this->view = 'group_view';
@@ -647,6 +687,21 @@ class QuestionGroupForm extends Component
         }
 
         $question->forceDelete();
+        ActivityLogger::log(
+            userId:   auth()->id(),
+            userType: 'admin',
+            action:   'delete',
+            extra: [
+                'model_type'  => 'Question',
+                'model_id'    => $questionId,
+                'description' => "Deleted question: {$questionCode}",
+                'properties'  => [
+                    'question_code' => $questionCode,
+                    'group_id'      => $this->groupId,
+                ],
+            ]
+        );
+
         $this->loadQuestionsList();
 
         session()->flash('success', 'Question deleted successfully.');

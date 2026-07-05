@@ -1111,7 +1111,7 @@
                     </li>
                     <li class="breadcrumb-item">
                         <a href="#" wire:click.prevent="cancelQuestion">
-                            {{ $group_content['title'][array_key_first($languages)] ?? $group_code }}
+                            {{ $group_content['title']['en'] ?? $group_code }}
                         </a>
                     </li>
                     <li class="breadcrumb-item active">

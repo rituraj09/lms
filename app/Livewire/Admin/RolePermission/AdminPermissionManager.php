@@ -7,6 +7,7 @@ use Livewire\Component;
 use App\Models\Admin;
 use App\Models\Role;
 use App\Models\Permission;
+use App\Services\ActivityLogger;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
@@ -33,15 +34,14 @@ class AdminPermissionManager extends Component
 
     protected $queryString = ['search', 'selectedGroup', 'mode'];
 
-    // ✅ FIXED: Accept Admin model directly from route binding
-    public function mount(Admin $admin)
+    public function mount(?string $id): void
     {
-        $this->admin = $admin;
+        $id = decrypt($id);
 
-        // Authorization check
+        $this->admin = Admin::findOrFail($id);
+
         $this->authorize('system.admin.assign_permissions');
 
-        // ✅ Additional check: Can this user manage the target admin?
         if (!auth('admin')->user()->canAssignPermissions($this->admin)) {
             abort(403, 'You cannot manage permissions for this admin.');
         }
@@ -51,7 +51,6 @@ class AdminPermissionManager extends Component
 
     public function loadCurrentPermissions()
     {
-        // ✅ Refresh admin to get latest data
         $this->admin->refresh();
         $this->admin->load(['roles', 'permissions', 'organisations']);
 
@@ -79,8 +78,8 @@ class AdminPermissionManager extends Component
 
         \Log::info('Loaded Permissions', [
             'system_permissions' => $this->systemPermissions,
-            'org_permissions' => $this->orgPermissions,
-            'selected_org' => $this->selectedOrg,
+            'org_permissions'    => $this->orgPermissions,
+            'selected_org'       => $this->selectedOrg,
         ]);
     }
 
@@ -91,7 +90,6 @@ class AdminPermissionManager extends Component
             return;
         }
 
-        // ✅ Verify admin has access to this org
         if (!$this->admin->hasOrganisationAccess($orgId)) {
             session()->flash('error', 'This admin does not have access to this organisation.');
             $this->selectedOrg = null;
@@ -113,13 +111,11 @@ class AdminPermissionManager extends Component
      */
     public function toggleSystemPermission($permissionId)
     {
-        // ✅ Prevent self-modification
         if ($this->admin->id === auth('admin')->id()) {
             session()->flash('error', 'You cannot modify your own permissions!');
             return;
         }
 
-        // ✅ Prevent non-super-admin from assigning to super-admin
         if ($this->admin->isSuperAdmin() && !auth('admin')->user()->isSuperAdmin()) {
             session()->flash('error', 'You cannot modify Super Admin permissions!');
             return;
@@ -127,13 +123,56 @@ class AdminPermissionManager extends Component
 
         try {
             $permissionId = (int) $permissionId;
-            $permission = Permission::findOrFail($permissionId);
+            $permission   = Permission::findOrFail($permissionId);
 
-            if (in_array($permissionId, $this->systemPermissions, true)) {
+            // Determine grant or revoke before making changes
+            $isRevoking = in_array($permissionId, $this->systemPermissions, true);
+
+            if ($isRevoking) {
                 $this->admin->revokePermissionTo($permission);
+
+                // Log: revoke system permission
+                ActivityLogger::log(
+                    userId:   auth('admin')->id(),
+                    userType: 'admin',
+                    action:   'revoke_permission',
+                    extra: [
+                        'model_type'  => 'Admin',
+                        'model_id'    => $this->admin->id,
+                        'description' => "Revoked system permission from admin: {$this->admin->name}",
+                        'properties'  => [
+                            'permission_id'   => $permission->id,
+                            'permission_name' => $permission->name,
+                            'display_name'    => $permission->display_name,
+                            'target_admin_id' => $this->admin->id,
+                            'target_admin'    => $this->admin->name,
+                        ],
+                    ]
+                );
+
                 session()->flash('success', "Permission '{$permission->display_name}' removed!");
             } else {
                 $this->admin->givePermissionTo($permission);
+
+                // Log: grant system permission
+                ActivityLogger::log(
+                    userId:   auth('admin')->id(),
+                    userType: 'admin',
+                    action:   'grant_permission',
+                    extra: [
+                        'model_type'  => 'Admin',
+                        'model_id'    => $this->admin->id,
+                        'description' => "Granted system permission '{$permission->display_name}' to admin: {$this->admin->name}",
+                        'properties'  => [
+                            'permission_id'   => $permission->id,
+                            'permission_name' => $permission->name,
+                            'display_name'    => $permission->display_name,
+                            'target_admin_id' => $this->admin->id,
+                            'target_admin'    => $this->admin->name,
+                        ],
+                    ]
+                );
+
                 session()->flash('success', "Permission '{$permission->display_name}' granted!");
             }
 
@@ -142,9 +181,9 @@ class AdminPermissionManager extends Component
         } catch (\Exception $e) {
             session()->flash('error', 'Failed to update permission: ' . $e->getMessage());
             \Log::error('Permission toggle failed', [
-                'error' => $e->getMessage(),
-                'admin_id' => $this->admin->id,
-                'permission_id' => $permissionId ?? null
+                'error'         => $e->getMessage(),
+                'admin_id'      => $this->admin->id,
+                'permission_id' => $permissionId ?? null,
             ]);
         }
     }
@@ -154,13 +193,11 @@ class AdminPermissionManager extends Component
      */
     public function toggleOrgPermission($permissionId)
     {
-        // ✅ Prevent self-modification
         if ($this->admin->id === auth('admin')->id()) {
             session()->flash('error', 'You cannot modify your own permissions!');
             return;
         }
 
-        // ✅ Prevent non-super-admin from assigning to super-admin
         if ($this->admin->isSuperAdmin() && !auth('admin')->user()->isSuperAdmin()) {
             session()->flash('error', 'You cannot modify Super Admin permissions!');
             return;
@@ -173,21 +210,44 @@ class AdminPermissionManager extends Component
 
         try {
             $permissionId = (int) $permissionId;
-            $permission = Permission::findOrFail($permissionId);
+            $permission   = Permission::findOrFail($permissionId);
 
-            if (in_array($permission->name, $this->orgPermissions, true)) {
-                // Remove from org permissions
+            // Determine grant or revoke before making changes
+            $isRevoking = in_array($permission->name, $this->orgPermissions, true);
+
+            if ($isRevoking) {
                 $this->orgPermissions = array_filter(
                     $this->orgPermissions,
                     fn($p) => $p !== $permission->name
                 );
             } else {
-                // Add to org permissions
                 $this->orgPermissions[] = $permission->name;
             }
 
-            // ✅ Save to pivot table
+            // Save to pivot table
             $this->admin->setOrgPermissions($this->selectedOrg, $this->orgPermissions);
+
+            // Log: org permission toggle (grant or revoke)
+            ActivityLogger::log(
+                userId:   auth('admin')->id(),
+                userType: 'admin',
+                action:   $isRevoking ? 'revoke_permission' : 'grant_permission',
+                extra: [
+                    'model_type'  => 'Admin',
+                    'model_id'    => $this->admin->id,
+                    'description' => $isRevoking
+                        ? "Revoked org permission '{$permission->display_name}' from admin: {$this->admin->name} for org ID: {$this->selectedOrg}"
+                        : "Granted org permission '{$permission->display_name}' to admin: {$this->admin->name} for org ID: {$this->selectedOrg}",
+                    'properties'  => [
+                        'permission_id'   => $permission->id,
+                        'permission_name' => $permission->name,
+                        'display_name'    => $permission->display_name,
+                        'organisation_id' => $this->selectedOrg,
+                        'target_admin_id' => $this->admin->id,
+                        'target_admin'    => $this->admin->name,
+                    ],
+                ]
+            );
 
             session()->flash('success', "Permission '{$permission->display_name}' updated!");
             $this->loadCurrentPermissions();
@@ -195,10 +255,10 @@ class AdminPermissionManager extends Component
         } catch (\Exception $e) {
             session()->flash('error', 'Failed to update permission: ' . $e->getMessage());
             \Log::error('Org permission toggle failed', [
-                'error' => $e->getMessage(),
-                'admin_id' => $this->admin->id,
-                'org_id' => $this->selectedOrg,
-                'permission_id' => $permissionId ?? null
+                'error'         => $e->getMessage(),
+                'admin_id'      => $this->admin->id,
+                'org_id'        => $this->selectedOrg,
+                'permission_id' => $permissionId ?? null,
             ]);
         }
     }
@@ -217,11 +277,35 @@ class AdminPermissionManager extends Component
             DB::beginTransaction();
 
             $count = count($this->systemPermissions);
+
+            // Capture permission names before detaching for the log
+            $removedPermissionNames = Permission::whereIn('id', $this->systemPermissions)
+                ->pluck('name')
+                ->toArray();
+
             $this->admin->permissions()
-                        ->where('name', 'like', 'system.%')
-                        ->detach();
+                ->where('name', 'like', 'system.%')
+                ->detach();
 
             DB::commit();
+
+            // Log: bulk remove system permissions
+            ActivityLogger::log(
+                userId:   auth('admin')->id(),
+                userType: 'admin',
+                action:   'revoke_permissions',
+                extra: [
+                    'model_type'  => 'Admin',
+                    'model_id'    => $this->admin->id,
+                    'description' => "Removed all {$count} system permission(s) from admin: {$this->admin->name}",
+                    'properties'  => [
+                        'removed_count'       => $count,
+                        'removed_permissions' => $removedPermissionNames,
+                        'target_admin_id'     => $this->admin->id,
+                        'target_admin'        => $this->admin->name,
+                    ],
+                ]
+            );
 
             $this->loadCurrentPermissions();
             session()->flash('success', "Removed {$count} system permission(s)!");
@@ -251,9 +335,32 @@ class AdminPermissionManager extends Component
             DB::beginTransaction();
 
             $count = count($this->orgPermissions);
+
+            // Capture names before clearing for the log
+            $removedPermissionNames = $this->orgPermissions;
+
             $this->admin->setOrgPermissions($this->selectedOrg, []);
 
             DB::commit();
+
+            // Log: bulk remove org permissions
+            ActivityLogger::log(
+                userId:   auth('admin')->id(),
+                userType: 'admin',
+                action:   'revoke_permissions',
+                extra: [
+                    'model_type'  => 'Admin',
+                    'model_id'    => $this->admin->id,
+                    'description' => "Removed all {$count} organisation permission(s) from admin: {$this->admin->name} for org ID: {$this->selectedOrg}",
+                    'properties'  => [
+                        'removed_count'       => $count,
+                        'removed_permissions' => $removedPermissionNames,
+                        'organisation_id'     => $this->selectedOrg,
+                        'target_admin_id'     => $this->admin->id,
+                        'target_admin'        => $this->admin->name,
+                    ],
+                ]
+            );
 
             $this->orgPermissions = [];
             session()->flash('success', "Removed {$count} organisation permission(s)!");
@@ -269,7 +376,6 @@ class AdminPermissionManager extends Component
      */
     public function getFilteredPermissionsProperty()
     {
-        // Determine which permissions to show based on mode
         $pattern = $this->mode === 'org' ? 'org.%' : 'system.%';
 
         $allPermissions = Permission::where('guard_name', 'admin')
@@ -282,14 +388,12 @@ class AdminPermissionManager extends Component
 
         $permissions = $allPermissions;
 
-        // Filter by group
         if ($this->selectedGroup !== 'all') {
             $permissions = collect([
                 $this->selectedGroup => $permissions[$this->selectedGroup] ?? collect()
             ]);
         }
 
-        // Filter by search
         if ($this->search) {
             $permissions = $permissions->map(function ($group) {
                 return $group->filter(function ($permission) {
@@ -346,17 +450,17 @@ class AdminPermissionManager extends Component
 
     public function clearSearch()
     {
-        $this->search = '';
+        $this->search        = '';
         $this->selectedGroup = 'all';
     }
 
     public function render()
     {
         return view('livewire.admin.role-permission.admin-permission-manager', [
-            'roles' => Role::where('guard_name', 'admin')->orderBy('name')->get(),
-            'permissionGroups' => $this->permissionGroups,
+            'roles'               => Role::where('guard_name', 'admin')->orderBy('name')->get(),
+            'permissionGroups'    => $this->permissionGroups,
             'filteredPermissions' => $this->filteredPermissions,
-            'totalPermissions' => $this->totalPermissions,
+            'totalPermissions'    => $this->totalPermissions,
         ]);
     }
 }

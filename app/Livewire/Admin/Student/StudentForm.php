@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Master\UserDetail;
 use App\Models\Master\State;
 use App\Models\Master\District;
+use App\Services\ActivityLogger;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\Attributes\Layout;
@@ -293,6 +294,22 @@ class StudentForm extends Component
             'emergency_contact_phone' => $this->emergency_contact_phone,
             'bio'                     => $this->bio,
         ]);
+        ActivityLogger::log(
+            userId:   auth('admin')->id(),
+            userType: 'admin',
+            action:   'create',
+            extra: [
+                'model_type'  => 'User',
+                'model_id'    =>  $user->id,
+                'description' => "Created Student: {$user->name}",
+                'properties'  => [
+                    'student_id' => $user->details->student_id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'phone' => $user->phone,
+                ],
+            ]
+        );
         // Initialize promotion records (iq, eq, lq at starting level)
         $promotionService = app(PromotionService::class);
         $initialized = $promotionService->initializeUserPromotion($user->id);
@@ -353,6 +370,22 @@ class StudentForm extends Component
                 'emergency_contact_name'  => $this->emergency_contact_name,
                 'emergency_contact_phone' => $this->emergency_contact_phone,
                 'bio'                     => $this->bio,
+            ]
+        );
+        ActivityLogger::log(
+            userId:   auth('admin')->id(),
+            userType: 'admin',
+            action:   'update',
+            extra: [
+                'model_type'  => 'User',
+                'model_id'    =>  $user->id,
+                'description' => "Updated Student: {$user->name}",
+                'properties'  => [
+                    'student_id' => $user->details->student_id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'phone' => $user->phone,
+                ],
             ]
         );
     }

@@ -127,7 +127,7 @@
                 <div class="d-flex gap-2">
 
                     {{-- ✅ FIXED: Route name --}}
-                    <a href="{{ route('admin.questions.edit', $group->id) }}" class="btn btn-sm btn-outline-primary">
+                    <a href="{{ route('admin.questions.edit', encrypt($group->id)) }}" class="btn btn-sm btn-outline-primary">
                         <i class="ri ri-edit-box-fill me-1"></i>
                         {{ $group->assessment_groups_count === 0 ? 'Edit' : 'View' }}
                     </a>
