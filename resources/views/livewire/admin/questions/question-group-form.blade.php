@@ -952,7 +952,7 @@
     @if ($showQuestionPreview && !empty($previewQuestion))
 
 
-        <div class="modal fade show d-block" tabindex="-1" style="z-index:1060;">
+        <div class="modal fade show d-block" tabindex="-1" style="z-index:9060;">
             <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
                 <div class="modal-content border-0 shadow-lg">
 
@@ -1072,14 +1072,24 @@
                                 @endforeach
                             </div>
                         @endif
+                        @if(!empty($previewQuestion['admin_note']))
+                            <div class="mt-6 border-t pt-4">
+                                <h6 class="text-sm font-semibold text-gray-700 mb-2">
+                                    Admin Note
+                                </h6>
 
+                                <div class="rounded-lg bg-yellow-50  p-3 text-sm text-gray-700 whitespace-pre-wrap">
+                                    {{ $previewQuestion['admin_note'] }}
+                                </div>
+                            </div>
+                        @endif
                     </div>
 
                     {{-- Modal Footer --}}
                     <div class="modal-footer border-top">
                         <button type="button"
                                 wire:click="closeQuestionPreview"
-                                class="btn btn-secondary">
+                                class="btn btn-secondary mt-4">
                             <i class="ri ri-close-line me-1"></i>Close
                         </button>
                     </div>
@@ -1797,7 +1807,7 @@
                                             <button type="button"
                                                     wire:click="removeOption({{ $optIndex }})"
                                                     class="btn btn-sm btn-outline-danger"
-                                                    @if (count($activeQuestion['options']) <= 2) disabled title="Minimum 2 options required" @endif>
+                                                    @if (count($activeQuestion['options']) <= 4) disabled title="Minimum 4 options required" @endif>
                                                 <i class="ri ri-delete-bin-fill"></i>
                                             </button>
 
@@ -2062,7 +2072,30 @@
             {{-- ══════════════════════════════════════════════════
                  RIGHT COLUMN
             ══════════════════════════════════════════════════ --}}
+
             <div class="col-lg-4">
+                {{-- ── Admin Note ──────────────────────────── --}}
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h6 class="mb-0 fw-semibold text-dark">
+                            <i class="ri ri-edit-2-line text-primary me-2"></i>
+                            Admin Note
+                        </h6>
+                    </div>
+                    <div class="card-body p-3">
+                         <textarea
+                             wire:model.defer="admin_note"
+                             rows="4"
+                             class="form-control"
+                             placeholder="Internal note for administrators only...">
+                  </textarea>
+
+                        <p class="mt-1 text-xs text-gray-500">
+                            This note is not visible to learners.
+                        </p>
+                    </div>
+                </div>
+
 
                 {{-- ── Group Context ──────────────────────────── --}}
                 <div class="card shadow-sm border-0 mb-4">

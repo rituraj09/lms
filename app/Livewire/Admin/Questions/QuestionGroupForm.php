@@ -185,6 +185,8 @@ class QuestionGroupForm extends Component
             'options'             => [
                 $this->emptyOption(),
                 $this->emptyOption(),
+                $this->emptyOption(),
+                $this->emptyOption(),
             ],
             'explanation'         => $explanation,
         ];
@@ -495,7 +497,7 @@ class QuestionGroupForm extends Component
         $rawOptions = $content['options'] ?? [];
 
         // Pad to minimum 2 options
-        while (count($rawOptions) < 2) {
+        while (count($rawOptions) < 4) {
             $rawOptions[] = [];
         }
 
@@ -529,7 +531,8 @@ class QuestionGroupForm extends Component
             'options'             => $options,
             'explanation'         => $explanation,
         ];
-
+        $notes = json_decode($question->admin_notes, true) ?? [];
+        $this->admin_note = $notes['note'] ?? '';
         /* ── Force full re-render of question form ────────────────── */
         $this->questionFormKey = 'edit-' . $questionId . '-' . time();
         $this->stemImageUpload = null;
@@ -612,7 +615,7 @@ class QuestionGroupForm extends Component
                         'answer_category'     => $this->activeQuestion['answer_category'],
                         'question_content'    => $questionContent,
                         'explaination'        => json_encode($this->activeQuestion['explanation']),
-                        'admin_notes'         => null,
+                        'admin_notes'       => json_encode([ 'note' => $this->admin_note,   ]),
                         'created_by'          => $this->activeQuestion['id']
                             ? Question::find($this->activeQuestion['id'])?->created_by
                             : auth()->id(),
@@ -713,6 +716,7 @@ class QuestionGroupForm extends Component
     private function resetQuestionForm(): void
     {
         $this->activeQuestion  = [];
+        $this->admin_note      = '';
         $this->stemImageUpload = null;
         $this->optionImages    = [];
         $this->resetErrorBag();
@@ -730,8 +734,8 @@ class QuestionGroupForm extends Component
 
     public function removeOption(int $optIndex): void
     {
-        if (count($this->activeQuestion['options']) <= 2) {
-            $this->addError('options_min', 'Minimum 2 options are required.');
+        if (count($this->activeQuestion['options']) <= 4) {
+            $this->addError('options_min', 'Minimum 4 options are required.');
             return;
         }
 
@@ -871,7 +875,7 @@ class QuestionGroupForm extends Component
         $category = $this->activeQuestion['answer_category'] ?? 'single_choice';
 
         if ($category !== 'open_text') {
-            $rules['activeQuestion.options'] = 'required|array|min:2';
+            $rules['activeQuestion.options'] = 'required|array|min:4';
 
             foreach ($this->activeQuestion['options'] ?? [] as $j => $opt) {
                 if (($opt['option_type'] ?? 'text') === 'text') {
@@ -894,8 +898,8 @@ class QuestionGroupForm extends Component
             'activeQuestion.age_group_id.required'        => 'Please select an age group.',
             'activeQuestion.stem.en.required'             => 'English question stem is required.',
             'activeQuestion.stem.en.min'                  => 'Question stem is too short.',
-            'activeQuestion.options.required'             => 'Please add at least 2 options.',
-            'activeQuestion.options.min'                  => 'Please add at least 2 options.',
+            'activeQuestion.options.required'             => 'Please add at least 4 options.',
+            'activeQuestion.options.min'                  => 'Please add at least 4 options.',
             'stemImageUpload.image'                       => 'File must be a valid image.',
             'stemImageUpload.max'                         => 'Image must not exceed 2 MB.',
         ]);
@@ -903,7 +907,11 @@ class QuestionGroupForm extends Component
     public function viewQuestion(int $questionId): void
     {
         $question = Question::with('questionGroup')->findOrFail($questionId);
+        $adminNotes = is_array($question->admin_notes)
+            ? $question->admin_notes
+            : json_decode($question->admin_notes ?? '{}', true);
 
+        $adminNote = $adminNotes['note'] ?? '';
         $raw    = $question->getRawOriginal('question_content');
         $content = is_array($question->question_content)
             ? $question->question_content
@@ -975,6 +983,7 @@ class QuestionGroupForm extends Component
             'answer_category' => $question->answer_category ?? $content['answer_category'] ?? '',
             'options'         => $formattedOptions,
             'marks'           => $marks,
+            'admin_note' => $adminNote,
         ];
 
         $this->showQuestionPreview = true;

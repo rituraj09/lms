@@ -661,16 +661,46 @@
                                 @endif
                             </h6>
 
+
+                        </div>
+                    </div>
+
+                    <div class="card-body p-0">
+                        <div class=" p-3 border-bottom bg-info-subtle ">
+                            {{-- SELECT ALL checkbox (only when questions are available) --}}
+                            @if ($pickerGroupId && $pickerQuestions && $pickerQuestions->count() > 0)
+                                @php
+
+                                    $selectableIds = $pickerQuestions
+                                        ->filter(fn($pq) => !in_array($pq->id, $currentGroupQuestionIds))
+                                        ->pluck('id')
+                                        ->toArray();
+                                    $allSelected = count($selectableIds) > 0
+                                        && count(array_intersect($selectableIds, $pickerSelectedQIds)) === count($selectableIds);
+                                @endphp
+                                @if (count($selectableIds) > 0)
+                                        <input
+                                            type="checkbox"
+                                            class="form-check-input"
+                                            id="selectAllQuestions"
+                                            {{ $allSelected ? 'checked' : '' }}
+                                            wire:click="{{ $allSelected ? 'deselectAllPickerQuestions' : 'selectAllPickerQuestions' }}"
+                                            style="cursor:pointer; width:1.1rem; height:1.1rem;">
+                                        <label class="form-check-label small fw-medium mb-0" for="selectAllQuestions" style="cursor:pointer;">
+                                            {{ $allSelected ? 'Deselect All' : 'Select All' }}
+                                            <span class="text-muted">({{ count($selectableIds) }})</span>
+                                        </label>
+
+                                @endif
+                            @endif
+
+                            {{-- Selected count badge --}}
                             @if ($pickerGroupId && count($pickerSelectedQIds) > 0)
                                 <span class="badge bg-success rounded-pill">
                                     {{ count($pickerSelectedQIds) }} selected
                                 </span>
                             @endif
                         </div>
-                    </div>
-
-                    <div class="card-body p-0">
-
                         @if (!$pickerGroupId)
                             <div class="text-center py-5 text-muted">
                                 <i class="ri ri-arrow-left-line fs-1 opacity-25"></i>
@@ -850,7 +880,7 @@
     @if ($showQuestionPreview && !empty($previewQuestion))
 
 
-        <div class="modal fade show d-block" tabindex="-1" style="z-index:1060;">
+        <div class="modal fade show d-block" tabindex="-1" style="z-index:9060;">
             <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
                 <div class="modal-content border-0 shadow-lg">
 
@@ -970,14 +1000,24 @@
                                 @endforeach
                             </div>
                         @endif
+                        @if(!empty($previewQuestion['admin_note']))
+                            <div class="mt-6 border-t pt-4">
+                                <h6 class="text-sm font-semibold text-gray-700 mb-2">
+                                    Admin Note
+                                </h6>
 
+                                <div class="rounded-lg bg-yellow-50   p-3 text-sm text-gray-700 whitespace-pre-wrap">
+                                    {{ $previewQuestion['admin_note'] }}
+                                </div>
+                            </div>
+                        @endif
                     </div>
 
                     {{-- Modal Footer --}}
                     <div class="modal-footer border-top">
                         <button type="button"
                                 wire:click="closeQuestionPreview"
-                                class="btn btn-secondary">
+                                class="btn btn-secondary mt-4">
                             <i class="ri ri-close-line me-1"></i>Close
                         </button>
                     </div>

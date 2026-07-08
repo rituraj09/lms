@@ -360,7 +360,56 @@ class AssessmentBuild extends Component
             $this->pickerSelectedQIds[] = $questionId;
         }
     }
+    public function selectAllPickerQuestions(): void
+    {
+        if (! $this->pickerGroupId) {
+            return;
+        }
 
+        $questions = $this->pickerQuestions;
+
+        if (! $questions || $questions->count() === 0) {
+            return;
+        }
+
+        foreach ($questions as $pq) {
+            // Skip questions already in the current group
+            if (in_array($pq->id, $this->currentGroupQuestionIds)) {
+                continue;
+            }
+
+            // Add if not already selected
+            if (! in_array($pq->id, $this->pickerSelectedQIds)) {
+                $this->pickerSelectedQIds[] = $pq->id;
+            }
+        }
+    }
+
+    /**
+     * Deselect all questions on the current page
+     */
+    public function deselectAllPickerQuestions(): void
+    {
+        if (! $this->pickerGroupId) {
+            return;
+        }
+
+        $questions = $this->pickerQuestions;
+
+        if (! $questions || $questions->count() === 0) {
+            return;
+        }
+
+        $pageIds = $questions->pluck('id')->toArray();
+
+        // Remove only current-page IDs from selection
+        $this->pickerSelectedQIds = array_values(
+            array_filter(
+                $this->pickerSelectedQIds,
+                fn($id) => ! in_array($id, $pageIds)
+            )
+        );
+    }
     public function addGroupToAssessment(): void
     {
         if (! $this->pickerGroupId || empty($this->pickerSelectedQIds)) {
@@ -501,7 +550,11 @@ class AssessmentBuild extends Component
     public function viewQuestion(int $questionId): void
     {
         $question = Question::with('questionGroup')->findOrFail($questionId);
+        $adminNotes = is_array($question->admin_notes)
+            ? $question->admin_notes
+            : json_decode($question->admin_notes ?? '{}', true);
 
+        $adminNote = $adminNotes['note'] ?? '';
         $raw     = $question->getRawOriginal('question_content');
         $content = is_array($question->question_content)
             ? $question->question_content
@@ -573,6 +626,7 @@ class AssessmentBuild extends Component
             'answer_category' => $question->answer_category ?? $content['answer_category'] ?? '',
             'options'         => $formattedOptions,
             'marks'           => $marks,
+            'admin_note' => $adminNote,
         ];
 
         $this->showQuestionPreview = true;
