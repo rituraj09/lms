@@ -76,13 +76,11 @@ class AdminForm extends Component
 
     public function mount(?string $id = null): void
     {
-
         $this->roles = Role::where('guard_name', 'admin')->get();
-
+        $this->organisations = Organisation::active()->get();
 
         if ($id) {
             $id = decrypt($id);
-            $this->organisations = Organisation::active()->get();
             $this->admin = Admin::with(['details', 'organisations'])->findOrFail($id);
             $this->isEditing = true;
 
