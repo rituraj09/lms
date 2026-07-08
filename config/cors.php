@@ -24,6 +24,7 @@ return [
         'http://127.0.0.1:5173',
         'http://localhost:3000',
         'https://app.mindshiksha.com',
+        'https://testapp.mindshiksha.online',
     ],
 
     'allowed_origins_patterns' => [],
