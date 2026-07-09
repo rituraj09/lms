@@ -17,17 +17,10 @@
         </div>
     @endif
 
-    @if ($errors->any())
+    @if ($errors->has('editingMaxAttemptsValue'))
         <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
-            <div class="d-flex align-items-center mb-2">
-                <i class="ri ri-error-warning-fill me-2 fs-5"></i>
-                <strong>Please fix the following errors:</strong>
-            </div>
-            <ul class="mb-0 small ps-3">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+            <i class="ri ri-error-warning-line me-2"></i>
+            {{ $errors->first('editingMaxAttemptsValue') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
@@ -36,16 +29,14 @@
     <div class="d-flex align-items-center justify-content-between mb-4">
         <div>
             <h4 class="fw-bold mb-1 text-dark">
-                <i class="ri ri-draft-line text-primary me-2"></i>
-                Assessments
+                <i class="ri ri-draft-line text-primary me-2"></i>Assessments
             </h4>
-            <p class="text-muted small mb-0">Manage all assessments and their Sections.</p>
+            <p class="text-muted small mb-0">Manage all assessments and their sections.</p>
         </div>
         @can('system.assessment.view')
             <a href="{{ route('admin.assessment-masters.manage') }}"
                class="btn btn-primary btn-sm shadow-sm">
-                <i class="ri ri-add-large-line me-1"></i>
-                New Assessment
+                <i class="ri ri-add-large-line me-1"></i>New Assessment
             </a>
         @endcan
     </div>
@@ -118,7 +109,7 @@
                     <div class="px-4 py-3">
                         <div class="d-flex align-items-start justify-content-between gap-3">
 
-                            {{-- Left --}}
+                            {{-- ── Left ─────────────────────────────────────────────── --}}
                             <div class="flex-1">
                                 <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
                                     <span class="fw-semibold text-dark fs-6">{{ $assessment->title }}</span>
@@ -157,11 +148,72 @@
                                 </div>
 
                                 {{-- Settings Badges --}}
-                                <div class="d-flex flex-wrap gap-2">
-                                    <span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle"
-                                          data-bs-toggle="tooltip" title="Max Attempts">
-                                        <i class="ri ri-repeat-line me-1"></i>{{ $assessment->max_attempts ?? 1 }}x Attempt
-                                    </span>
+                                <div class="d-flex flex-wrap gap-2 align-items-center">
+
+                                    {{-- ── Max Attempts Badge / Inline Editor ──────── --}}
+                                    @if ($editingMaxAttemptsId === $assessment->id)
+
+                                        {{-- EDITING STATE --}}
+                                        <div class="d-flex align-items-center gap-1"
+                                             wire:key="max-edit-{{ $assessment->id }}">
+                                            <span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle">
+                                                <i class="ri ri-repeat-line me-1"></i>Max Attempts
+                                            </span>
+                                            <input type="number"
+                                                   wire:model="editingMaxAttemptsValue"
+                                                   min="1"
+                                                   max="99"
+                                                   class="form-control form-control-sm text-center
+                                                          @error('editingMaxAttemptsValue') is-invalid @enderror"
+                                                   style="width: 65px; font-size: .75rem;"
+                                                   wire:keydown.enter="saveMaxAttempts"
+                                                   wire:keydown.escape="cancelMaxAttemptsEdit">
+                                            <button wire:click="saveMaxAttempts"
+                                                    wire:loading.attr="disabled"
+                                                    wire:target="saveMaxAttempts"
+                                                    class="btn btn-success btn-sm py-0 px-2"
+                                                    title="Save"
+                                                    style="font-size:.75rem;">
+                                                <span wire:loading.remove wire:target="saveMaxAttempts">
+                                                    <i class="ri ri-check-line"></i>
+                                                </span>
+                                                <span wire:loading wire:target="saveMaxAttempts">
+                                                    <span class="spinner-border spinner-border-sm"></span>
+                                                </span>
+                                            </button>
+                                            <button wire:click="cancelMaxAttemptsEdit"
+                                                    class="btn btn-outline-secondary btn-sm py-0 px-2"
+                                                    title="Cancel"
+                                                    style="font-size:.75rem;">
+                                                <i class="ri ri-close-line"></i>
+                                            </button>
+                                        </div>
+
+                                    @else
+
+                                        {{-- DISPLAY STATE --}}
+                                        <span class="badge rounded-pill bg-primary-subtle text-primary
+                                                     border border-primary-subtle d-inline-flex
+                                                     align-items-center gap-1"
+                                              style="cursor: default;"
+                                              data-bs-toggle="tooltip"
+                                              title="Max Attempts — click pencil to edit">
+                                            <i class="ri ri-repeat-line"></i>
+                                            {{ $assessment->max_attempts ?? 1 }}x Attempt
+                                            {{-- Always-visible edit pencil for max_attempts --}}
+                                            <button wire:click="openMaxAttemptsEdit(
+                                                        {{ $assessment->id }},
+                                                        {{ $assessment->max_attempts ?? 1 }}
+                                                    )"
+                                                    class="btn btn-link p-0 ms-1 text-primary"
+                                                    style="font-size:.7rem; line-height:1;"
+                                                    title="Edit max attempts">
+                                                <i class="ri ri-pencil-line"></i>
+                                            </button>
+                                        </span>
+
+                                    @endif
+                                    {{-- ── End Max Attempts ─────────────────────────── --}}
 
                                     @if ($assessment->has_negative_mark)
                                         <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle"
@@ -177,35 +229,41 @@
 
                                     <span class="badge rounded-pill {{ $assessment->shuffle_sections ? 'bg-info-subtle text-info border border-info-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle' }}"
                                           data-bs-toggle="tooltip" title="Shuffle Sections">
-                                        <i class="ri ri-shuffle-line me-1"></i>{{ $assessment->shuffle_sections ? 'Shuffle On' : 'Shuffle Off' }}
+                                        <i class="ri ri-shuffle-line me-1"></i>
+                                        {{ $assessment->shuffle_sections ? 'Shuffle On' : 'Shuffle Off' }}
                                     </span>
 
                                     <span class="badge rounded-pill {{ $assessment->show_result_immediately ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle' }}"
                                           data-bs-toggle="tooltip" title="Show Result Immediately">
-                                        <i class="ri ri-bar-chart-line me-1"></i>{{ $assessment->show_result_immediately ? 'Instant Result' : 'Result Later' }}
+                                        <i class="ri ri-bar-chart-line me-1"></i>
+                                        {{ $assessment->show_result_immediately ? 'Instant Result' : 'Result Later' }}
                                     </span>
 
                                     @if ($assessment->show_result_immediately)
                                         <span class="badge rounded-pill {{ $assessment->show_correct_answers ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle' }}"
                                               data-bs-toggle="tooltip" title="Show Correct Answers">
-                                            <i class="ri ri-checkbox-circle-line me-1"></i>{{ $assessment->show_correct_answers ? 'Answers Shown' : 'Answers Hidden' }}
+                                            <i class="ri ri-checkbox-circle-line me-1"></i>
+                                            {{ $assessment->show_correct_answers ? 'Answers Shown' : 'Answers Hidden' }}
                                         </span>
 
                                         @if ($assessment->show_correct_answers)
                                             <span class="badge rounded-pill {{ $assessment->show_explainations ? 'bg-info-subtle text-info border border-info-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle' }}"
                                                   data-bs-toggle="tooltip" title="Show Explanations">
-                                                <i class="ri ri-book-open-line me-1"></i>{{ $assessment->show_explainations ? 'Explanations On' : 'Explanations Off' }}
+                                                <i class="ri ri-book-open-line me-1"></i>
+                                                {{ $assessment->show_explainations ? 'Explanations On' : 'Explanations Off' }}
                                             </span>
                                         @endif
                                     @endif
                                 </div>
                             </div>
 
-                            {{-- Right: Actions --}}
-                            <div class="d-flex gap-2 flex-shrink-0">
+                            {{-- ── Right: Actions ───────────────────────────────────── --}}
+                            <div class="d-flex gap-2 flex-shrink-0 align-items-center">
 
+                                {{-- Attempts lock badge --}}
                                 @if ($assessment->attempts_count > 0)
-                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle d-flex align-items-center gap-1"
+                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle
+                                                 d-flex align-items-center gap-1"
                                           data-bs-toggle="tooltip"
                                           title="{{ $assessment->attempts_count }} attempt(s) made. Edit & Builder are locked.">
                                         <i class="ri ri-lock-line"></i>
@@ -213,10 +271,12 @@
                                     </span>
                                 @endif
 
-                                    <a href="{{ route('admin.assessments.preview', encrypt($assessment->id)) }}"
-                                       class="btn btn-info btn-sm">
-                                        <i class="ri ri-eye-line"></i>
-                                    </a>
+                                {{-- Preview --}}
+                                <a href="{{ route('admin.assessments.preview', encrypt($assessment->id)) }}"
+                                   class="btn btn-info btn-sm"
+                                   data-bs-toggle="tooltip" title="Preview">
+                                    <i class="ri ri-eye-line"></i>
+                                </a>
 
                                 {{-- Builder --}}
                                 @if ($assessment->attempts_count > 0)
@@ -229,28 +289,26 @@
                                     </button>
                                 @else
                                     <a href="{{ route('admin.assessment-masters.build', encrypt($assessment->id)) }}"
-
                                        class="btn btn-sm btn-outline-info"
-                                       data-bs-toggle="tooltip"
-                                       title="Open Builder">
+                                       data-bs-toggle="tooltip" title="Open Builder">
                                         <i class="ri ri-tools-line me-1"></i>Builder
                                     </a>
                                 @endif
 
                                 {{-- Edit --}}
                                 @if ($assessment->attempts_count > 0)
+                                    {{-- Locked: only max_attempts is editable via inline badge above --}}
                                     <button type="button"
                                             class="btn btn-sm btn-outline-secondary"
                                             disabled
                                             data-bs-toggle="tooltip"
-                                            title="Locked: Cannot edit after students have attempted">
+                                            title="Locked: Full edit disabled after attempts. Use the pencil on 'Attempts' badge to edit max attempts.">
                                         <i class="ri ri-lock-line"></i>
                                     </button>
                                 @else
                                     <a href="{{ route('admin.assessment-masters.manage', encrypt($assessment->id)) }}"
                                        class="btn btn-sm btn-outline-primary"
-                                       data-bs-toggle="tooltip"
-                                       title="Edit Assessment">
+                                       data-bs-toggle="tooltip" title="Edit Assessment">
                                         <i class="ri ri-pencil-line"></i>
                                     </a>
                                 @endif
@@ -281,7 +339,7 @@
                                                for="st-{{ $assessment->id }}-{{ $val }}"
                                                data-bs-toggle="tooltip"
                                                title="{{ $isDisabled ? 'Cannot set to Draft after attempts made' : $label }}"
-                                               style="font-size:.7rem;padding:.2rem .5rem;">
+                                               style="font-size:.7rem; padding:.2rem .5rem;">
                                             <i class="ri {{ $icon }}"></i> {{ $label }}
                                         </label>
                                     @endforeach
@@ -293,8 +351,7 @@
                                             wire:click="deleteAssessment({{ $assessment->id }})"
                                             wire:confirm="Delete this assessment permanently?"
                                             class="btn btn-sm btn-outline-danger"
-                                            data-bs-toggle="tooltip"
-                                            title="Delete Assessment">
+                                            data-bs-toggle="tooltip" title="Delete Assessment">
                                         <i class="ri ri-delete-bin-line"></i>
                                     </button>
                                 @endif

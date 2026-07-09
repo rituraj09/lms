@@ -205,5 +205,149 @@
     <div class="mt-4">
         {{ $groups->links('pagination::bootstrap-5') }}
     </div>
+    {{-- ─── Flash Messages ──────────────────────────────────────────────── --}}
+    @if (session()->has('success'))
+        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 mb-4"
+             role="alert">
+            <i class="ri ri-checkbox-circle-line fs-5"></i>
+            <span>{{ session('success') }}</span>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
 
+    @if (session()->has('error'))
+        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 mb-4"
+             role="alert">
+            <i class="ri ri-error-warning-line fs-5"></i>
+            <span>{{ session('error') }}</span>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+
+    {{-- ─── Delete Confirmation Modal ──────────────────────────────────── --}}
+    @if ($confirmingDelete && $deletingGroup)
+        {{-- Backdrop --}}
+        <div class="modal-backdrop fade show" style="z-index: 1040;"></div>
+
+        <div class="modal fade show d-block"
+             tabindex="-1"
+             role="dialog"
+             style="z-index: 1050;"
+             aria-modal="true"
+             aria-labelledby="deleteModalTitle">
+
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content border-0 shadow-lg">
+
+                    {{-- Header --}}
+                    <div class="modal-header bg-danger text-white border-0 pb-3">
+                        <h5 class="modal-title d-flex align-items-center gap-2" id="deleteModalTitle">
+                            <i class="ri ri-delete-bin-line fs-5"></i>
+                            Delete Question Group
+                        </h5>
+                        <button type="button"
+                                class="btn-close btn-close-white"
+                                wire:click="cancelDelete"
+                                aria-label="Close">
+                        </button>
+                    </div>
+
+                    {{-- Body --}}
+                    <div class="modal-body py-4">
+
+                        {{-- Group has questions — BLOCK deletion --}}
+                        @if ($deletingGroup->questions_count > 0)
+                            <div class="text-center">
+                                <div class="mb-3">
+                                <span class="bg-warning-subtle rounded-circle d-inline-flex
+                                             align-items-center justify-content-center"
+                                      style="width:64px; height:64px;">
+                                    <i class="ri ri-alert-line text-warning fs-2"></i>
+                                </span>
+                                </div>
+                                <h6 class="fw-semibold mb-2">Cannot Delete This Group</h6>
+                                <p class="text-muted mb-3">
+                                    <strong class="text-dark">{{ $deletingGroup->name }}</strong>
+                                    currently contains
+                                    <span class="badge bg-warning text-dark">
+                                    {{ $deletingGroup->questions_count }}
+                                        {{ Str::plural('question', $deletingGroup->questions_count) }}
+                                </span>.
+                                </p>
+                                <div class="alert alert-warning d-flex align-items-start gap-2 text-start mb-0">
+                                    <i class="ri ri-information-line mt-1 flex-shrink-0"></i>
+                                    <span>
+                                    Please <strong>remove all questions</strong>
+                                    from this group before deleting it.
+                                </span>
+                                </div>
+                            </div>
+
+                            {{-- Group is empty — ALLOW deletion --}}
+                        @else
+                            <div class="text-center">
+                                <div class="mb-3">
+                                <span class="bg-danger-subtle rounded-circle d-inline-flex
+                                             align-items-center justify-content-center"
+                                      style="width:64px; height:64px;">
+                                    <i class="ri ri-delete-bin-line text-danger fs-2"></i>
+                                </span>
+                                </div>
+                                <h6 class="fw-semibold mb-2">Are you sure?</h6>
+                                <p class="text-muted mb-0">
+                                    You are about to permanently delete the group
+                                    <br>
+                                    <strong class="text-dark fs-6">{{ $deletingGroup->name }}</strong>.
+                                    <br><br>
+                                    <span class="text-danger fw-medium">This action cannot be undone.</span>
+                                </p>
+                            </div>
+                        @endif
+
+                    </div>
+
+                    {{-- Footer --}}
+                    <div class="modal-footer border-0 pt-0">
+
+                        @if ($deletingGroup->questions_count > 0)
+                            {{-- Only close button when deletion is blocked --}}
+                            <button type="button"
+                                    class="btn btn-secondary px-4"
+                                    wire:click="cancelDelete">
+                                <i class="ri ri-close-line me-1"></i>
+                                Close
+                            </button>
+                        @else
+                            {{-- Cancel + Confirm when deletion is allowed --}}
+                            <button type="button"
+                                    class="btn btn-outline-secondary px-4"
+                                    wire:click="cancelDelete">
+                                <i class="ri ri-close-line me-1"></i>
+                                Cancel
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-danger px-4"
+                                    wire:click="deleteGroup"
+                                    wire:loading.attr="disabled"
+                                    wire:target="deleteGroup">
+                            <span wire:loading.remove wire:target="deleteGroup">
+                                <i class="ri ri-delete-bin-line me-1"></i>
+                                Yes, Delete
+                            </span>
+                                <span wire:loading wire:target="deleteGroup">
+                                <span class="spinner-border spinner-border-sm me-1"
+                                      role="status" aria-hidden="true"></span>
+                                Deleting…
+                            </span>
+                            </button>
+                        @endif
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    @endif
 </div>

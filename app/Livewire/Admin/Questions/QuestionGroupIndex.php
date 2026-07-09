@@ -3,6 +3,7 @@
 
 namespace App\Livewire\Admin\Questions;
 
+use App\Services\ActivityLogger;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Livewire\WithPagination;
@@ -74,25 +75,49 @@ class QuestionGroupIndex extends Component
 
     public function deleteGroup(): void
     {
-        $group = QuestionGroup::findOrFail($this->deletingGroupId);
+        $group = QuestionGroup::withCount('questions')
+            ->findOrFail($this->deletingGroupId);
+
+        // ── Guard: cannot delete if questions exist ───────────────────
+        if ($group->questions_count > 0) {
+            session()->flash(
+                'error',
+                "Cannot delete \"{$group->name}\": it still has {$group->questions_count} question(s). Please remove all questions first."
+            );
+            $this->cancelDelete();
+            return;
+        }
 
         $this->authorize('delete', $group);
 
         $group->update(['updated_by' => auth()->id()]);
         $group->delete();
-
+        ActivityLogger::log(
+            userId:   auth()->id(),
+            userType: 'admin',
+            action:   'delete',
+            extra: [
+                'model_type'  => 'Question Group',
+                'model_id'    => $this->deletingGroupId,
+                'description' => "Deleted question group: {$group->group_code}",
+                'properties'  => [
+                    'question_group_code' => $group->group_code,
+                ],
+            ]
+        );
         $this->cancelDelete();
         session()->flash('success', 'Question group deleted successfully.');
     }
+
 
     // ─── Render ───────────────────────────────────────────────────────
     public function render()
     {
         $groups = QuestionGroup::with([
-                'questions' => fn($q) => $q->withCount('assessmentQuestions'),
-                'createdBy:id,name',
-                'updatedBy:id,name',
-            ])
+            'questions' => fn($q) => $q->withCount('assessmentQuestions'),
+            'createdBy:id,name',
+            'updatedBy:id,name',
+        ])
             ->withCount(['questions', 'assessmentGroups'])
             ->when($this->search, fn($q) => $q->search($this->search))
             ->when(
@@ -102,9 +127,14 @@ class QuestionGroupIndex extends Component
             ->latest()
             ->paginate($this->perPage);
 
+        $deletingGroup = $this->deletingGroupId
+            ? $groups->firstWhere('id', $this->deletingGroupId)
+            ?? QuestionGroup::withCount('questions')->find($this->deletingGroupId)
+            : null;
+
         return view(
             'livewire.admin.questions.question-group-index',
-            compact('groups')
+            compact('groups', 'deletingGroup')
         );
     }
 }

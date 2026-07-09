@@ -267,6 +267,8 @@ class QuestionGroupForm extends Component
             return;
         }
 
+        // SoftDeletes trait automatically excludes deleted_at IS NOT NULL
+        // so Question::where(...) already excludes soft-deleted records ✅
         $this->questionsList = Question::where('question_group_id', $this->groupId)
             ->with(['primarySkill', 'subSkill', 'difficultyLevel', 'ageGroup'])
             ->latest()
@@ -275,16 +277,16 @@ class QuestionGroupForm extends Component
                 $content = $q->question_content ?? [];
 
                 return [
-                    'id'             => $q->id,
-                    'question_code'  => $q->question_code,
-                    'answer_category'=> $q->answer_category,
-                    'marks'          => $content['marks'] ?? 0,
-                    'primary_skill'  => $q->primarySkill?->name  ?? '—',
-                    'difficulty'     => $q->difficultyLevel?->name ?? '—',
-                    'age_group'      => $q->ageGroup?->name       ?? '—',
-                    'stem_en'        => strip_tags($content['stem']['en'] ?? ''),
-                    'options_count'  => count($content['options'] ?? []),
-                    'in_assessment'  => $q->isUsedInAssessment(),
+                    'id'              => $q->id,
+                    'question_code'   => $q->question_code,
+                    'answer_category' => $q->answer_category,
+                    'marks'           => $content['marks'] ?? 0,
+                    'primary_skill'   => $q->primarySkill?->name   ?? '—',
+                    'difficulty'      => $q->difficultyLevel?->name ?? '—',
+                    'age_group'       => $q->ageGroup?->name        ?? '—',
+                    'stem_en'         => strip_tags($content['stem']['en'] ?? ''),
+                    'options_count'   => count($content['options'] ?? []),
+                    'in_assessment'   => $q->isUsedInAssessment(),
                 ];
             })
             ->toArray();
@@ -667,8 +669,12 @@ class QuestionGroupForm extends Component
     {
         $question = Question::find($questionId);
 
-        if (! $question) return;
+        if (! $question) {
+            session()->flash('error', 'Question not found.');
+            return;
+        }
 
+        // ── Guard: cannot delete if used in assessment ─────────────────
         if ($question->isUsedInAssessment()) {
             session()->flash(
                 'error',
@@ -677,19 +683,17 @@ class QuestionGroupForm extends Component
             return;
         }
 
-        $content = $question->question_content ?? [];
+        // ── Capture code before delete (for activity log) ──────────────
+        $questionCode = $question->question_code;
 
-        if (! empty($content['image'])) {
-            Storage::disk('public')->delete($content['image']);
-        }
+        // ── Soft delete — NO file deletion, files stay on disk ─────────
+        $question->update([
+            'updated_by' => auth()->id(),
+        ]);
 
-        foreach ($content['options'] ?? [] as $opt) {
-            if (! empty($opt['image_path'])) {
-                Storage::disk('public')->delete($opt['image_path']);
-            }
-        }
+        $question->delete(); // sets deleted_at via SoftDeletes trait
 
-        $question->forceDelete();
+        // ── Activity log ───────────────────────────────────────────────
         ActivityLogger::log(
             userId:   auth()->id(),
             userType: 'admin',
@@ -697,7 +701,7 @@ class QuestionGroupForm extends Component
             extra: [
                 'model_type'  => 'Question',
                 'model_id'    => $questionId,
-                'description' => "Deleted question: {$questionCode}",
+                'description' => "Soft deleted question: {$questionCode}",
                 'properties'  => [
                     'question_code' => $questionCode,
                     'group_id'      => $this->groupId,

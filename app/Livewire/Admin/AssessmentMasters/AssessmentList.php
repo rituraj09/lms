@@ -15,6 +15,10 @@ class AssessmentList extends Component
     public string $typeFilter   = '';
     public int    $perPage      = 10;
 
+    // ─── Max Attempts Edit State ───────────────────────────────────────
+    public ?int $editingMaxAttemptsId    = null;
+    public int  $editingMaxAttemptsValue = 1;
+
     public array $assessmentTypes = [
         'iq'       => 'IQ',
         'eq'       => 'EQ',
@@ -54,6 +58,74 @@ class AssessmentList extends Component
     }
 
     /* ================================================================
+     |  MAX ATTEMPTS INLINE EDIT
+     * ================================================================*/
+
+    /**
+     * Open inline editor for max_attempts field.
+     */
+    public function openMaxAttemptsEdit(int $id, int $currentValue): void
+    {
+        $this->editingMaxAttemptsId    = $id;
+        $this->editingMaxAttemptsValue = $currentValue;
+        $this->resetErrorBag('editingMaxAttemptsValue');
+    }
+
+    /**
+     * Cancel without saving.
+     */
+    public function cancelMaxAttemptsEdit(): void
+    {
+        $this->editingMaxAttemptsId    = null;
+        $this->editingMaxAttemptsValue = 1;
+        $this->resetErrorBag('editingMaxAttemptsValue');
+    }
+
+    /**
+     * Validate & save the new max_attempts value.
+     */
+    public function saveMaxAttempts(): void
+    {
+        $this->validate([
+            'editingMaxAttemptsValue' => 'required|integer|min:1|max:99',
+        ], [
+            'editingMaxAttemptsValue.required' => 'Max attempts is required.',
+            'editingMaxAttemptsValue.integer'  => 'Must be a whole number.',
+            'editingMaxAttemptsValue.min'      => 'Minimum 1 attempt is required.',
+            'editingMaxAttemptsValue.max'      => 'Maximum allowed is 99 attempts.',
+        ]);
+
+        $assessment = Assessment::findOrFail($this->editingMaxAttemptsId);
+
+        $old = $assessment->max_attempts;
+
+        $assessment->update([
+            'max_attempts' => $this->editingMaxAttemptsValue,
+            'updated_by'   => auth()->id(),
+        ]);
+
+        ActivityLogger::log(
+            userId:   auth('admin')->id(),
+            userType: 'admin',
+            action:   'update',
+            extra: [
+                'model_type'  => 'Assessment',
+                'model_id'    => $assessment->id,
+                'description' => "Updated max attempts from {$old} to {$this->editingMaxAttemptsValue}. Assessment: {$assessment->assessment_code}",
+                'properties'  => [
+                    'field'     => 'max_attempts',
+                    'old_value' => $old,
+                    'new_value' => $this->editingMaxAttemptsValue,
+                ],
+            ]
+        );
+
+        $this->cancelMaxAttemptsEdit();
+
+        session()->flash('success', 'Maximum attempts updated successfully.');
+    }
+
+    /* ================================================================
      |  LIST ACTIONS
      * ================================================================*/
     public function createAssessment(): void
@@ -68,7 +140,7 @@ class AssessmentList extends Component
         if ($assessment->isLockedForEditing()) {
             session()->flash(
                 'error',
-                'This assessment cannot be edited because students have already attempted it. You can only change its status (Publish/Unpublish).'
+                'This assessment cannot be edited because students have already attempted it.'
             );
             return;
         }
@@ -133,7 +205,7 @@ class AssessmentList extends Component
         if ($assessment->hasAttempts() && $newStatus === 'draft') {
             session()->flash(
                 'error',
-                'Cannot set to Draft because students have already attempted this assessment. Only Publish or Unpublish is allowed.'
+                'Cannot set to Draft because students have already attempted this assessment.'
             );
             return;
         }
@@ -148,6 +220,7 @@ class AssessmentList extends Component
                 return;
             }
         }
+
         ActivityLogger::log(
             userId:   auth('admin')->id(),
             userType: 'admin',
@@ -155,10 +228,10 @@ class AssessmentList extends Component
             extra: [
                 'model_type'  => 'Assessment',
                 'model_id'    => $id,
-                'description' => "Change status of the assessment to $newStatus. Assessment code:  $assessment->assessment_code",
-
+                'description' => "Changed status to {$newStatus}. Assessment: {$assessment->assessment_code}",
             ]
         );
+
         $assessment->status     = $newStatus;
         $assessment->updated_by = auth()->id();
         $assessment->save();
@@ -170,9 +243,7 @@ class AssessmentList extends Component
     {
         $assessment = Assessment::findOrFail($id);
 
-        $newStatus = $assessment->status === 'publish'
-            ? 'unpublish'
-            : 'publish';
+        $newStatus = $assessment->status === 'publish' ? 'unpublish' : 'publish';
 
         $this->changeStatus($id, $newStatus);
     }
