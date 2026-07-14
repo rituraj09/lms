@@ -41,6 +41,7 @@ class UserPromotionDetail extends Model
     public function promotionDetail(): BelongsTo
     {
         return $this->belongsTo(PromotionDetail::class, 'promotion_details_id');
+
     }
 
     /**

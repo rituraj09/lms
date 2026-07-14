@@ -65,8 +65,8 @@ class StudentDetails extends Component
         }
 
         // Generate new password
-        $this->newPassword = Str::password(12);
-
+        // $this->newPassword = Str::password(12);
+ $this->newPassword = '123456';
         // Update password
         $this->student->update([
             'password' => Hash::make($this->newPassword)

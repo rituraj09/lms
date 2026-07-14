@@ -122,11 +122,35 @@ class User extends Authenticatable
      /**
       * Get active promotion for specific assessment type
       */
-     public function activePromotion($assessmentType)
-     {
-         return $this->userPromotions()
-             ->active()
-             ->ofAssessmentType($assessmentType)
-             ->first();
-     }
+    public function activePromotion($assessmentType)
+    {
+        return $this->userPromotions()
+            ->active()
+            ->ofAssessmentType($assessmentType)
+            ->first();
+    }
+    public function getPromotionLevelAttribute(): string
+    {
+        // Use already-loaded relation if available (avoids N+1 when eager loaded)
+        $promotions = $this->relationLoaded('userPromotions')
+            ? $this->userPromotions
+            : $this->userPromotions()
+                ->where('current_status', true)
+                ->with('promotionDetail.currentPromotion')
+                ->get();
+
+        $promotions = $promotions
+            ->where('current_status', true)
+            ->keyBy('assessment_type');
+
+        $labels = ['iq' => 'IQ', 'eq' => 'EQ', 'lq' => 'LQ'];
+        $parts  = [];
+
+        foreach ($labels as $key => $label) {
+            $name = $promotions->get($key)?->promotionDetail?->currentPromotion?->name ?? '—';
+            $parts[] = "{$label}: {$name}";
+        }
+
+        return implode('  |  ', $parts);
+    }
 }

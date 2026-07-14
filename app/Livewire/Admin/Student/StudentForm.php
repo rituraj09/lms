@@ -259,8 +259,8 @@ class StudentForm extends Component
 
     protected function createStudent()
     {
-        $this->generatedPassword = Str::password(12);
-
+        // $this->generatedPassword = Str::password(12);
+         $this->generatedPassword = '123456';
         $avatarPath = null;
         if ($this->avatar) {
             $avatarPath = $this->avatar->store('avatars', 'public');

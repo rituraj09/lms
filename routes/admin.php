@@ -12,6 +12,7 @@ use App\Services\OrganisationContext;
 use App\Livewire\Admin\AssessmentMasters\AssessmentList;
 use App\Livewire\Admin\AssessmentMasters\AssessmentManage;
 use App\Livewire\Admin\AssessmentMasters\AssessmentBuild;
+use App\Livewire\Admin\AssessmentMasters\AssessmentBuildView;
 use App\Livewire\Admin\Student\ManageStudents;
 use App\Livewire\Admin\Student\StudentForm;
 use App\Livewire\Admin\Student\StudentDetails;
@@ -64,6 +65,10 @@ Route::group(['middleware' => ['redirect.notauth:admin','auth:admin']], function
         $router->get('/build/{id}', AssessmentBuild::class)
             ->name('build')
             ->middleware('can:system.assessment.create');
+
+         $router->get('/build-view/{id}', AssessmentBuildView::class)
+             ->name('build-view')
+            ->middleware('can:system.assessment.view');
     });
 
     Route::prefix('assessments')->name('assessments.')->group(function ($router) {

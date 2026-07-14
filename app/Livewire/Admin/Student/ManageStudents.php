@@ -106,30 +106,67 @@ class ManageStudents extends Component
         }
     }
 
-    public function render()
+   public function render()
     {
-        $students = User::with(['details', 'organisation'])
-            ->where('organisation_id', $this->organisationId)
-            ->when($this->search, function ($query) {
-                $query->where(function ($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%')
-                        ->orWhere('email', 'like', '%' . $this->search . '%')
-                        ->orWhere('phone', 'like', '%' . $this->search . '%')
-                        ->orWhereHas('details', function ($detailQuery) {
-                            $detailQuery->where('student_id', 'like', '%' . $this->search . '%')
-                                ->orWhere('first_name', 'like', '%' . $this->search . '%')
-                                ->orWhere('last_name', 'like', '%' . $this->search . '%');
-                        });
-                });
-            })
-            ->when($this->statusFilter, function ($query) {
-                $query->where('status', $this->statusFilter);
-            })
-            ->latest()
-            ->paginate($this->perPage);
+        $students = User::with([
+            'details',
+            'organisation',
+            'userPromotions' => function($query) {
+                $query->current(); // Use the scope from UserPromotionDetail model
+            },
+            'userPromotions.promotionDetail.currentPromotion',
+        ])
+        ->where('organisation_id', $this->organisationId)
+        ->when($this->search, function ($query) {
+            $query->where(function ($q) {
+                $q->where('name', 'like', '%' . $this->search . '%')
+                    ->orWhere('email', 'like', '%' . $this->search . '%')
+                    ->orWhere('phone', 'like', '%' . $this->search . '%')
+                    ->orWhereHas('details', function ($detailQuery) {
+                        $detailQuery
+                            ->where('student_id', 'like', '%' . $this->search . '%')
+                            ->orWhere('first_name', 'like', '%' . $this->search . '%')
+                            ->orWhere('last_name', 'like', '%' . $this->search . '%');
+                    });
+            });
+        })
+        ->when($this->statusFilter, function ($query) {
+            $query->where('status', $this->statusFilter);
+        })
+        ->latest()
+        ->paginate($this->perPage);
+
+        // Transform the collection to add promotionMap
+        $students->through(function ($student) {
+            // Build promotion map for IQ, EQ, LQ
+            $student->promotionMap = [
+                'iq' => $this->getPromotionName($student, 'iq'),
+                'eq' => $this->getPromotionName($student, 'eq'),
+                'lq' => $this->getPromotionName($student, 'lq'),
+            ];
+
+            return $student;
+        });
 
         return view('livewire.admin.student.manage-students', [
             'students' => $students,
         ]);
+    }
+
+    /**
+     * Get the promotion name for a specific assessment type
+     */
+    private function getPromotionName($student, string $type): ?string
+    {
+        // userPromotions already filtered by current() scope
+        $userPromotion = collect($student->userPromotions ?? [])
+            ->where('assessment_type', $type)
+            ->first();
+
+        if (!$userPromotion) {
+            return null;
+        }
+
+        return $userPromotion->promotionDetail?->currentPromotion?->name;
     }
 }

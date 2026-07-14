@@ -34,8 +34,7 @@
             <p class="text-muted small mb-0">Manage all assessments and their sections.</p>
         </div>
         @can('system.assessment.view')
-            <a href="{{ route('admin.assessment-masters.manage') }}"
-               class="btn btn-primary btn-sm shadow-sm">
+            <a href="{{ route('admin.assessment-masters.manage') }}" class="btn btn-primary btn-sm shadow-sm">
                 <i class="ri ri-add-large-line me-1"></i>New Assessment
             </a>
         @endcan
@@ -50,10 +49,8 @@
                         <span class="input-group-text bg-light">
                             <i class="ri ri-search-line text-muted"></i>
                         </span>
-                        <input type="text"
-                               wire:model.live.debounce.300ms="search"
-                               class="form-control"
-                               placeholder="Search by title or code...">
+                        <input type="text" wire:model.live.debounce.300ms="search" class="form-control"
+                            placeholder="Search by title or code...">
                     </div>
                 </div>
                 <div class="col-md-2">
@@ -66,20 +63,20 @@
                 </div>
                 <div class="col-md-4">
                     <div class="btn-group w-100" role="group">
-                        <input type="radio" class="btn-check" wire:model.live="statusFilter"
-                               value="" id="sf-all" autocomplete="off">
+                        <input type="radio" class="btn-check" wire:model.live="statusFilter" value=""
+                            id="sf-all" autocomplete="off">
                         <label class="btn btn-outline-secondary btn-sm" for="sf-all">All</label>
 
-                        <input type="radio" class="btn-check" wire:model.live="statusFilter"
-                               value="draft" id="sf-draft" autocomplete="off">
+                        <input type="radio" class="btn-check" wire:model.live="statusFilter" value="draft"
+                            id="sf-draft" autocomplete="off">
                         <label class="btn btn-outline-warning btn-sm" for="sf-draft">Draft</label>
 
-                        <input type="radio" class="btn-check" wire:model.live="statusFilter"
-                               value="publish" id="sf-publish" autocomplete="off">
+                        <input type="radio" class="btn-check" wire:model.live="statusFilter" value="publish"
+                            id="sf-publish" autocomplete="off">
                         <label class="btn btn-outline-success btn-sm" for="sf-publish">Live</label>
 
-                        <input type="radio" class="btn-check" wire:model.live="statusFilter"
-                               value="unpublish" id="sf-unpublish" autocomplete="off">
+                        <input type="radio" class="btn-check" wire:model.live="statusFilter" value="unpublish"
+                            id="sf-unpublish" autocomplete="off">
                         <label class="btn btn-outline-danger btn-sm" for="sf-unpublish">Off</label>
                     </div>
                 </div>
@@ -129,21 +126,26 @@
                                         <i class="ri ri-barcode-line me-1"></i>{{ $assessment->assessment_code }}
                                     </small>
                                     <small class="text-muted">
-                                        <i class="ri ri-question-line me-1"></i>{{ $assessment->assessment_questions_count }} Question(s)
+                                        <i
+                                            class="ri ri-question-line me-1"></i>{{ $assessment->assessment_questions_count }}
+                                        Question(s)
                                     </small>
                                     <small class="text-muted">
                                         <i class="ri ri-trophy-line me-1"></i>{{ $assessment->total_marks }} Marks
                                     </small>
                                     <small class="text-muted">
-                                        <i class="ri ri-crosshair-line me-1"></i>Pass: {{ $assessment->passing_marks }}
+                                        <i class="ri ri-crosshair-line me-1"></i>Pass:
+                                        {{ $assessment->passing_marks }}
                                     </small>
                                     @if ($assessment->duration_minutes)
                                         <small class="text-muted">
-                                            <i class="ri ri-timer-line me-1"></i>{{ $assessment->duration_minutes }} min
+                                            <i class="ri ri-timer-line me-1"></i>{{ $assessment->duration_minutes }}
+                                            min
                                         </small>
                                     @endif
                                     <small class="text-muted">
-                                        <i class="ri ri-user-line me-1"></i>{{ $assessment->ageGroup?->name ?? '—' }} years
+                                        <i class="ri ri-user-line me-1"></i>{{ $assessment->ageGroup?->name ?? '—' }}
+                                        years
                                     </small>
                                 </div>
 
@@ -152,28 +154,23 @@
 
                                     {{-- ── Max Attempts Badge / Inline Editor ──────── --}}
                                     @if ($editingMaxAttemptsId === $assessment->id)
-
                                         {{-- EDITING STATE --}}
                                         <div class="d-flex align-items-center gap-1"
-                                             wire:key="max-edit-{{ $assessment->id }}">
-                                            <span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle">
+                                            wire:key="max-edit-{{ $assessment->id }}">
+                                            <span
+                                                class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle">
                                                 <i class="ri ri-repeat-line me-1"></i>Max Attempts
                                             </span>
-                                            <input type="number"
-                                                   wire:model="editingMaxAttemptsValue"
-                                                   min="1"
-                                                   max="99"
-                                                   class="form-control form-control-sm text-center
+                                            <input type="number" wire:model="editingMaxAttemptsValue" min="1"
+                                                max="99"
+                                                class="form-control form-control-sm text-center
                                                           @error('editingMaxAttemptsValue') is-invalid @enderror"
-                                                   style="width: 65px; font-size: .75rem;"
-                                                   wire:keydown.enter="saveMaxAttempts"
-                                                   wire:keydown.escape="cancelMaxAttemptsEdit">
-                                            <button wire:click="saveMaxAttempts"
-                                                    wire:loading.attr="disabled"
-                                                    wire:target="saveMaxAttempts"
-                                                    class="btn btn-success btn-sm py-0 px-2"
-                                                    title="Save"
-                                                    style="font-size:.75rem;">
+                                                style="width: 65px; font-size: .75rem;"
+                                                wire:keydown.enter="saveMaxAttempts"
+                                                wire:keydown.escape="cancelMaxAttemptsEdit">
+                                            <button wire:click="saveMaxAttempts" wire:loading.attr="disabled"
+                                                wire:target="saveMaxAttempts" class="btn btn-success btn-sm py-0 px-2"
+                                                title="Save" style="font-size:.75rem;">
                                                 <span wire:loading.remove wire:target="saveMaxAttempts">
                                                     <i class="ri ri-check-line"></i>
                                                 </span>
@@ -182,73 +179,75 @@
                                                 </span>
                                             </button>
                                             <button wire:click="cancelMaxAttemptsEdit"
-                                                    class="btn btn-outline-secondary btn-sm py-0 px-2"
-                                                    title="Cancel"
-                                                    style="font-size:.75rem;">
+                                                class="btn btn-outline-secondary btn-sm py-0 px-2" title="Cancel"
+                                                style="font-size:.75rem;">
                                                 <i class="ri ri-close-line"></i>
                                             </button>
                                         </div>
-
                                     @else
-
                                         {{-- DISPLAY STATE --}}
-                                        <span class="badge rounded-pill bg-primary-subtle text-primary
+                                        <span
+                                            class="badge rounded-pill bg-primary-subtle text-primary
                                                      border border-primary-subtle d-inline-flex
                                                      align-items-center gap-1"
-                                              style="cursor: default;"
-                                              data-bs-toggle="tooltip"
-                                              title="Max Attempts — click pencil to edit">
+                                            style="cursor: default;" data-bs-toggle="tooltip"
+                                            title="Max Attempts — click pencil to edit">
                                             <i class="ri ri-repeat-line"></i>
                                             {{ $assessment->max_attempts ?? 1 }}x Attempt
                                             {{-- Always-visible edit pencil for max_attempts --}}
-                                            <button wire:click="openMaxAttemptsEdit(
+                                            <button
+                                                wire:click="openMaxAttemptsEdit(
                                                         {{ $assessment->id }},
                                                         {{ $assessment->max_attempts ?? 1 }}
                                                     )"
-                                                    class="btn btn-link p-0 ms-1 text-primary"
-                                                    style="font-size:.7rem; line-height:1;"
-                                                    title="Edit max attempts">
+                                                class="btn btn-link p-0 ms-1 text-primary"
+                                                style="font-size:.7rem; line-height:1;" title="Edit max attempts">
                                                 <i class="ri ri-pencil-line"></i>
                                             </button>
                                         </span>
-
                                     @endif
                                     {{-- ── End Max Attempts ─────────────────────────── --}}
 
                                     @if ($assessment->has_negative_mark)
-                                        <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle"
-                                              data-bs-toggle="tooltip" title="Negative Marking Enabled">
+                                        <span
+                                            class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle"
+                                            data-bs-toggle="tooltip" title="Negative Marking Enabled">
                                             <i class="ri ri-subtract-line me-1"></i>Negative Mark
                                         </span>
                                     @else
-                                        <span class="badge rounded-pill bg-secondary-subtle text-secondary border border-secondary-subtle"
-                                              data-bs-toggle="tooltip" title="No Negative Marking">
+                                        <span
+                                            class="badge rounded-pill bg-secondary-subtle text-secondary border border-secondary-subtle"
+                                            data-bs-toggle="tooltip" title="No Negative Marking">
                                             <i class="ri ri-subtract-line me-1"></i>No Negative
                                         </span>
                                     @endif
 
-                                    <span class="badge rounded-pill {{ $assessment->shuffle_sections ? 'bg-info-subtle text-info border border-info-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle' }}"
-                                          data-bs-toggle="tooltip" title="Shuffle Sections">
+                                    <span
+                                        class="badge rounded-pill {{ $assessment->shuffle_sections ? 'bg-info-subtle text-info border border-info-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle' }}"
+                                        data-bs-toggle="tooltip" title="Shuffle Sections">
                                         <i class="ri ri-shuffle-line me-1"></i>
                                         {{ $assessment->shuffle_sections ? 'Shuffle On' : 'Shuffle Off' }}
                                     </span>
 
-                                    <span class="badge rounded-pill {{ $assessment->show_result_immediately ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle' }}"
-                                          data-bs-toggle="tooltip" title="Show Result Immediately">
+                                    <span
+                                        class="badge rounded-pill {{ $assessment->show_result_immediately ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle' }}"
+                                        data-bs-toggle="tooltip" title="Show Result Immediately">
                                         <i class="ri ri-bar-chart-line me-1"></i>
                                         {{ $assessment->show_result_immediately ? 'Instant Result' : 'Result Later' }}
                                     </span>
 
                                     @if ($assessment->show_result_immediately)
-                                        <span class="badge rounded-pill {{ $assessment->show_correct_answers ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle' }}"
-                                              data-bs-toggle="tooltip" title="Show Correct Answers">
+                                        <span
+                                            class="badge rounded-pill {{ $assessment->show_correct_answers ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle' }}"
+                                            data-bs-toggle="tooltip" title="Show Correct Answers">
                                             <i class="ri ri-checkbox-circle-line me-1"></i>
                                             {{ $assessment->show_correct_answers ? 'Answers Shown' : 'Answers Hidden' }}
                                         </span>
 
                                         @if ($assessment->show_correct_answers)
-                                            <span class="badge rounded-pill {{ $assessment->show_explainations ? 'bg-info-subtle text-info border border-info-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle' }}"
-                                                  data-bs-toggle="tooltip" title="Show Explanations">
+                                            <span
+                                                class="badge rounded-pill {{ $assessment->show_explainations ? 'bg-info-subtle text-info border border-info-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle' }}"
+                                                data-bs-toggle="tooltip" title="Show Explanations">
                                                 <i class="ri ri-book-open-line me-1"></i>
                                                 {{ $assessment->show_explainations ? 'Explanations On' : 'Explanations Off' }}
                                             </span>
@@ -262,10 +261,11 @@
 
                                 {{-- Attempts lock badge --}}
                                 @if ($assessment->attempts_count > 0)
-                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle
+                                    <span
+                                        class="badge bg-warning-subtle text-warning border border-warning-subtle
                                                  d-flex align-items-center gap-1"
-                                          data-bs-toggle="tooltip"
-                                          title="{{ $assessment->attempts_count }} attempt(s) made. Edit & Builder are locked.">
+                                        data-bs-toggle="tooltip"
+                                        title="{{ $assessment->attempts_count }} attempt(s) made. Edit & Builder are locked.">
                                         <i class="ri ri-lock-line"></i>
                                         {{ $assessment->attempts_count }} Attempts
                                     </span>
@@ -273,24 +273,21 @@
 
                                 {{-- Preview --}}
                                 <a href="{{ route('admin.assessments.preview', encrypt($assessment->id)) }}"
-                                   class="btn btn-info btn-sm"
-                                   data-bs-toggle="tooltip" title="Preview">
+                                    class="btn btn-info btn-sm" data-bs-toggle="tooltip" title="Preview">
                                     <i class="ri ri-eye-line"></i>
                                 </a>
 
                                 {{-- Builder --}}
                                 @if ($assessment->attempts_count > 0)
-                                    <button type="button"
-                                            class="btn btn-sm btn-outline-secondary"
-                                            disabled
-                                            data-bs-toggle="tooltip"
-                                            title="Locked: Students have attempted this assessment">
-                                        <i class="ri ri-lock-line me-1"></i>Builder
-                                    </button>
+                                    <a href="{{ route('admin.assessment-masters.build-view', encrypt($assessment->id)) }}"
+                                        class="btn btn-sm btn-outline-warning" data-bs-toggle="tooltip"
+                                        title="View Builder (Locked — students have attempted)">
+                                        <i class="ri ri-eye-line me-1"></i>Builder
+                                    </a>
                                 @else
                                     <a href="{{ route('admin.assessment-masters.build', encrypt($assessment->id)) }}"
-                                       class="btn btn-sm btn-outline-info"
-                                       data-bs-toggle="tooltip" title="Open Builder">
+                                        class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip"
+                                        title="Open Builder">
                                         <i class="ri ri-tools-line me-1"></i>Builder
                                     </a>
                                 @endif
@@ -298,17 +295,15 @@
                                 {{-- Edit --}}
                                 @if ($assessment->attempts_count > 0)
                                     {{-- Locked: only max_attempts is editable via inline badge above --}}
-                                    <button type="button"
-                                            class="btn btn-sm btn-outline-secondary"
-                                            disabled
-                                            data-bs-toggle="tooltip"
-                                            title="Locked: Full edit disabled after attempts. Use the pencil on 'Attempts' badge to edit max attempts.">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" disabled
+                                        data-bs-toggle="tooltip"
+                                        title="Locked: Full edit disabled after attempts. Use the pencil on 'Attempts' badge to edit max attempts.">
                                         <i class="ri ri-lock-line"></i>
                                     </button>
                                 @else
                                     <a href="{{ route('admin.assessment-masters.manage', encrypt($assessment->id)) }}"
-                                       class="btn btn-sm btn-outline-primary"
-                                       data-bs-toggle="tooltip" title="Edit Assessment">
+                                        class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip"
+                                        title="Edit Assessment">
                                         <i class="ri ri-pencil-line"></i>
                                     </a>
                                 @endif
@@ -317,29 +312,27 @@
                                 <div class="btn-group btn-group-sm" role="group">
                                     @php
                                         $statusOptions = [
-                                            'draft'     => ['warning',   'ri-draft-line',           'Draft'],
-                                            'publish'   => ['success',   'ri-checkbox-circle-line', 'Live'],
-                                            'unpublish' => ['secondary', 'ri-eye-off-line',         'Off'],
+                                            'draft' => ['warning', 'ri-draft-line', 'Draft'],
+                                            'publish' => ['success', 'ri-checkbox-circle-line', 'Live'],
+                                            'unpublish' => ['secondary', 'ri-eye-off-line', 'Off'],
                                         ];
                                         $isLocked = $assessment->attempts_count > 0;
                                     @endphp
 
                                     @foreach ($statusOptions as $val => [$color, $icon, $label])
                                         @php $isDisabled = $isLocked && $val === 'draft'; @endphp
-                                        <input type="radio"
-                                               class="btn-check"
-                                               name="status-{{ $assessment->id }}"
-                                               id="st-{{ $assessment->id }}-{{ $val }}"
-                                               value="{{ $val }}"
-                                               autocomplete="off"
-                                               @if(!$isDisabled) wire:click="changeStatus({{ $assessment->id }}, '{{ $val }}')" @endif
+                                        <input type="radio" class="btn-check" name="status-{{ $assessment->id }}"
+                                            id="st-{{ $assessment->id }}-{{ $val }}"
+                                            value="{{ $val }}" autocomplete="off"
+                                            @if (!$isDisabled) wire:click="changeStatus({{ $assessment->id }}, '{{ $val }}')" @endif
                                             {{ $assessment->status === $val ? 'checked' : '' }}
                                             {{ $isDisabled ? 'disabled' : '' }}>
-                                        <label class="btn btn-outline-{{ $color }} {{ $isDisabled ? 'opacity-50' : '' }}"
-                                               for="st-{{ $assessment->id }}-{{ $val }}"
-                                               data-bs-toggle="tooltip"
-                                               title="{{ $isDisabled ? 'Cannot set to Draft after attempts made' : $label }}"
-                                               style="font-size:.7rem; padding:.2rem .5rem;">
+                                        <label
+                                            class="btn btn-outline-{{ $color }} {{ $isDisabled ? 'opacity-50' : '' }}"
+                                            for="st-{{ $assessment->id }}-{{ $val }}"
+                                            data-bs-toggle="tooltip"
+                                            title="{{ $isDisabled ? 'Cannot set to Draft after attempts made' : $label }}"
+                                            style="font-size:.7rem; padding:.2rem .5rem;">
                                             <i class="ri {{ $icon }}"></i> {{ $label }}
                                         </label>
                                     @endforeach
@@ -347,11 +340,10 @@
 
                                 {{-- Delete --}}
                                 @if ($assessment->attempts_count === 0 && $assessment->status !== 'publish')
-                                    <button type="button"
-                                            wire:click="deleteAssessment({{ $assessment->id }})"
-                                            wire:confirm="Delete this assessment permanently?"
-                                            class="btn btn-sm btn-outline-danger"
-                                            data-bs-toggle="tooltip" title="Delete Assessment">
+                                    <button type="button" wire:click="deleteAssessment({{ $assessment->id }})"
+                                        wire:confirm="Delete this assessment permanently?"
+                                        class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip"
+                                        title="Delete Assessment">
                                         <i class="ri ri-delete-bin-line"></i>
                                     </button>
                                 @endif
@@ -366,8 +358,7 @@
                     <h6 class="mt-3 fw-semibold">No Assessments Found</h6>
                     <p class="small mb-4">Click "New Assessment" to get started.</p>
                     @can('system.assessment.view')
-                        <a href="{{ route('admin.assessment-masters.manage') }}"
-                           class="btn btn-primary btn-sm">
+                        <a href="{{ route('admin.assessment-masters.manage') }}" class="btn btn-primary btn-sm">
                             <i class="ri ri-add-large-line me-1"></i>New Assessment
                         </a>
                     @endcan

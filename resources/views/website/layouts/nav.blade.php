@@ -5,7 +5,8 @@
     <div class="nav-inner">
 
         <a href="{{ route('home') }}" class="nav-logo" onclick="showPage('home')">
-            <img src="{{ asset('brand-logo/logo-alt/logo-text-right-bottom.png') }}" style="height:46px;width:auto" alt="MindShiksha">
+            <img src="{{ asset('brand-logo/logo-alt/logo-text-right-bottom.png') }}" style="height:46px;width:auto"
+                alt="MindShiksha">
 
         </a>
         <div class="nav-links">
@@ -19,15 +20,15 @@
                 <div class="nav-dropdown-menu">
                     <a href="{{ route('cognitive') }}"
                         class="nav-dropdown-item {{ request()->routeIs('cognitive') ? 'active' : '' }}">
-                    Cognitive Skill Framework
+                        Cognitive Skill Framework
                     </a>
                     <a href="{{ route('life-skill') }}"
                         class="nav-dropdown-item  {{ request()->routeIs('life-skill') ? 'active' : '' }}">
-                         Life Skill Framework
+                        Life Skill Framework
                     </a>
                     <a href="{{ route('leadership-skill') }}"
-                       class="nav-dropdown-item  {{ request()->routeIs('leadership-skill') ? 'active' : '' }}">
-                         Leadership Skill Framework
+                        class="nav-dropdown-item  {{ request()->routeIs('leadership-skill') ? 'active' : '' }}">
+                        Leadership Skill Framework
                     </a>
                 </div>
             </div>
@@ -45,7 +46,7 @@
         </div>
 
         <div class="nav-actions">
-            <a href="https://hub.mindshiksha.com/admin/login" class="btn btn-secondary demo-btn">
+            <a href="https://testhub.mindshiksha.online/admin/login" class="btn btn-secondary demo-btn">
                 <i class="fas fa-sign-in"></i>
                 Login</a>
             <a href="{{ route('contact') }}" class="btn btn-primary demo-btn">
@@ -63,7 +64,8 @@
         Cognitive Framework</a>
     <a href="{{ route('life-skill') }}" class="mobile-nav-link" onclick="navigateTo('lifeskill');toggleMobileMenu()">
         Life Skill Framework</a>
-    <a href="{{ route('leadership-skill') }}" class="mobile-nav-link" onclick="navigateTo('lifeskill');toggleMobileMenu()">
+    <a href="{{ route('leadership-skill') }}" class="mobile-nav-link"
+        onclick="navigateTo('lifeskill');toggleMobileMenu()">
         Leadership Skill Framework</a>
     <a href="{{ route('solutions') }}" class="mobile-nav-link" onclick="navigateTo('solutions');toggleMobileMenu()">
         Solutions</a>
@@ -77,8 +79,9 @@
         Contact</a>
     <div style="margin-top:1rem;">
 
-        <a href="https://hub.mindshiksha.com/admin/login" class="btn btn-secondary  " style="width:100%;justify-content:center;">
-                <i class="fas fa-sign-in"></i> Login
+        <a href="https://testhub.mindshiksha.online/admin/login" class="btn btn-secondary  "
+            style="width:100%;justify-content:center;">
+            <i class="fas fa-sign-in"></i> Login
         </a>
         <button class="btn btn-primary" style="margin-top:10px;width:100%;justify-content:center;"
             onclick="navigateTo('contact');toggleMobileMenu()">

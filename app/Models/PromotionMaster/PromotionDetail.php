@@ -32,6 +32,7 @@ class PromotionDetail extends Model
     public function currentPromotion(): BelongsTo
     {
         return $this->belongsTo(Promotion::class, 'current_promotion_id');
+
     }
 
     /**
