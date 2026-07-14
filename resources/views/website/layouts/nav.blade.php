@@ -7,7 +7,7 @@
         <a href="{{ route('home') }}" class="nav-logo" onclick="showPage('home')">
             <img src="{{ asset('brand-logo/logo-alt/logo-text-right-bottom.png') }}" style="height:46px;width:auto"
                 alt="MindShiksha">
-
+            Test
         </a>
         <div class="nav-links">
             <a href="{{ route('home') }}" class="nav-link  {{ request()->routeIs('home') ? 'active' : '' }}">Home</a>

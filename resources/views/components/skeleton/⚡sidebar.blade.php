@@ -41,28 +41,29 @@ new class extends Component {
 
             {{-- Normal Mode Brand --}}
             <a href="{{ route('admin.home') }}" class="app-brand-link d-flex align-items-center gap-2">
-                    <span class="app-brand-logo flex-shrink-0">
-                        <img style="width: 36px; height: 36px; object-fit: contain;" class="rounded"
-                             src="{{ asset('brand-logo/logo-alt/logo-only.png') }}" alt="{{ config('app.name') }}"/>
-                    </span>
+                <span class="app-brand-logo flex-shrink-0">
+                    <img style="width: 36px; height: 36px; object-fit: contain;" class="rounded"
+                        src="{{ asset('brand-logo/logo-alt/logo-only.png') }}" alt="{{ config('app.name') }}" />
+                </span>
                 <div class="app-brand-text-group d-flex flex-column lh-sm">
                     <img style="height: 30px; object-fit: contain;"
-                         src="{{ asset('brand-logo/logo-alt/logo-text-only.png') }}" alt="{{ config('app.name') }}"/>
+                        src="{{ asset('brand-logo/logo-alt/logo-text-only.png') }}" alt="{{ config('app.name') }}" />
+                    Test
                 </div>
             </a>
 
 
             {{-- Collapse Toggle --}}
             <a href="javascript:void(0);"
-               class="layout-menu-toggle menu-link text-large ms-auto d-xl-flex d-none flex-shrink-0">
+                class="layout-menu-toggle menu-link text-large ms-auto d-xl-flex d-none flex-shrink-0">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"
-                     xmlns="http://www.w3.org/2000/svg">
+                    xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M8.47365 11.7183C8.11707 12.0749 8.11707 12.6531 8.47365 13.0097L12.071 16.607C12.4615 16.9975 12.4615 17.6305 12.071 18.021C11.6805 18.4115 11.0475 18.4115 10.657 18.021L5.83009 13.1941C5.37164 12.7356 5.37164 11.9924 5.83009 11.5339L10.657 6.707C11.0475 6.31653 11.6805 6.31653 12.071 6.707C12.4615 7.09747 12.4615 7.73053 12.071 8.121L8.47365 11.7183Z"
-                        fill-opacity="0.9"/>
+                        fill-opacity="0.9" />
                     <path
                         d="M14.3584 11.8336C14.0654 12.1266 14.0654 12.6014 14.3584 12.8944L18.071 16.607C18.4615 16.9975 18.4615 17.6305 18.071 18.021C17.6805 18.4115 17.0475 18.4115 16.657 18.021L11.6819 13.0459C11.3053 12.6693 11.3053 12.0587 11.6819 11.6821L16.657 6.707C17.0475 6.31653 17.6805 6.31653 18.071 6.707C18.4615 7.09747 18.4615 7.73053 18.071 8.121L14.3584 11.8336Z"
-                        fill-opacity="0.4"/>
+                        fill-opacity="0.4" />
                 </svg>
             </a>
         </div>
@@ -75,53 +76,52 @@ new class extends Component {
 
 
 
-            {{-- ======================================== --}}
-            {{-- ORGANISATION MODE MENU                   --}}
-            {{-- ======================================== --}}
+        {{-- ======================================== --}}
+        {{-- ORGANISATION MODE MENU                   --}}
+        {{-- ======================================== --}}
 
-                {{-- Organisation Info Banner --}}
-                @if ($activeOrg)
-                    <div class="active-org-card px-3 py-3 mx-2 mb-2 rounded-3">
-                            <div class="d-flex justify-content-end  mb-1 active-org-header flex-column">
-                                <span class="badge bg-label-success" style="font-size:0.62rem;">
-                                    <i class="ri ri-building-line me-1"></i>ACTIVE ORG
-                                </span>
+        {{-- Organisation Info Banner --}}
+        @if ($activeOrg)
+            <div class="active-org-card px-3 py-3 mx-2 mb-2 rounded-3">
+                <div class="d-flex justify-content-end  mb-1 active-org-header flex-column">
+                    <span class="badge bg-label-success" style="font-size:0.62rem;">
+                        <i class="ri ri-building-line me-1"></i>ACTIVE ORG
+                    </span>
 
+                </div>
+                <a href="{{ route('admin.organisations.dashboard', encrypt($activeOrg->id)) }}"
+                    class="app-brand-link d-flex align-items-center gap-2">
+                    <span class="active-org-logo flex-shrink-0">
+                        @if ($activeOrg->logo)
+                            <img src="{{ asset('storage/' . $activeOrg->logo) }}"
+                                class="rounded-circle border border-2 border-success"
+                                style="width:36px;height:36px;object-fit:cover;" alt="{{ $activeOrg->name }}">
+                        @else
+                            <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center fw-bold"
+                                style="width:36px;height:36px;">
+                                {{ strtoupper(substr($activeOrg->name, 0, 2)) }}
                             </div>
-                            <a href="{{ route('admin.organisations.dashboard', encrypt($activeOrg->id)) }}"
-                               class="app-brand-link d-flex align-items-center gap-2">
-                                <span class="active-org-logo flex-shrink-0">
-                                    @if ($activeOrg->logo)
-                                        <img src="{{ asset('storage/' . $activeOrg->logo) }}"
-                                             class="rounded-circle border border-2 border-success"
-                                             style="width:36px;height:36px;object-fit:cover;"
-                                             alt="{{ $activeOrg->name }}">
-                                    @else
-                                        <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center fw-bold"
-                                             style="width:36px;height:36px;">
-                                            {{ strtoupper(substr($activeOrg->name,0,2)) }}
-                                        </div>
-                                    @endif
-                                </span>
+                        @endif
+                    </span>
 
-                                <div class="app-brand-text-group d-flex flex-column lh-sm">
-                                   <span class="app-brand-text fw-bold fs-6 text-success text-nowrap"
-                                        style="max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                        {{ $activeOrg->name }}
-                                    </span>
-                                    <span class="app-brand-subtext text-muted text-nowrap"
-                                          style="font-size: 0.53rem; letter-spacing: 0.02em;">
-                                        <i class="ri ri-building-line me-1"></i>{{ $activeOrg->code }} · Org Mode
-                                    </span>
-                                </div>
+                    <div class="app-brand-text-group d-flex flex-column lh-sm">
+                        <span class="app-brand-text fw-bold fs-6 text-success text-nowrap"
+                            style="max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            {{ $activeOrg->name }}
+                        </span>
+                        <span class="app-brand-subtext text-muted text-nowrap"
+                            style="font-size: 0.53rem; letter-spacing: 0.02em;">
+                            <i class="ri ri-building-line me-1"></i>{{ $activeOrg->code }} · Org Mode
+                        </span>
+                    </div>
 
-                            </a>
-                        </div>
-                    <div class="border-bottom"></div>
-                @endif
-                <ul class="menu-inner pt-1 pb-10 ps ps--active-y">
+                </a>
+            </div>
+            <div class="border-bottom"></div>
+        @endif
+        <ul class="menu-inner pt-1 pb-10 ps ps--active-y">
 
-                    @if ($activeOrg)
+            @if ($activeOrg)
                 {{-- Home / Exit (Show if user has any system permissions) --}}
                 @if ($isSuperAdmin || $authAdmin->getSystemPermissions()->isNotEmpty())
                     <li class="menu-item">
@@ -151,22 +151,22 @@ new class extends Component {
 
                     </li>
                 @endif
-{{--                @if ($canOrg('org.course.view'))--}}
-{{--                    <li class="menu-item">--}}
-{{--                        <a href="javascript:void(0);" class="menu-link">--}}
-{{--                            <i class="menu-icon icon-base ri ri-book-open-line"></i>--}}
-{{--                            <div>All Courses</div>--}}
-{{--                        </a>--}}
-{{--                    </li>--}}
-{{--                @endif--}}
-{{--                @if ($canOrg('org.module.view'))--}}
-{{--                    <li class="menu-item">--}}
-{{--                        <a href="javascript:void(0);" class="menu-link">--}}
-{{--                            <i class="menu-icon icon-base ri ri-layout-masonry-line"></i>--}}
-{{--                            <div>Modules & Lessons</div>--}}
-{{--                        </a>--}}
-{{--                    </li>--}}
-{{--                @endif--}}
+                {{--                @if ($canOrg('org.course.view')) --}}
+                {{--                    <li class="menu-item"> --}}
+                {{--                        <a href="javascript:void(0);" class="menu-link"> --}}
+                {{--                            <i class="menu-icon icon-base ri ri-book-open-line"></i> --}}
+                {{--                            <div>All Courses</div> --}}
+                {{--                        </a> --}}
+                {{--                    </li> --}}
+                {{--                @endif --}}
+                {{--                @if ($canOrg('org.module.view')) --}}
+                {{--                    <li class="menu-item"> --}}
+                {{--                        <a href="javascript:void(0);" class="menu-link"> --}}
+                {{--                            <i class="menu-icon icon-base ri ri-layout-masonry-line"></i> --}}
+                {{--                            <div>Modules & Lessons</div> --}}
+                {{--                        </a> --}}
+                {{--                    </li> --}}
+                {{--                @endif --}}
                 @if ($canOrg('org.assessment.view'))
                     <li class="menu-item">
                         <a href="javascript:void(0);" class="menu-link ">
@@ -176,14 +176,14 @@ new class extends Component {
                     </li>
                 @endif
                 {{-- Side bar can be add here ritz from sidebar_orgMode.txt file- --}}
-{{--                @if ($canOrg('org.settings.view'))--}}
-{{--                    <li class="menu-item">--}}
-{{--                        <a href="{{ route('admin.org.edit', $activeOrg->id) }}" class="menu-link">--}}
-{{--                            <i class="menu-icon icon-base ri ri-settings-3-line"></i>--}}
-{{--                            <div>Org Settings</div>--}}
-{{--                        </a>--}}
-{{--                    </li>--}}
-{{--                @endif--}}
+                {{--                @if ($canOrg('org.settings.view')) --}}
+                {{--                    <li class="menu-item"> --}}
+                {{--                        <a href="{{ route('admin.org.edit', $activeOrg->id) }}" class="menu-link"> --}}
+                {{--                            <i class="menu-icon icon-base ri ri-settings-3-line"></i> --}}
+                {{--                            <div>Org Settings</div> --}}
+                {{--                        </a> --}}
+                {{--                    </li> --}}
+                {{--                @endif --}}
                 {{-- Switch Organisation --}}
                 @if ($isSuperAdmin)
                     @php $adminOrgs = \App\Models\Master\Organisation::active()->limit(5)->get(); @endphp
@@ -193,7 +193,7 @@ new class extends Component {
                 @if ($adminOrgs->count() > 1)
                     <li class="menu-header small mt-4">
                         <span class="menu-header-text text-uppercase"
-                              style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
+                            style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
                             Switch Organisation
                         </span>
                     </li>
@@ -227,69 +227,69 @@ new class extends Component {
                 </li>
 
                 {{-- ==================== LEARNING MANAGEMENT ==================== --}}
-{{--                @if ($canAnySystem(['system.course.view', 'system.course.create', 'system.module.view']))--}}
-{{--                    <li class="menu-header small mt-4">--}}
-{{--                        <span class="menu-header-text text-uppercase"--}}
-{{--                              style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">--}}
-{{--                            Learning Management--}}
-{{--                        </span>--}}
-{{--                    </li>--}}
+                {{--                @if ($canAnySystem(['system.course.view', 'system.course.create', 'system.module.view'])) --}}
+                {{--                    <li class="menu-header small mt-4"> --}}
+                {{--                        <span class="menu-header-text text-uppercase" --}}
+                {{--                              style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;"> --}}
+                {{--                            Learning Management --}}
+                {{--                        </span> --}}
+                {{--                    </li> --}}
 
-{{--                    @if ($canSystem('system.course.view'))--}}
-{{--                        <li class="menu-item">--}}
-{{--                            <a href="javascript:void(0);" class="menu-link menu-toggle">--}}
-{{--                                <i class="menu-icon icon-base ri ri-book-open-line"></i>--}}
-{{--                                <div>Courses</div>--}}
-{{--                            </a>--}}
-{{--                            <ul class="menu-sub">--}}
-{{--                                <li class="menu-item">--}}
-{{--                                    <a href="#" class="menu-link">--}}
-{{--                                        <div>All Courses</div>--}}
-{{--                                    </a>--}}
-{{--                                </li>--}}
-{{--                                @if ($canSystem('system.course.create'))--}}
-{{--                                    <li class="menu-item">--}}
-{{--                                        <a href="#" class="menu-link">--}}
-{{--                                            <div>Create Course</div>--}}
-{{--                                        </a>--}}
-{{--                                    </li>--}}
-{{--                                @endif--}}
-{{--                                <li class="menu-item">--}}
-{{--                                    <a href="#" class="menu-link">--}}
-{{--                                        <div>Categories</div>--}}
-{{--                                    </a>--}}
-{{--                                </li>--}}
-{{--                            </ul>--}}
-{{--                        </li>--}}
-{{--                    @endif--}}
+                {{--                    @if ($canSystem('system.course.view')) --}}
+                {{--                        <li class="menu-item"> --}}
+                {{--                            <a href="javascript:void(0);" class="menu-link menu-toggle"> --}}
+                {{--                                <i class="menu-icon icon-base ri ri-book-open-line"></i> --}}
+                {{--                                <div>Courses</div> --}}
+                {{--                            </a> --}}
+                {{--                            <ul class="menu-sub"> --}}
+                {{--                                <li class="menu-item"> --}}
+                {{--                                    <a href="#" class="menu-link"> --}}
+                {{--                                        <div>All Courses</div> --}}
+                {{--                                    </a> --}}
+                {{--                                </li> --}}
+                {{--                                @if ($canSystem('system.course.create')) --}}
+                {{--                                    <li class="menu-item"> --}}
+                {{--                                        <a href="#" class="menu-link"> --}}
+                {{--                                            <div>Create Course</div> --}}
+                {{--                                        </a> --}}
+                {{--                                    </li> --}}
+                {{--                                @endif --}}
+                {{--                                <li class="menu-item"> --}}
+                {{--                                    <a href="#" class="menu-link"> --}}
+                {{--                                        <div>Categories</div> --}}
+                {{--                                    </a> --}}
+                {{--                                </li> --}}
+                {{--                            </ul> --}}
+                {{--                        </li> --}}
+                {{--                    @endif --}}
 
-{{--                    @if ($canSystem('system.module.view'))--}}
-{{--                        <li class="menu-item">--}}
-{{--                            <a href="javascript:void(0);" class="menu-link menu-toggle">--}}
-{{--                                <i class="menu-icon icon-base ri ri-layout-masonry-line"></i>--}}
-{{--                                <div>Modules & Lessons</div>--}}
-{{--                            </a>--}}
-{{--                            <ul class="menu-sub">--}}
-{{--                                <li class="menu-item">--}}
-{{--                                    <a href="#" class="menu-link">--}}
-{{--                                        <div>All Modules</div>--}}
-{{--                                    </a>--}}
-{{--                                </li>--}}
-{{--                                <li class="menu-item">--}}
-{{--                                    <a href="#" class="menu-link">--}}
-{{--                                        <div>All Lessons</div>--}}
-{{--                                    </a>--}}
-{{--                                </li>--}}
-{{--                            </ul>--}}
-{{--                        </li>--}}
-{{--                    @endif--}}
-{{--                @endif--}}
+                {{--                    @if ($canSystem('system.module.view')) --}}
+                {{--                        <li class="menu-item"> --}}
+                {{--                            <a href="javascript:void(0);" class="menu-link menu-toggle"> --}}
+                {{--                                <i class="menu-icon icon-base ri ri-layout-masonry-line"></i> --}}
+                {{--                                <div>Modules & Lessons</div> --}}
+                {{--                            </a> --}}
+                {{--                            <ul class="menu-sub"> --}}
+                {{--                                <li class="menu-item"> --}}
+                {{--                                    <a href="#" class="menu-link"> --}}
+                {{--                                        <div>All Modules</div> --}}
+                {{--                                    </a> --}}
+                {{--                                </li> --}}
+                {{--                                <li class="menu-item"> --}}
+                {{--                                    <a href="#" class="menu-link"> --}}
+                {{--                                        <div>All Lessons</div> --}}
+                {{--                                    </a> --}}
+                {{--                                </li> --}}
+                {{--                            </ul> --}}
+                {{--                        </li> --}}
+                {{--                    @endif --}}
+                {{--                @endif --}}
 
                 {{-- ==================== ASSESSMENT & EVALUATION ==================== --}}
                 @if ($canAnySystem(['system.question.view', 'system.assessment.view']))
                     <li class="menu-header small mt-4">
                         <span class="menu-header-text text-uppercase"
-                              style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
+                            style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
                             Assessment & Evaluation
                         </span>
                     </li>
@@ -330,11 +330,11 @@ new class extends Component {
                                         </a>
                                     </li>
                                 @endif
-{{--                                <li class="menu-item">--}}
-{{--                                    <a href="#" class="menu-link">--}}
-{{--                                        <div>Results & Scores</div>--}}
-{{--                                    </a>--}}
-{{--                                </li>--}}
+                                {{--                                <li class="menu-item"> --}}
+                                {{--                                    <a href="#" class="menu-link"> --}}
+                                {{--                                        <div>Results & Scores</div> --}}
+                                {{--                                    </a> --}}
+                                {{--                                </li> --}}
                             </ul>
                         </li>
                     @endif
@@ -344,7 +344,7 @@ new class extends Component {
                 @if ($canAnySystem(['system.student.view', 'system.admin.view', 'system.role.view']))
                     <li class="menu-header small mt-4">
                         <span class="menu-header-text text-uppercase"
-                              style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
+                            style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
                             User Management
                         </span>
                     </li>
@@ -381,7 +381,7 @@ new class extends Component {
                 @if ($canSystem('system.organisation.view'))
                     <li class="menu-header small mt-4">
                         <span class="menu-header-text text-uppercase"
-                              style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
+                            style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
                             Organization
                         </span>
                     </li>
@@ -401,93 +401,93 @@ new class extends Component {
                 @endif
 
                 {{-- ==================== REPORTS & ANALYTICS ==================== --}}
-                        @if ($canSystem('system.report.view'))
-                            <li class="menu-header small mt-4">
-                                <span class="menu-header-text text-uppercase"
-                                      style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
-                                    Reports & Analytics
-                                </span>
-                            </li>
+                @if ($canSystem('system.report.view'))
+                    <li class="menu-header small mt-4">
+                        <span class="menu-header-text text-uppercase"
+                            style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
+                            Reports & Analytics
+                        </span>
+                    </li>
+                    <li class="menu-item">
+                        <a href="javascript:void(0);" class="menu-link menu-toggle">
+                            <i class="menu-icon icon-base ri ri-bar-chart-box-line"></i>
+                            <div>Reports</div>
+                        </a>
+                        <ul class="menu-sub">
+
                             <li class="menu-item">
-                                <a href="javascript:void(0);" class="menu-link menu-toggle">
-                                    <i class="menu-icon icon-base ri ri-bar-chart-box-line"></i>
-                                    <div>Reports</div>
+                                <a href="{{ route('admin.reports.reports.student-list') }}" class="menu-link">
+                                    <div>All Students</div>
                                 </a>
-                                <ul class="menu-sub">
-
-                                    <li class="menu-item">
-                                        <a href="{{ route('admin.reports.reports.student-list') }}" class="menu-link">
-                                            <div>All Students</div>
-                                        </a>
-                                    </li>
-{{--                                    <li class="menu-item">--}}
-{{--                                        <a href="#" class="menu-link">--}}
-{{--                                            <div>Overview</div>--}}
-{{--                                        </a>--}}
-{{--                                    </li>--}}
-{{--                                    <li class="menu-item">--}}
-{{--                                        <a href="#" class="menu-link">--}}
-{{--                                            <div>Course Progress</div>--}}
-{{--                                        </a>--}}
-{{--                                    </li>--}}
-{{--                                    <li class="menu-item">--}}
-{{--                                        <a href="#" class="menu-link">--}}
-{{--                                            <div>Assessment Reports</div>--}}
-{{--                                        </a>--}}
-{{--                                    </li>--}}
-
-{{--                                    @if ($canSystem('system.report.export'))--}}
-{{--                                        <li class="menu-item">--}}
-{{--                                            <a href="#" class="menu-link">--}}
-{{--                                                <div>Export Reports</div>--}}
-{{--                                            </a>--}}
-{{--                                        </li>--}}
-{{--                                    @endif--}}
-
-                                    {{-- ✅ Activity Logs - Last Item --}}
-                                    @if ($canSystem('system.activity.view'))
-                                        <li class="menu-item">
-                                            <a href="{{ route('admin.reports.activity-logs') }}" class="menu-link">
-
-                                                <div>Activity Logs</div>
-                                            </a>
-                                        </li>
-                                    @endif
-
-                                </ul>
                             </li>
-                        @endif
+                            {{--                                    <li class="menu-item"> --}}
+                            {{--                                        <a href="#" class="menu-link"> --}}
+                            {{--                                            <div>Overview</div> --}}
+                            {{--                                        </a> --}}
+                            {{--                                    </li> --}}
+                            {{--                                    <li class="menu-item"> --}}
+                            {{--                                        <a href="#" class="menu-link"> --}}
+                            {{--                                            <div>Course Progress</div> --}}
+                            {{--                                        </a> --}}
+                            {{--                                    </li> --}}
+                            {{--                                    <li class="menu-item"> --}}
+                            {{--                                        <a href="#" class="menu-link"> --}}
+                            {{--                                            <div>Assessment Reports</div> --}}
+                            {{--                                        </a> --}}
+                            {{--                                    </li> --}}
+
+                            {{--                                    @if ($canSystem('system.report.export')) --}}
+                            {{--                                        <li class="menu-item"> --}}
+                            {{--                                            <a href="#" class="menu-link"> --}}
+                            {{--                                                <div>Export Reports</div> --}}
+                            {{--                                            </a> --}}
+                            {{--                                        </li> --}}
+                            {{--                                    @endif --}}
+
+                            {{-- ✅ Activity Logs - Last Item --}}
+                            @if ($canSystem('system.activity.view'))
+                                <li class="menu-item">
+                                    <a href="{{ route('admin.reports.activity-logs') }}" class="menu-link">
+
+                                        <div>Activity Logs</div>
+                                    </a>
+                                </li>
+                            @endif
+
+                        </ul>
+                    </li>
+                @endif
                 {{-- ==================== COMMUNICATION ==================== --}}
-{{--                <li class="menu-header small mt-4">--}}
-{{--                    <span class="menu-header-text text-uppercase"--}}
-{{--                          style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">--}}
-{{--                        Communication--}}
-{{--                    </span>--}}
-{{--                </li>--}}
-{{--                <li class="menu-item">--}}
-{{--                    <a href="javascript:void(0);" class="menu-link menu-toggle">--}}
-{{--                        <i class="menu-icon icon-base ri ri-mail-send-line"></i>--}}
-{{--                        <div>Announcements</div>--}}
-{{--                    </a>--}}
-{{--                    <ul class="menu-sub">--}}
-{{--                        <li class="menu-item">--}}
-{{--                            <a href="#" class="menu-link">--}}
-{{--                                <div>All Announcements</div>--}}
-{{--                            </a>--}}
-{{--                        </li>--}}
-{{--                        <li class="menu-item">--}}
-{{--                            <a href="#" class="menu-link">--}}
-{{--                                <div>Create Announcement</div>--}}
-{{--                            </a>--}}
-{{--                        </li>--}}
-{{--                    </ul>--}}
-{{--                </li>--}}
+                {{--                <li class="menu-header small mt-4"> --}}
+                {{--                    <span class="menu-header-text text-uppercase" --}}
+                {{--                          style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;"> --}}
+                {{--                        Communication --}}
+                {{--                    </span> --}}
+                {{--                </li> --}}
+                {{--                <li class="menu-item"> --}}
+                {{--                    <a href="javascript:void(0);" class="menu-link menu-toggle"> --}}
+                {{--                        <i class="menu-icon icon-base ri ri-mail-send-line"></i> --}}
+                {{--                        <div>Announcements</div> --}}
+                {{--                    </a> --}}
+                {{--                    <ul class="menu-sub"> --}}
+                {{--                        <li class="menu-item"> --}}
+                {{--                            <a href="#" class="menu-link"> --}}
+                {{--                                <div>All Announcements</div> --}}
+                {{--                            </a> --}}
+                {{--                        </li> --}}
+                {{--                        <li class="menu-item"> --}}
+                {{--                            <a href="#" class="menu-link"> --}}
+                {{--                                <div>Create Announcement</div> --}}
+                {{--                            </a> --}}
+                {{--                        </li> --}}
+                {{--                    </ul> --}}
+                {{--                </li> --}}
 
                 {{-- ==================== SYSTEM SETTINGS ==================== --}}
                 @if ($canSystem('system.settings.view'))
                     <li class="menu-header small mt-4">
                         <span class="menu-header-text text-uppercase"
-                              style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
+                            style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">
                             System Settings
                         </span>
                     </li>
@@ -519,9 +519,9 @@ new class extends Component {
 
 @push('script')
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             let currentUrl = window.location.href;
-            $('.menu-link').each(function () {
+            $('.menu-link').each(function() {
                 let linkUrl = $(this).attr('href');
                 if (
                     linkUrl &&
