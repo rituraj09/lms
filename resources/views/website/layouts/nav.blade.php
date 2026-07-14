@@ -7,7 +7,6 @@
         <a href="{{ route('home') }}" class="nav-logo" onclick="showPage('home')">
             <img src="{{ asset('brand-logo/logo-alt/logo-text-right-bottom.png') }}" style="height:46px;width:auto"
                 alt="MindShiksha">
-            Test
         </a>
         <div class="nav-links">
             <a href="{{ route('home') }}" class="nav-link  {{ request()->routeIs('home') ? 'active' : '' }}">Home</a>
@@ -46,7 +45,7 @@
         </div>
 
         <div class="nav-actions">
-            <a href="https://testhub.mindshiksha.online/admin/login" class="btn btn-secondary demo-btn">
+            <a href="https://hub.mindshiksha.com/admin/login" class="btn btn-secondary demo-btn">
                 <i class="fas fa-sign-in"></i>
                 Login</a>
             <a href="{{ route('contact') }}" class="btn btn-primary demo-btn">
@@ -79,7 +78,7 @@
         Contact</a>
     <div style="margin-top:1rem;">
 
-        <a href="https://testhub.mindshiksha.online/admin/login" class="btn btn-secondary  "
+        <a href="https://hub.mindshiksha.com/admin/login" class="btn btn-secondary  "
             style="width:100%;justify-content:center;">
             <i class="fas fa-sign-in"></i> Login
         </a>

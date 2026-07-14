@@ -48,7 +48,7 @@ new class extends Component {
                 <div class="app-brand-text-group d-flex flex-column lh-sm">
                     <img style="height: 30px; object-fit: contain;"
                         src="{{ asset('brand-logo/logo-alt/logo-text-only.png') }}" alt="{{ config('app.name') }}" />
-                    Test
+
                 </div>
             </a>
 
