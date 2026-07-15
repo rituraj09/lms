@@ -648,10 +648,19 @@ class AssessmentBuild extends Component
             ->pluck('question_group_id')
             ->toArray();
 
+        $defaultLang = $this->languages[0] ?? 'en';
+        $search = $this->groupPickerSearch;
+
         return QuestionGroup::withCount('questions')
-            ->when($this->groupPickerSearch, fn($q) =>
-            $q->where('group_code', 'like', "%{$this->groupPickerSearch}%")
-            )
+            ->when($search, function ($q) use ($search, $defaultLang) {
+                $q->where(function ($query) use ($search, $defaultLang) {
+                    $query->where('group_code', 'like', "%{$search}%")
+                        ->orWhereRaw(
+                            "JSON_UNQUOTE(JSON_EXTRACT(group_content, '$.title.{$defaultLang}')) LIKE ?",
+                            ["%{$search}%"]
+                        );
+                });
+            })
             ->get()
             ->map(function ($pg) use ($usedMultipleGroupIds) {
                 $pg->is_used_multiple = in_array($pg->id, $usedMultipleGroupIds);
