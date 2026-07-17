@@ -54,7 +54,7 @@
                             'label' => 'Reports',
                             'icon' => 'icon-base ri ri-bar-chart-line',
                             'event' => 'report_card',
-                            'class' => 'btn-primary',
+                            'class' => 'btn-primary text-white',
                         ],
                     ]" />
             </div>

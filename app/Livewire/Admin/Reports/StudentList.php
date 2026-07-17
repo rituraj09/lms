@@ -50,7 +50,7 @@ class StudentList extends Component
     public function viewUserReport(int $id): void
     {
         $this->redirect(
-            route('admin.reports.detailed-report', ['studentId' => $id]),
+            route('admin.reports.student-report-cards', ['id' => Crypt::encrypt($id)]),
             navigate: false
         );
     }

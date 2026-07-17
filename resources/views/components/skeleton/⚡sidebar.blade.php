@@ -175,6 +175,24 @@ new class extends Component {
                         </a>
                     </li>
                 @endif
+
+                @if ($canOrg('org.student.view'))
+                    <li class="menu-item">
+                        <a href="javascript:void(0);" class="menu-link menu-toggle">
+                            <i class="menu-icon icon-base ri ri-bar-chart-box-line"></i>
+                            <div>Reports</div>
+                        </a>
+                        <ul class="menu-sub">
+
+                            <li class="menu-item">
+                                <a href="{{ route('admin.org.reports.students-list', encrypt($activeOrg->id)) }}"
+                                    class="menu-link {{ request()->routeIs('admin.org.reports') ? 'active' : '' }}">
+                                    <div>Students list</div>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
                 {{-- Side bar can be add here ritz from sidebar_orgMode.txt file- --}}
                 {{--                @if ($canOrg('org.settings.view')) --}}
                 {{--                    <li class="menu-item"> --}}

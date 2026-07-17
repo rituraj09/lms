@@ -16,10 +16,12 @@ use App\Livewire\Admin\AssessmentMasters\AssessmentBuildView;
 use App\Livewire\Admin\Student\ManageStudents;
 use App\Livewire\Admin\Student\StudentForm;
 use App\Livewire\Admin\Student\StudentDetails;
+use App\Livewire\Admin\Student\StudentList as OrgStudentList;
 use App\Livewire\Admin\Reports\StudentList;
 use App\Livewire\Admin\Reports\ActivityLogs;
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\RolePermission\AdminPermissionManager;
+use App\Livewire\Admin\Reports\PromotionCertificate;
 
 // ── Guest Routes (not logged in) ──────────────────────────────────
 Route::middleware('redirect.auth:admin')->group(function ($router) {
@@ -144,9 +146,13 @@ Route::group(['middleware' => ['redirect.notauth:admin','auth:admin']], function
     // student list
         $router->get('student-list', StudentList::class)
             ->name('reports.student-list');
-        $router->get('/student-report-cards', StudentReportCard::class)->name('report-cards');
-        $router->get('/student-detailed-report/{studentId}', StudentDetailedReport::class)->name('detailed-report');
-        $router->get('/admin/activity-logs', ActivityLogs::class)
+       $router->get('student-report-cards/{id}', StudentReportCard::class)
+            ->name('student-report-cards');
+        $router->get('student-detailed-report/{studentId}', StudentDetailedReport::class)->name('detailed-report');
+         $router->get('student-report-cards/certificate/{student}/{history}',
+    PromotionCertificate::class)->name('promotion-certificate');
+
+        $router->get('admin/activity-logs', ActivityLogs::class)
             ->name('activity-logs');
     });
 
@@ -171,6 +177,14 @@ Route::group(['middleware' => ['redirect.notauth:admin','auth:admin']], function
             ->name('students.edit');
         $router->get('/students/view/{organisationId}/{studentId}', StudentDetails::class)
             ->name('students.view');
+
+        $router->get('/reports/students-list/{organisationId}', OrgStudentList::class)
+            ->name('reports.students-list');
+        $router->get('/reports/students-list/student-report-cards/{organisationId}/{id}',
+            StudentReportCard::class)->name('reports.students-list.report-cards');
+        $router->get('/reports/students-list/student-report-cards/{organisationId}/{id}',
+            StudentReportCard::class)->name('reports.students-list.report-cards');
+
 
         // Route::prefix('{organisationId}/students')->name('students.')->group(function () {
         //     Route::get('/', \App\Livewire\Admin\Student\StudentList::class)

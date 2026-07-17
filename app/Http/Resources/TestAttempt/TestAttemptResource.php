@@ -1,5 +1,5 @@
 <?php
-// app/Http/Resources/TestAttemptResource.php
+// app/Http/Resources/TestAttempt/TestAttemptResource.php
 
 namespace App\Http\Resources\TestAttempt;
 
@@ -49,7 +49,8 @@ class TestAttemptResource extends JsonResource
             'negative_score'     => (float) $this->negative_score,
             'total_score'        => (float) $this->total_score,
             'status'             => $this->status,
-            'assessment_type_id' => $this->assessment->assessment_type_id,
+            'assessment_type_id' => $this->assessment->assessment_type_id ?? null,
+
             // Computed
             'total_questions'    => $totalQuestions,
             'answered_questions' => $answeredQuestions,
@@ -58,11 +59,33 @@ class TestAttemptResource extends JsonResource
             'duration_minutes'   => $this->getDurationInMinutes(),
             'has_expired'        => $this->hasExpired(),
 
-            // Relationships
-            'assessment' => $this->whenLoaded(
-                'assessment',
-                fn() => new AssessmentDetailResource($this->assessment)
-            ),
+            // ✅ ADD THIS: Direct assessment fields for table display
+            'assessment' => $this->whenLoaded('assessment', function() {
+                $assessment = $this->assessment;
+                return [
+                    'id' => $assessment->id,
+                    'title' => $assessment->title,
+                    'name' => $assessment->name ?? null,
+                    'total_marks' => $assessment->total_marks,
+                    'assessment_type_id' => $assessment->assessment_type_id,
+
+                    // ✅ Age Group
+                    'age_group' => $assessment->relationLoaded('ageGroup') && $assessment->ageGroup
+                        ? [
+                            'id' => $assessment->ageGroup->id,
+                            'name' => $assessment->ageGroup->name,
+                        ]
+                        : null,
+
+                    // ✅ Difficulty Level
+                    'difficulty_level' => $assessment->relationLoaded('difficultyLevel') && $assessment->difficultyLevel
+                        ? [
+                            'id' => $assessment->difficultyLevel->id,
+                            'level' => $assessment->difficultyLevel->level,
+                        ]
+                        : null,
+                ];
+            }),
 
             'responses' => $this->whenLoaded(
                 'responses',

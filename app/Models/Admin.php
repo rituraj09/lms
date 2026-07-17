@@ -8,6 +8,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\Permission\Traits\HasRoles;
+use Laravel\Sanctum\HasApiTokens;
 use App\Models\Master\AdminDetail;
 use App\Models\Master\Organisation;
 use Spatie\Permission\Models\Permission;
@@ -16,7 +17,7 @@ use Illuminate\Support\Collection;
 #[Unguarded]
 class Admin extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles, SoftDeletes;
+    use HasFactory, Notifiable, HasRoles, SoftDeletes, HasApiTokens;
 
     protected $guard_name = 'admin';
 

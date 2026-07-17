@@ -1,85 +1,130 @@
 <?php
-
 // app/Livewire/Admin/Reports/StudentReportCard.php
 namespace App\Livewire\Admin\Reports;
 
 use Livewire\Attributes\Layout;
 use Livewire\Component;
-use Livewire\WithPagination;
-use App\Services\StudentReportService;
-use App\Models\EvaluationMaster\AgeGroup;
 use App\Models\User;
+use App\Models\TestAttempt\UserPromotionDetail;
 
 #[Layout('layouts.backend')]
 class StudentReportCard extends Component
 {
-    use WithPagination;
+    public int $userId;
+    public User $student;
 
-    public $search = '';
-    public $ageGroupFilter = '';
-    public $perPage = 15;
+    public array $currentPromotions = [];
+    public array $promotionHistories = [];
 
-    protected $paginationTheme = 'bootstrap';
+    public string $activeHistoryType = 'iq';
+    public bool $showModal = false;
+    public string $backUrl = '';
 
-    protected $queryString = [
-        'search' => ['except' => ''],
-        'ageGroupFilter' => ['except' => ''],
-    ];
-
-    public function updatingSearch()
+    public function mount(string $id, string $organisationId = ''): void
     {
-        $this->resetPage();
+        $decryptedId = decrypt($id);
+        $this->userId = $decryptedId;
+
+        $this->backUrl = $this->resolveBackUrl($organisationId);
+
+        $this->student = User::with([
+            'details',
+            'organisation',
+        ])->findOrFail($decryptedId);
+
+        $this->loadPromotionData();
+    }
+    private function resolveBackUrl(string $encryptedOrgId = ''): string
+    {
+        // If we have an organisationId in the route → org-scoped
+        if (!empty($encryptedOrgId)) {
+            return route('admin.org.reports.students-list', [
+                'organisationId' => $encryptedOrgId,
+            ]);
+        }
+
+        // Global admin route
+        return route('admin.reports.reports.student-list');
     }
 
-    public function updatingAgeGroupFilter()
+
+    public function loadPromotionData(): void
     {
-        $this->resetPage();
+        $types = ['iq', 'eq', 'lq'];
+
+        foreach ($types as $type) {
+            $current = UserPromotionDetail::with([
+                'promotionDetail.currentPromotion.ageGroup',
+                'promotionDetail.currentPromotion.difficultyLevel',
+                'promotionDetail.nextPromotion.ageGroup',
+                'promotionDetail.nextPromotion.difficultyLevel',
+                'testAttempt.assessment',
+            ])
+                ->where('user_id', $this->userId)
+                ->where('assessment_type', $type)
+                ->where('current_status', true)
+                ->latest()
+                ->first();
+
+            $this->currentPromotions[$type] = $current;
+
+            $history = UserPromotionDetail::with([
+                'promotionDetail.currentPromotion.ageGroup',
+                'promotionDetail.currentPromotion.difficultyLevel',
+                'promotionDetail.nextPromotion',
+                'testAttempt.assessment',
+            ])
+                ->where('user_id', $this->userId)
+                ->where('assessment_type', $type)
+                ->latest()
+                ->get();
+
+            $this->promotionHistories[$type] = $history;
+        }
+    }
+
+    public function openHistoryModal(string $type): void
+    {
+        $this->activeHistoryType = $type;
+        $this->showModal = true;
+    }
+
+    public function setActiveHistoryType(string $type): void
+    {
+        $this->activeHistoryType = $type;
+    }
+
+    public function closeModal(): void
+    {
+        $this->showModal = false;
+    }
+
+    public function getPhysicalAge(): ?string
+    {
+        $dob = $this->student->details?->date_of_birth;
+        if (!$dob) {
+            return null;
+        }
+        return \Carbon\Carbon::parse($dob)->age . ' years';
+    }
+
+    public function getScorePercentage(?object $attempt, ?object $assessment): float
+    {
+        if (!$attempt || !$assessment) {
+            return 0;
+        }
+        $totalMarks = $assessment->total_marks ?? 0;
+        if ($totalMarks <= 0) {
+            return 0;
+        }
+        return round(($attempt->total_score / $totalMarks) * 100, 1);
     }
 
     public function render()
     {
-        $query = User::with([
-            'details.currentAgeGroup',
-            'organisation',
-            'completedTestAttempts.assessment',
-            'completedTestAttempts.responses.assessmentQuestion.question.primarySkill',
-            'completedTestAttempts.responses.assessmentQuestion.question.subSkill'
-        ])
-            ->whereHas('completedTestAttempts'); // Only users with completed attempts
-
-        // Search filter
-        if ($this->search) {
-            $query->where(function($q) {
-                $q->where('name', 'like', "%{$this->search}%")
-                    ->orWhere('email', 'like', "%{$this->search}%")
-                    ->orWhereHas('details', function($ud) {
-                        $ud->where('student_id', 'like', "%{$this->search}%")
-                            ->orWhere('first_name', 'like', "%{$this->search}%")
-                            ->orWhere('last_name', 'like', "%{$this->search}%");
-                    });
-            });
-        }
-
-        // Age group filter
-        if ($this->ageGroupFilter) {
-            $query->whereHas('details', function($q) {
-                $q->where('current_age_group_id', $this->ageGroupFilter);
-            });
-        }
-
-        $users = $query->paginate($this->perPage);
-
-        $ageGroups = AgeGroup::where('is_active', true)->get();
-
         return view('livewire.admin.reports.student-report-card', [
-            'users' => $users,
-            'ageGroups' => $ageGroups
+            'physicalAge'     => $this->getPhysicalAge(),
+            'assessmentTypes' => ['iq' => 'IQ', 'eq' => 'EQ', 'lq' => 'LQ'],
         ]);
-    }
-
-    public function exportReports()
-    {
-        // Add export functionality later
-        session()->flash('message', 'Export feature coming soon!');
     }
 }
