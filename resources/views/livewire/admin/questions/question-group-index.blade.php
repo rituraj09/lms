@@ -36,7 +36,7 @@
                             <i class="ri ri-search-line text-muted"></i>
                         </span>
                         <input type="text" wire:model.live.debounce.300ms="search" class="form-control"
-                            placeholder="Search by title, code or note...">
+                            placeholder="Search by title, code">
                     </div>
                 </div>
 
@@ -93,19 +93,17 @@
                     {{-- Group Info --}}
                     <div>
                         <h6 class="mb-1 fw-semibold">
-                            {{ $group->title }}
+                            {{ $group->group_title }} {{-- ✅ uses accessor --}}
                         </h6>
 
                         <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
 
-                            {{-- Category Badge --}}
                             <span
                                 class="badge
-                                {{ $group->questions_category === 'single' ? 'bg-primary-subtle text-primary' : 'bg-purple-subtle text-purple' }}">
+            {{ $group->questions_category === 'single' ? 'bg-primary-subtle text-primary' : 'bg-purple-subtle text-purple' }}">
                                 {{ ucfirst($group->questions_category) }}
                             </span>
 
-                            {{-- Locked Badge --}}
                             @if ($group->assessment_groups_count > 0)
                                 <span class="badge bg-warning-subtle text-warning">
                                     <i class="ri ri-git-repository-private-line me-1"></i>
@@ -127,7 +125,8 @@
                 <div class="d-flex gap-2">
 
                     {{-- ✅ FIXED: Route name --}}
-                    <a href="{{ route('admin.questions.edit', encrypt($group->id)) }}" class="btn btn-sm btn-outline-primary">
+                    <a href="{{ route('admin.questions.edit', encrypt($group->id)) }}"
+                        class="btn btn-sm btn-outline-primary">
                         <i class="ri ri-edit-box-fill me-1"></i>
                         {{ $group->assessment_groups_count === 0 ? 'Edit' : 'View' }}
                     </a>
@@ -208,7 +207,7 @@
     {{-- ─── Flash Messages ──────────────────────────────────────────────── --}}
     @if (session()->has('success'))
         <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 mb-4"
-             role="alert">
+            role="alert">
             <i class="ri ri-checkbox-circle-line fs-5"></i>
             <span>{{ session('success') }}</span>
             <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
@@ -216,8 +215,7 @@
     @endif
 
     @if (session()->has('error'))
-        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 mb-4"
-             role="alert">
+        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 mb-4" role="alert">
             <i class="ri ri-error-warning-line fs-5"></i>
             <span>{{ session('error') }}</span>
             <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
@@ -230,12 +228,8 @@
         {{-- Backdrop --}}
         <div class="modal-backdrop fade show" style="z-index: 1040;"></div>
 
-        <div class="modal fade show d-block"
-             tabindex="-1"
-             role="dialog"
-             style="z-index: 1050;"
-             aria-modal="true"
-             aria-labelledby="deleteModalTitle">
+        <div class="modal fade show d-block" tabindex="-1" role="dialog" style="z-index: 1050;" aria-modal="true"
+            aria-labelledby="deleteModalTitle">
 
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content border-0 shadow-lg">
@@ -246,10 +240,8 @@
                             <i class="ri ri-delete-bin-line fs-5"></i>
                             Delete Question Group
                         </h5>
-                        <button type="button"
-                                class="btn-close btn-close-white"
-                                wire:click="cancelDelete"
-                                aria-label="Close">
+                        <button type="button" class="btn-close btn-close-white" wire:click="cancelDelete"
+                            aria-label="Close">
                         </button>
                     </div>
 
@@ -258,51 +250,28 @@
 
                         {{-- Group has questions — BLOCK deletion --}}
                         @if ($deletingGroup->questions_count > 0)
-                            <div class="text-center">
-                                <div class="mb-3">
-                                <span class="bg-warning-subtle rounded-circle d-inline-flex
-                                             align-items-center justify-content-center"
-                                      style="width:64px; height:64px;">
-                                    <i class="ri ri-alert-line text-warning fs-2"></i>
-                                </span>
-                                </div>
-                                <h6 class="fw-semibold mb-2">Cannot Delete This Group</h6>
-                                <p class="text-muted mb-3">
-                                    <strong class="text-dark">{{ $deletingGroup->name }}</strong>
-                                    currently contains
-                                    <span class="badge bg-warning text-dark">
+                            <p class="text-muted mb-3">
+                                <strong class="text-dark">
+                                    {{ $deletingGroup->group_title }} {{-- ✅ --}}
+                                </strong>
+                                currently contains
+                                <span class="badge bg-warning text-dark">
                                     {{ $deletingGroup->questions_count }}
-                                        {{ Str::plural('question', $deletingGroup->questions_count) }}
+                                    {{ Str::plural('question', $deletingGroup->questions_count) }}
                                 </span>.
-                                </p>
-                                <div class="alert alert-warning d-flex align-items-start gap-2 text-start mb-0">
-                                    <i class="ri ri-information-line mt-1 flex-shrink-0"></i>
-                                    <span>
-                                    Please <strong>remove all questions</strong>
-                                    from this group before deleting it.
-                                </span>
-                                </div>
-                            </div>
+                            </p>
 
-                            {{-- Group is empty — ALLOW deletion --}}
+                            {{-- ── Group is empty — ALLOW deletion ── --}}
                         @else
-                            <div class="text-center">
-                                <div class="mb-3">
-                                <span class="bg-danger-subtle rounded-circle d-inline-flex
-                                             align-items-center justify-content-center"
-                                      style="width:64px; height:64px;">
-                                    <i class="ri ri-delete-bin-line text-danger fs-2"></i>
-                                </span>
-                                </div>
-                                <h6 class="fw-semibold mb-2">Are you sure?</h6>
-                                <p class="text-muted mb-0">
-                                    You are about to permanently delete the group
-                                    <br>
-                                    <strong class="text-dark fs-6">{{ $deletingGroup->name }}</strong>.
-                                    <br><br>
-                                    <span class="text-danger fw-medium">This action cannot be undone.</span>
-                                </p>
-                            </div>
+                            <p class="text-muted mb-0">
+                                You are about to permanently delete the group
+                                <br>
+                                <strong class="text-dark fs-6">
+                                    {{ $deletingGroup->group_title }} {{-- ✅ --}}
+                                </strong>.
+                                <br><br>
+                                <span class="text-danger fw-medium">This action cannot be undone.</span>
+                            </p>
                         @endif
 
                     </div>
@@ -312,35 +281,28 @@
 
                         @if ($deletingGroup->questions_count > 0)
                             {{-- Only close button when deletion is blocked --}}
-                            <button type="button"
-                                    class="btn btn-secondary px-4"
-                                    wire:click="cancelDelete">
+                            <button type="button" class="btn btn-secondary px-4" wire:click="cancelDelete">
                                 <i class="ri ri-close-line me-1"></i>
                                 Close
                             </button>
                         @else
                             {{-- Cancel + Confirm when deletion is allowed --}}
-                            <button type="button"
-                                    class="btn btn-outline-secondary px-4"
-                                    wire:click="cancelDelete">
+                            <button type="button" class="btn btn-outline-secondary px-4" wire:click="cancelDelete">
                                 <i class="ri ri-close-line me-1"></i>
                                 Cancel
                             </button>
 
-                            <button type="button"
-                                    class="btn btn-danger px-4"
-                                    wire:click="deleteGroup"
-                                    wire:loading.attr="disabled"
-                                    wire:target="deleteGroup">
-                            <span wire:loading.remove wire:target="deleteGroup">
-                                <i class="ri ri-delete-bin-line me-1"></i>
-                                Yes, Delete
-                            </span>
+                            <button type="button" class="btn btn-danger px-4" wire:click="deleteGroup"
+                                wire:loading.attr="disabled" wire:target="deleteGroup">
+                                <span wire:loading.remove wire:target="deleteGroup">
+                                    <i class="ri ri-delete-bin-line me-1"></i>
+                                    Yes, Delete
+                                </span>
                                 <span wire:loading wire:target="deleteGroup">
-                                <span class="spinner-border spinner-border-sm me-1"
-                                      role="status" aria-hidden="true"></span>
-                                Deleting…
-                            </span>
+                                    <span class="spinner-border spinner-border-sm me-1" role="status"
+                                        aria-hidden="true"></span>
+                                    Deleting…
+                                </span>
                             </button>
                         @endif
 

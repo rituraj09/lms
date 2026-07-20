@@ -39,22 +39,22 @@ class UserSeeder extends Seeder
 
         // ── Admin ─────────────────────────────────────────────────
         $admin = Admin::firstOrCreate(
-            ['email' => 'admin@lms.com'],
+            ['email' => 'ashimxyz@gmail.com'],
             [
-                'name'     => 'Admin User',
-                'mobile'   => '9000000002',
-                'password' => Hash::make('Admin@1234'),
+                'name'     => 'Ashim Sharma',
+                'mobile'   => '9181382832',
+                'password' => Hash::make('Mind@2026'),
                 'status'   => 'active',
             ]
         );
-        $admin->assignRole('admin');
+        $admin->assignRole('super_admin');
 
         AdminDetail::firstOrCreate(
             ['admin_id' => $admin->id],
             [
-                'first_name'  => 'Admin',
-                'last_name'   => 'User',
-                'designation' => 'Administrator',
+                'first_name'  => 'Ashim',
+                'last_name'   => 'Sharma',
+                'designation' => 'System Administrator',
             ]
         );
 

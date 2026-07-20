@@ -72,17 +72,18 @@ class QuestionGroupIndex extends Component
         $this->confirmingDelete = false;
         $this->deletingGroupId  = null;
     }
-
     public function deleteGroup(): void
     {
         $group = QuestionGroup::withCount('questions')
             ->findOrFail($this->deletingGroupId);
 
+        $groupTitle = $group->group_title; // ✅ uses accessor → group_content.title.en
+
         // ── Guard: cannot delete if questions exist ───────────────────
         if ($group->questions_count > 0) {
             session()->flash(
                 'error',
-                "Cannot delete \"{$group->name}\": it still has {$group->questions_count} question(s). Please remove all questions first."
+                "Cannot delete \"{$groupTitle}\": it still has {$group->questions_count} question(s). Please remove all questions first."
             );
             $this->cancelDelete();
             return;
@@ -92,6 +93,7 @@ class QuestionGroupIndex extends Component
 
         $group->update(['updated_by' => auth()->id()]);
         $group->delete();
+
         ActivityLogger::log(
             userId:   auth()->id(),
             userType: 'admin',
@@ -101,14 +103,15 @@ class QuestionGroupIndex extends Component
                 'model_id'    => $this->deletingGroupId,
                 'description' => "Deleted question group: {$group->group_code}",
                 'properties'  => [
-                    'question_group_code' => $group->group_code,
+                    'question_group_code'  => $group->group_code,
+                    'question_group_title' => $groupTitle, // ✅ added
                 ],
             ]
         );
-        $this->cancelDelete();
-        session()->flash('success', 'Question group deleted successfully.');
-    }
 
+        $this->cancelDelete();
+        session()->flash('success', "Question group \"{$groupTitle}\" deleted successfully."); // ✅
+    }
 
     // ─── Render ───────────────────────────────────────────────────────
     public function render()

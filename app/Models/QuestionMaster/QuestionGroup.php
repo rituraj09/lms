@@ -16,9 +16,8 @@ class QuestionGroup extends Model
     use  SoftDeletes;
 
 
-
     protected $casts = [
-        'group_content' => 'array',
+        'group_content' => 'array',   // ✅ correct column
     ];
 
     // ─── Relationships ────────────────────────────────────────────────
@@ -67,15 +66,35 @@ class QuestionGroup extends Model
 
     // ─── Scopes ───────────────────────────────────────────────────────
 
-    public function scopeSearch($query, string $search)
+    public function scopeSearch($query, string $term)
     {
-        return $query->where(function ($q) use ($search) {
-            $q->where('title', 'like', "%{$search}%")
-              ->orWhere('group_code', 'like', "%{$search}%")
-              ->orWhere('admin_note', 'like', "%{$search}%");
+        $term = mb_strtolower($term); // ✅ lowercase the search term
+
+        return $query->where(function ($q) use ($term) {
+            $q->whereRaw(
+                    "LOWER(JSON_UNQUOTE(JSON_EXTRACT(group_content, '$.title.en'))) LIKE ?",
+                    ["%{$term}%"]
+                )
+                ->orWhereRaw(
+                    "LOWER(JSON_UNQUOTE(JSON_EXTRACT(group_content, '$.content.en'))) LIKE ?",
+                    ["%{$term}%"]
+                )
+                ->orWhereRaw(
+                    "LOWER(group_code) LIKE ?",
+                    ["%{$term}%"]
+                );
         });
     }
 
+    /**
+     * Handy accessor  →  $group->group_title
+     */
+    public function getGroupTitleAttribute(): string
+    {
+        return data_get($this->group_content, 'title.en')
+            ?? $this->group_code
+            ?? '—';
+    }
     public function scopeByCategory($query, string $category)
     {
         return $query->where('questions_category', $category);
