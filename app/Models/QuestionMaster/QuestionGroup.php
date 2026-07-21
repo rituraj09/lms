@@ -50,7 +50,8 @@ class QuestionGroup extends Model
      */
     public function isLinkedToAssessment(): bool
     {
-        return $this->assessmentGroups()->exists();
+
+        return $this->assessmentGroups()->whereNull('deleted_at')->exists();
     }
 
     /**
@@ -61,6 +62,7 @@ class QuestionGroup extends Model
     {
         return $this->questions()
             ->whereHas('assessmentQuestions')
+            ->whereNull('assessmentQuestions.deleted_at')
             ->exists();
     }
 

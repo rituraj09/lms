@@ -109,9 +109,11 @@ class AssessmentBuild extends Component
      * ================================================================*/
     private function loadBuilder(int $assessmentId): void
     {
+        // Only load non-soft-deleted groups and questions
         $groups = AssessmentGroup::where('assessment_id', $assessmentId)
             ->with([
                 'questionGroup',
+                'assessmentQuestions' => fn($q) => $q->whereNull('deleted_at'), // ← only active
                 'assessmentQuestions.question',
             ])
             ->get();
@@ -158,7 +160,6 @@ class AssessmentBuild extends Component
             ];
         }
     }
-
     /* ================================================================
      |  SAVE BUILDER
      * ================================================================*/
@@ -488,24 +489,39 @@ class AssessmentBuild extends Component
         $ag = $this->assessmentGroups[$agIndex] ?? null;
 
         if ($ag && $ag['assessment_group_id']) {
-            AssessmentGroup::where('id', $ag['assessment_group_id'])->delete();
+            $assessmentGroup = AssessmentGroup::find($ag['assessment_group_id']);
 
-            // ── Activity Log: Delete Group ─────────────────────────
-            ActivityLogger::log(
-                userId:   auth('admin')->id(),
-                userType: 'admin',
-                action:   'delete',
-                extra: [
-                    'model_type'  => 'AssessmentGroup',
-                    'model_id'    => $ag['assessment_group_id'],
-                    'description' => "Removed group [{$ag['group_code']}] from assessment: {$this->title} [{$this->assessment_code}]",
-                    'properties'  => [
-                        'assessment_id'     => $this->assessmentId,
-                        'question_group_id' => $ag['question_group_id'],
-                        'group_code'        => $ag['group_code'],
-                    ],
-                ]
-            );
+            if ($assessmentGroup) {
+                // ── Soft delete all questions in this group first ───────────
+                AssessmentQuestion::where('assessment_group_id', $assessmentGroup->id)
+                    ->whereNull('deleted_at') // only soft-delete active ones
+                    ->update([
+                        'deleted_at' => now(),
+                        'updated_by' => auth('admin')->id(),
+                    ]);
+
+                // ── Then soft delete the group itself ───────────────────────
+                $assessmentGroup->update(['updated_by' => auth('admin')->id()]);
+                $assessmentGroup->delete(); // soft delete
+
+                // ── Activity Log ─────────────────────────────────────────────
+                ActivityLogger::log(
+                    userId:   auth('admin')->id(),
+                    userType: 'admin',
+                    action:   'delete',
+                    extra: [
+                        'model_type'  => 'AssessmentGroup',
+                        'model_id'    => $ag['assessment_group_id'],
+                        'description' => "Soft deleted group [{$ag['group_code']}] and its " . count($ag['questions']) . " question(s) from assessment: {$this->title} [{$this->assessment_code}]",
+                        'properties'  => [
+                            'assessment_id'     => $this->assessmentId,
+                            'question_group_id' => $ag['question_group_id'],
+                            'group_code'        => $ag['group_code'],
+                            'questions_deleted' => count($ag['questions']),
+                        ],
+                    ]
+                );
+            }
         }
 
         array_splice($this->assessmentGroups, $agIndex, 1);
@@ -514,15 +530,18 @@ class AssessmentBuild extends Component
     /* ================================================================
      |  REMOVE QUESTION  (Delete)
      * ================================================================*/
-    public function removeQuestionFromGroup(int $agIndex, int $qIndex): void
-    {
-        $q  = $this->assessmentGroups[$agIndex]['questions'][$qIndex] ?? null;
-        $ag = $this->assessmentGroups[$agIndex] ?? null;
+   public function removeQuestionFromGroup(int $agIndex, int $qIndex): void
+{
+    $q  = $this->assessmentGroups[$agIndex]['questions'][$qIndex] ?? null;
+    $ag = $this->assessmentGroups[$agIndex] ?? null;
 
-        if ($q && ($q['assessment_question_id'] ?? null)) {
-            AssessmentQuestion::where('id', $q['assessment_question_id'])->delete();
+    if ($q && ($q['assessment_question_id'] ?? null)) {
+        $assessmentQuestion = AssessmentQuestion::find($q['assessment_question_id']);
 
-            // ── Activity Log: Delete Question ──────────────────────
+        if ($assessmentQuestion) {
+            $assessmentQuestion->delete(); // ← soft delete
+
+            // ── Activity Log ─────────────────────────────────────────────
             ActivityLogger::log(
                 userId:   auth('admin')->id(),
                 userType: 'admin',
@@ -530,19 +549,20 @@ class AssessmentBuild extends Component
                 extra: [
                     'model_type'  => 'AssessmentQuestion',
                     'model_id'    => $q['assessment_question_id'],
-                    'description' => "Removed question [{$q['question_code']}] from group [{$ag['group_code']}] — assessment: {$this->title} [{$this->assessment_code}]",
+                    'description' => "Soft deleted question [{$q['question_code']}] from group [{$ag['group_code']}] — assessment: {$this->title} [{$this->assessment_code}]",
                     'properties'  => [
-                        'assessment_id'   => $this->assessmentId,
-                        'question_id'     => $q['question_id'],
-                        'question_code'   => $q['question_code'],
-                        'group_code'      => $ag['group_code'] ?? null,
+                        'assessment_id' => $this->assessmentId,
+                        'question_id'   => $q['question_id'],
+                        'question_code' => $q['question_code'],
+                        'group_code'    => $ag['group_code'] ?? null,
                     ],
                 ]
             );
         }
-
-        array_splice($this->assessmentGroups[$agIndex]['questions'], $qIndex, 1);
     }
+
+    array_splice($this->assessmentGroups[$agIndex]['questions'], $qIndex, 1);
+}
 
     /* ================================================================
      |  QUESTION PREVIEW MODAL
@@ -643,27 +663,60 @@ class AssessmentBuild extends Component
      * ================================================================*/
     public function getPickerGroupsProperty()
     {
-        $usedMultipleGroupIds = collect($this->assessmentGroups)
-            ->where('questions_category', 'multiple')
-            ->pluck('question_group_id')
+        // ── Only count NON-SOFT-DELETED assessment groups ───────────────
+        // Using DB table query to explicitly exclude soft-deleted
+        $usedMultipleGroupIds = \DB::table('assessment_groups')
+            ->join('question_groups', 'assessment_groups.question_group_id', '=', 'question_groups.id')
+            ->where('question_groups.questions_category', 'multiple')
+            ->whereNull('assessment_groups.deleted_at')
+            ->pluck('assessment_groups.question_group_id')
+            ->toArray();
+
+        // ── Only count NON-SOFT-DELETED assessment questions ────────────
+        $usedInAnyAssessment = \DB::table('assessment_questions')
+            ->whereNull('deleted_at')
+            ->pluck('question_id')
+            ->toArray();
+
+        $usedInThisAssessment = collect($this->assessmentGroups)
+            ->flatMap(fn($ag) => collect($ag['questions'])->pluck('question_id'))
             ->toArray();
 
         $defaultLang = $this->languages[0] ?? 'en';
-        $search = $this->groupPickerSearch;
+        $search      = trim($this->groupPickerSearch);
 
         return QuestionGroup::withCount('questions')
             ->when($search, function ($q) use ($search, $defaultLang) {
                 $q->where(function ($query) use ($search, $defaultLang) {
                     $query->where('group_code', 'like', "%{$search}%")
-                        ->orWhereRaw(
-                            "JSON_UNQUOTE(JSON_EXTRACT(group_content, '$.title.{$defaultLang}')) LIKE ?",
-                            ["%{$search}%"]
-                        );
+                        ->orWhere("group_content->title->{$defaultLang}", 'like', "%{$search}%");
                 });
             })
             ->get()
-            ->map(function ($pg) use ($usedMultipleGroupIds) {
+            ->map(function ($pg) use ($usedMultipleGroupIds, $usedInAnyAssessment, $usedInThisAssessment) {
+
                 $pg->is_used_multiple = in_array($pg->id, $usedMultipleGroupIds);
+
+                $groupQuestionIds = $pg->questions()->pluck('id')->toArray();
+                $totalQuestions   = count($groupQuestionIds);
+
+                if ($totalQuestions === 0) {
+                    $pg->all_questions_used = false;
+                    $pg->used_count         = 0;
+                    $pg->total_count        = 0;
+                    return $pg;
+                }
+
+                $usedIds  = array_intersect(
+                    $groupQuestionIds,
+                    array_unique(array_merge($usedInAnyAssessment, $usedInThisAssessment))
+                );
+                $usedCount = count($usedIds);
+
+                $pg->all_questions_used = ($usedCount === $totalQuestions);
+                $pg->used_count         = $usedCount;
+                $pg->total_count        = $totalQuestions;
+
                 return $pg;
             });
     }
@@ -677,25 +730,46 @@ class AssessmentBuild extends Component
             return collect();
         }
 
-        $allUsedQuestionIds = collect($this->assessmentGroups)
+        // ── Only count NON-SOFT-DELETED assessment questions ────────────
+        // Using explicit whereNull to exclude soft-deleted records
+        $usedInAnyAssessment = \DB::table('assessment_questions')
+            ->whereNull('deleted_at')
+            ->pluck('question_id')
+            ->toArray();
+
+        // ── Questions used in THIS assessment (from in-memory state) ────
+        // These are already filtered (loadBuilder loads only non-deleted)
+        $usedInThisAssessment = collect($this->assessmentGroups)
             ->flatMap(fn($ag) => collect($ag['questions'])->pluck('question_id'))
             ->toArray();
+
+        $allUsedIds = array_unique(array_merge($usedInAnyAssessment, $usedInThisAssessment));
 
         if ($this->pickerMode === 'existing' && $this->pickerAgIndex !== null) {
             $currentGroupQIds = collect(
                 $this->assessmentGroups[$this->pickerAgIndex]['questions']
             )->pluck('question_id')->toArray();
 
-            $otherGroupsUsedIds = array_diff($allUsedQuestionIds, $currentGroupQIds);
+            $hideIds = array_diff($allUsedIds, $currentGroupQIds);
 
             return Question::where('question_group_id', $this->pickerGroupId)
-                ->whereNotIn('id', $otherGroupsUsedIds)
-                ->paginate(15);
+                ->whereNotIn('id', $hideIds)
+                ->with(['primarySkill', 'subSkill', 'ageGroup', 'difficultyLevel'])
+                ->paginate(15)
+                ->through(function ($q) use ($currentGroupQIds) {
+                    $q->already_in_group = in_array($q->id, $currentGroupQIds);
+                    return $q;
+                });
         }
 
         return Question::where('question_group_id', $this->pickerGroupId)
-            ->whereNotIn('id', $allUsedQuestionIds)
-            ->paginate(15);
+            ->whereNotIn('id', $allUsedIds)
+            ->with(['primarySkill', 'subSkill', 'ageGroup', 'difficultyLevel'])
+            ->paginate(15)
+            ->through(function ($q) {
+                $q->already_in_group = false;
+                return $q;
+            });
     }
 
     public function getCurrentGroupQuestionIdsProperty(): array

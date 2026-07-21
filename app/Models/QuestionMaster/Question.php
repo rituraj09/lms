@@ -70,7 +70,9 @@ class Question extends Model
      */
     public function isUsedInAssessment(): bool
     {
-        return $this->assessmentQuestions()->exists();
+        return $this->assessmentQuestions()
+                    ->whereNull('deleted_at')  // ← Only count active (non-soft-deleted)
+                    ->exists();
     }
 
     // ─── Scopes ───────────────────────────────────────────────────────

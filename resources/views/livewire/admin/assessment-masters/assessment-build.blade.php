@@ -52,7 +52,7 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-0 small">
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.assessment-masters.list') }}" >Assessments</a>
+                            <a href="{{ route('admin.assessment-masters.list') }}">Assessments</a>
                         </li>
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.assessment-masters.manage', encrypt($assessmentId)) }}">
@@ -65,7 +65,7 @@
             </div>
 
             <div class="d-flex gap-2">
-                <a  href="{{ route('admin.assessment-masters.list') }}" class="btn btn-outline-secondary btn-sm">
+                <a href="{{ route('admin.assessment-masters.list') }}" class="btn btn-outline-secondary btn-sm">
                     <i class="ri ri-arrow-left-line me-1"></i> Cancel
                 </a>
                 <button type="button" wire:click="backToForm" class="btn btn-outline-warning btn-sm">
@@ -73,7 +73,7 @@
                 </button>
 
                 <button type="button" wire:click="saveBuilder" wire:loading.attr="disabled"
-                        class="btn btn-primary btn-sm shadow-sm">
+                    class="btn btn-primary btn-sm shadow-sm">
                     <span wire:loading wire:target="saveBuilder">
                         <span class="spinner-border spinner-border-sm me-1"></span>Saving…
                     </span>
@@ -103,22 +103,24 @@
                 @else
                     @foreach ($assessmentGroups as $agIndex => $ag)
                         <div class="card shadow-sm border-0 mb-4"
-                             wire:key="ag-{{ $agIndex }}-{{ $ag['question_group_id'] }}">
+                            wire:key="ag-{{ $agIndex }}-{{ $ag['question_group_id'] }}">
 
                             {{-- Group Header --}}
                             <div class="card-header py-3 border-bottom"
-                                 style="background:linear-gradient(135deg,#D9D979,#FFFFEE);">
+                                style="background:linear-gradient(135deg,#D9D979,#FFFFEE);">
                                 <div class="d-flex align-items-start justify-content-between gap-3">
                                     <div>
                                         <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
-                                            <span class="badge bg-primary fw-semibold">Group {{ $loop->iteration }}</span>
+                                            <span class="badge bg-primary fw-semibold">Group
+                                                {{ $loop->iteration }}</span>
                                             <span class="fw-semibold text-dark">{{ $ag['group_title'] }}</span>
                                             @if ($ag['questions_category'] === 'multiple')
                                                 <span class="badge bg-info-subtle text-info border border-info-subtle">
                                                     <i class="ri ri-file-copy-2-line me-1"></i>Passage
                                                 </span>
                                             @else
-                                                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">
+                                                <span
+                                                    class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">
                                                     Single
                                                 </span>
                                             @endif
@@ -129,10 +131,9 @@
                                         </small>
                                     </div>
                                     <div class="d-flex gap-2">
-                                        <button type="button"
-                                                wire:click="removeAssessmentGroup({{ $agIndex }})"
-                                                wire:confirm="Remove this group from the assessment?"
-                                                class="btn btn-sm btn-outline-danger">
+                                        <button type="button" wire:click="removeAssessmentGroup({{ $agIndex }})"
+                                            wire:confirm="Remove this group from the assessment?"
+                                            class="btn btn-sm btn-outline-danger">
                                             <i class="ri ri-delete-bin-line me-1"></i>Remove Group
                                         </button>
                                     </div>
@@ -144,7 +145,7 @@
                                 {{-- Passage for MULTIPLE --}}
                                 @if ($ag['questions_category'] === 'multiple' && !empty($ag['group_content']['content']))
                                     @php
-                                        $defaultLang    = array_key_first($languages);
+                                        $defaultLang = array_key_first($languages);
                                         $passageContent = $ag['group_content']['content'][$defaultLang] ?? '';
                                     @endphp
                                     @if ($passageContent)
@@ -162,45 +163,51 @@
                                         <div class="row g-3">
                                             <div class="col-12">
                                                 <label class="form-label fw-medium small">
-                                                    Group Instructions <span class="text-muted fw-normal">(Optional)</span>
+                                                    Group Instructions <span
+                                                        class="text-muted fw-normal">(Optional)</span>
                                                 </label>
-                                                <textarea wire:model="assessmentGroups.{{ $agIndex }}.instructions"
-                                                          class="form-control form-control-sm" rows="2"
-                                                          placeholder="Instructions shown before this group..."></textarea>
+                                                <textarea wire:model="assessmentGroups.{{ $agIndex }}.instructions" class="form-control form-control-sm"
+                                                    rows="2" placeholder="Instructions shown before this group..."></textarea>
                                             </div>
                                             <div class="col-md-4">
                                                 <label class="form-label fw-medium small">
                                                     <i class="ri ri-timer-line me-1"></i>Group Timer (sec)
                                                 </label>
                                                 <input type="number"
-                                                       wire:model="assessmentGroups.{{ $agIndex }}.group_timer"
-                                                       class="form-control form-control-sm" min="0"
-                                                       placeholder="0 = no timer">
+                                                    wire:model="assessmentGroups.{{ $agIndex }}.group_timer"
+                                                    class="form-control form-control-sm" min="0"
+                                                    placeholder="0 = no timer">
                                             </div>
                                             <div class="col-md-8">
                                                 <label class="form-label fw-medium small d-block">Settings</label>
                                                 <div class="d-flex flex-wrap gap-4 mt-1">
                                                     <div class="form-check form-switch">
-                                                        <input class="form-check-input" type="checkbox" role="switch"
-                                                               wire:model="assessmentGroups.{{ $agIndex }}.suffle_question"
-                                                               id="shuffle-{{ $agIndex }}">
-                                                        <label class="form-check-label small" for="shuffle-{{ $agIndex }}">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            role="switch"
+                                                            wire:model="assessmentGroups.{{ $agIndex }}.suffle_question"
+                                                            id="shuffle-{{ $agIndex }}">
+                                                        <label class="form-check-label small"
+                                                            for="shuffle-{{ $agIndex }}">
                                                             Shuffle Questions
                                                         </label>
                                                     </div>
                                                     <div class="form-check form-switch">
-                                                        <input class="form-check-input" type="checkbox" role="switch"
-                                                               wire:model="assessmentGroups.{{ $agIndex }}.allow_back_to_group_question"
-                                                               id="backGroup-{{ $agIndex }}">
-                                                        <label class="form-check-label small" for="backGroup-{{ $agIndex }}">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            role="switch"
+                                                            wire:model="assessmentGroups.{{ $agIndex }}.allow_back_to_group_question"
+                                                            id="backGroup-{{ $agIndex }}">
+                                                        <label class="form-check-label small"
+                                                            for="backGroup-{{ $agIndex }}">
                                                             Allow Back to group Question
                                                         </label>
                                                     </div>
                                                     <div class="form-check form-switch">
-                                                        <input class="form-check-input" type="checkbox" role="switch"
-                                                               wire:model="assessmentGroups.{{ $agIndex }}.allow_back_to_previous_question"
-                                                               id="backQ-{{ $agIndex }}">
-                                                        <label class="form-check-label small" for="backQ-{{ $agIndex }}">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            role="switch"
+                                                            wire:model="assessmentGroups.{{ $agIndex }}.allow_back_to_previous_question"
+                                                            id="backQ-{{ $agIndex }}">
+                                                        <label class="form-check-label small"
+                                                            for="backQ-{{ $agIndex }}">
                                                             Allow Back (Question)
                                                         </label>
                                                     </div>
@@ -220,36 +227,42 @@
                                     @else
                                         @foreach ($ag['questions'] as $qIndex => $question)
                                             <div class="border rounded-3 mb-3 overflow-hidden"
-                                                 wire:key="aq-{{ $agIndex }}-{{ $qIndex }}-{{ $question['question_id'] }}">
+                                                wire:key="aq-{{ $agIndex }}-{{ $qIndex }}-{{ $question['question_id'] }}">
 
                                                 {{-- Question Header --}}
                                                 <div class="d-flex align-items-start gap-3 p-3 bg-light border-bottom">
-                                                    <span class="badge bg-secondary fw-bold d-inline-flex align-items-center justify-content-center flex-shrink-0"
-                                                          style="width:30px;height:30px;font-size:.85rem;">
+                                                    <span
+                                                        class="badge bg-secondary fw-bold d-inline-flex align-items-center justify-content-center flex-shrink-0"
+                                                        style="width:30px;height:30px;font-size:.85rem;">
                                                         {{ $qIndex + 1 }}
                                                     </span>
                                                     <div class="flex-1">
                                                         <p class="mb-1 small fw-medium text-dark">
-                                                            {!!   Str::limit($question['stem_en'] ?: '(No English stem)', 80) !!}
+                                                            {!! Str::limit($question['stem_en'] ?: '(No English stem)', 80) !!}
                                                         </p>
                                                         <div class="d-flex flex-wrap gap-2">
                                                             @if ($question['answer_category'] === 'single_optional')
-                                                                <span class="badge bg-primary-subtle text-primary" style="font-size:.7rem;">Single</span>
+                                                                <span class="badge bg-primary-subtle text-primary"
+                                                                    style="font-size:.7rem;">Single</span>
                                                             @elseif ($question['answer_category'] === 'multi_optional')
-                                                                <span class="badge bg-info-subtle text-info" style="font-size:.7rem;">Multi</span>
+                                                                <span class="badge bg-info-subtle text-info"
+                                                                    style="font-size:.7rem;">Multi</span>
                                                             @else
-                                                                <span class="badge bg-secondary-subtle text-secondary" style="font-size:.7rem;">Open</span>
+                                                                <span class="badge bg-secondary-subtle text-secondary"
+                                                                    style="font-size:.7rem;">Open</span>
                                                             @endif
-                                                            <span class="badge bg-success-subtle text-success" style="font-size:.7rem;">
+                                                            <span class="badge bg-success-subtle text-success"
+                                                                style="font-size:.7rem;">
                                                                 {{ $question['marks'] }} Mark(s)
                                                             </span>
-                                                            <code style="font-size:.7rem;">{{ $question['question_code'] }}</code>
+                                                            <code
+                                                                style="font-size:.7rem;">{{ $question['question_code'] }}</code>
                                                         </div>
                                                     </div>
                                                     <button type="button"
-                                                            wire:click="removeQuestionFromGroup({{ $agIndex }}, {{ $qIndex }})"
-                                                            wire:confirm="Remove this question?"
-                                                            class="btn btn-sm btn-outline-danger flex-shrink-0">
+                                                        wire:click="removeQuestionFromGroup({{ $agIndex }}, {{ $qIndex }})"
+                                                        wire:confirm="Remove this question?"
+                                                        class="btn btn-sm btn-outline-danger flex-shrink-0">
                                                         <i class="ri ri-delete-bin-line"></i>
                                                     </button>
                                                 </div>
@@ -261,23 +274,28 @@
 
 
                                                         <div class="col-md-3">
-                                                            <label class="form-label fw-medium mb-1" style="font-size:.75rem;">
+                                                            <label class="form-label fw-medium mb-1"
+                                                                style="font-size:.75rem;">
                                                                 <i class="ri ri-timer-line me-1"></i>Timer (sec)
                                                             </label>
                                                             <input type="number"
-                                                                   wire:model="assessmentGroups.{{ $agIndex }}.questions.{{ $qIndex }}.question_timer"
-                                                                   class="form-control form-control-sm" min="0" placeholder="0">
+                                                                wire:model="assessmentGroups.{{ $agIndex }}.questions.{{ $qIndex }}.question_timer"
+                                                                class="form-control form-control-sm" min="0"
+                                                                placeholder="0">
                                                         </div>
 
                                                         @if ($has_negative_mark)
                                                             <div class="col-md-4">
-                                                                <label class="form-label fw-medium mb-1" style="font-size:.75rem;">
-                                                                    <i class="ri ri-subtract-line me-1 text-danger"></i>Negative Mark
+                                                                <label class="form-label fw-medium mb-1"
+                                                                    style="font-size:.75rem;">
+                                                                    <i
+                                                                        class="ri ri-subtract-line me-1 text-danger"></i>Negative
+                                                                    Mark
                                                                 </label>
                                                                 <input type="number"
-                                                                       wire:model="assessmentGroups.{{ $agIndex }}.questions.{{ $qIndex }}.negative_mark"
-                                                                       class="form-control form-control-sm border-danger"
-                                                                       min="0" step="0.5" placeholder="0">
+                                                                    wire:model="assessmentGroups.{{ $agIndex }}.questions.{{ $qIndex }}.negative_mark"
+                                                                    class="form-control form-control-sm border-danger"
+                                                                    min="0" step="0.5" placeholder="0">
                                                             </div>
                                                         @endif
 
@@ -293,7 +311,7 @@
 
                             <div class="card-footer p-2">
                                 <button type="button" wire:click="openAddMoreQuestions({{ $agIndex }})"
-                                        class="btn btn-sm btn-outline-success">
+                                    class="btn btn-sm btn-outline-success">
                                     <i class="ri ri-add-large-line me-1"></i>Add More Questions to this section
                                 </button>
                             </div>
@@ -303,7 +321,7 @@
 
                     <div class="text-center mb-4">
                         <button type="button" wire:click="openGroupPicker"
-                                class="btn btn-outline-primary btn-sm px-4">
+                            class="btn btn-outline-primary btn-sm px-4">
                             <i class="ri ri-add-large-line me-1"></i>Add Another Section
                         </button>
                     </div>
@@ -318,7 +336,8 @@
 
                 {{-- Assessment Info Card --}}
                 <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <div
+                        class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                         <h6 class="mb-0 fw-semibold text-dark">
                             <i class="ri ri-draft-line text-primary me-2"></i>Assessment Info
                         </h6>
@@ -349,7 +368,7 @@
                             <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
                                 <span class="small text-muted">Age Group</span>
                                 <span class="badge bg-warning-subtle text-warning">
-                                             {{ $ageGroup }}
+                                    {{ $ageGroup }}
                                 </span>
                             </li>
                             <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
@@ -362,7 +381,8 @@
 
                             <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
                                 <span class="small text-muted">Status</span>
-                                <span class="badge {{ $status === 'publish' ? 'bg-success' : ($status === 'draft' ? 'bg-secondary' : 'bg-warning text-dark') }}">
+                                <span
+                                    class="badge {{ $status === 'publish' ? 'bg-success' : ($status === 'draft' ? 'bg-secondary' : 'bg-warning text-dark') }}">
                                     {{ ucfirst($status) }}
                                 </span>
                             </li>
@@ -376,7 +396,8 @@
 
                             <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
                                 <span class="small text-muted">Negative Mark</span>
-                                <span class="badge {{ $has_negative_mark ? 'bg-danger-subtle text-danger' : 'bg-secondary-subtle text-secondary' }}">
+                                <span
+                                    class="badge {{ $has_negative_mark ? 'bg-danger-subtle text-danger' : 'bg-secondary-subtle text-secondary' }}">
                                     {{ $has_negative_mark ? 'Enabled' : 'Disabled' }}
                                 </span>
                             </li>
@@ -388,14 +409,16 @@
 
                             <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
                                 <span class="small text-muted">Shuffle Sections</span>
-                                <span class="badge {{ $shuffle_sections ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary' }}">
+                                <span
+                                    class="badge {{ $shuffle_sections ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary' }}">
                                     {{ $shuffle_sections ? 'Yes' : 'No' }}
                                 </span>
                             </li>
 
                             <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
                                 <span class="small text-muted">Show Result</span>
-                                <span class="badge {{ $show_result_immediately ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary' }}">
+                                <span
+                                    class="badge {{ $show_result_immediately ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary' }}">
                                     {{ $show_result_immediately ? 'Immediately' : 'Later' }}
                                 </span>
                             </li>
@@ -403,7 +426,8 @@
                             @if ($show_result_immediately)
                                 <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
                                     <span class="small text-muted">Show Answers</span>
-                                    <span class="badge {{ $show_correct_answers ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary' }}">
+                                    <span
+                                        class="badge {{ $show_correct_answers ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary' }}">
                                         {{ $show_correct_answers ? 'Yes' : 'No' }}
                                     </span>
                                 </li>
@@ -411,7 +435,8 @@
                                 @if ($show_correct_answers)
                                     <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
                                         <span class="small text-muted">Show Explanations</span>
-                                        <span class="badge {{ $show_explainations ? 'bg-info-subtle text-info' : 'bg-secondary-subtle text-secondary' }}">
+                                        <span
+                                            class="badge {{ $show_explainations ? 'bg-info-subtle text-info' : 'bg-secondary-subtle text-secondary' }}">
                                             {{ $show_explainations ? 'Yes' : 'No' }}
                                         </span>
                                     </li>
@@ -465,7 +490,7 @@
                     </div>
                     <div class="card-footer bg-white p-3">
                         <button type="button" wire:click="saveBuilder" wire:loading.attr="disabled"
-                                class="btn btn-primary w-100">
+                            class="btn btn-primary w-100">
                             <span wire:loading wire:target="saveBuilder">
                                 <span class="spinner-border spinner-border-sm me-1"></span>Saving…
                             </span>
@@ -498,17 +523,16 @@
                         <i class="ri ri-add-circle-line text-success me-2"></i>Add More Questions
                     @else
                         <i class="ri ri-layout-grid-line text-primary me-2"></i>Select Question Group & Questions
-
                     @endif
                 </h4>
 
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-0 small">
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.assessment-masters.list') }}" >Assessments</a>
+                            <a href="{{ route('admin.assessment-masters.list') }}">Assessments</a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.assessment-masters.manage', encrypt($assessmentId)) }}"  >
+                            <a href="{{ route('admin.assessment-masters.manage', encrypt($assessmentId)) }}">
                                 {{ $title }}
                             </a>
                         </li>
@@ -533,7 +557,7 @@
 
                 @if ($pickerGroupId && count($pickerSelectedQIds) > 0)
                     <button type="button" wire:click="addGroupToAssessment" wire:loading.attr="disabled"
-                            class="btn btn-primary btn-sm shadow-sm">
+                        class="btn btn-primary btn-sm shadow-sm">
                         <span wire:loading wire:target="addGroupToAssessment">
                             <span class="spinner-border spinner-border-sm me-1"></span>Adding…
                         </span>
@@ -545,24 +569,24 @@
                 @endif
             </div>
         </div>
-    <div class="card mb-3">
-        <div class="card-body">
-                 <span class="small badge bg-secondary-subtle text-dark text-small">
-                               Code: {{ $assessment_code }}
-                            </span>
-           Title: {{ $title    }}
-              <span class="small badge bg-primary-subtle text-primary text-small">
-                                {{ strtoupper($assessment_type_id ?: '—') }}
-                            </span>
-            <span class="small badge bg-warning-subtle text-warning  text-small">
-                                                 {{ $ageGroup }}
-                            </span>
-            <span class="small badge bg-danger-subtle text-danger  text-small">
-                                    {{ $difficultLevel }}
-                            </span>
-        </div>
+        <div class="card mb-3">
+            <div class="card-body">
+                <span class="small badge bg-secondary-subtle text-dark text-small">
+                    Code: {{ $assessment_code }}
+                </span>
+                Title: {{ $title }}
+                <span class="small badge bg-primary-subtle text-primary text-small">
+                    {{ strtoupper($assessment_type_id ?: '—') }}
+                </span>
+                <span class="small badge bg-warning-subtle text-warning  text-small">
+                    {{ $ageGroup }}
+                </span>
+                <span class="small badge bg-danger-subtle text-danger  text-small">
+                    {{ $difficultLevel }}
+                </span>
+            </div>
 
-    </div>
+        </div>
 
         <div class="row g-4">
 
@@ -583,10 +607,8 @@
                                     <span class="input-group-text bg-white">
                                         <i class="ri ri-search-line text-muted"></i>
                                     </span>
-                                    <input type="text"
-                                           wire:model.live.debounce.300ms="groupPickerSearch"
-                                           class="form-control"
-                                           placeholder="Search groups...">
+                                    <input type="text" wire:model.live.debounce.300ms="groupPickerSearch"
+                                        class="form-control" placeholder="Search groups...">
                                 </div>
                             </div>
 
@@ -594,40 +616,90 @@
                             <div style="max-height:600px;overflow-y:auto;">
                                 @forelse ($pickerGroups as $pg)
                                     @php
-                                        $pgContent   = $pg->group_content ?? [];
-                                        $pgTitle     = $pgContent['title'][array_key_first($languages)] ?? $pg->group_code;
-                                        $isMultiUsed = $pg->questions_category === 'multiple' &&
-                                            collect($assessmentGroups)->where('question_group_id', $pg->id)->count() > 0;
+                                        $pgContent = $pg->group_content ?? [];
+                                        $pgTitle = $pgContent['title'][array_key_first($languages)] ?? $pg->group_code;
+
+                                        $isMultiUsed = $pg->is_used_multiple ?? false;
+                                        $allQuestionsUsed = $pg->all_questions_used ?? false;
+                                        $usedCount = $pg->used_count ?? 0;
+                                        $totalCount = $pg->total_count ?? 0;
+                                        $someUsed = $usedCount > 0 && !$allQuestionsUsed;
+
+                                        // Determine row style
+                                        $isFullyDisabled = $isMultiUsed || $allQuestionsUsed;
+
+                                        $rowBg = match (true) {
+                                            $allQuestionsUsed => 'bg-danger-subtle',
+                                            $isMultiUsed => 'bg-warning-subtle',
+                                            $pickerGroupId === $pg->id => 'active',
+                                            default => '',
+                                        };
+
+                                        $borderStyle = match (true) {
+                                            $allQuestionsUsed => 'border-start border-danger border-3',
+                                            $someUsed => 'border-start border-warning border-3',
+                                            $pickerGroupId === $pg->id => 'border-start border-primary border-3',
+                                            default => '',
+                                        };
                                     @endphp
 
-                                    <button type="button"
-                                            wire:click="selectPickerGroup({{ $pg->id }})"
-                                            wire:key="pg-{{ $pg->id }}"
-                                            class="list-group-item list-group-item-action px-3 py-2 border-0
-                                                   {{ $pickerGroupId === $pg->id ? 'active' : '' }}
-                                                   {{ $isMultiUsed ? 'disabled opacity-50' : '' }}"
-                                            style="font-size:.85rem;">
+                                    <button type="button" wire:key="pg-{{ $pg->id }}"
+                                        @if (!$isFullyDisabled) wire:click="selectPickerGroup({{ $pg->id }})" @endif
+                                        class="list-group-item list-group-item-action px-3 py-2 border-0
+                   {{ $rowBg }} {{ $borderStyle }}
+                   {{ $isFullyDisabled ? 'disabled opacity-75' : '' }}"
+                                        {{ $isFullyDisabled ? 'disabled' : '' }}
+                                        style="font-size:.85rem; {{ $isFullyDisabled ? 'cursor:not-allowed;' : '' }}">
 
-                                        <div class="fw-semibold text-truncate mb-1  {{ $pickerGroupId === $pg->id ? 'text-warning' : 'text-dark' }}"
-                                             title="{{ $pgTitle }}">
+                                        {{-- Group Title --}}
+                                        <div class="fw-semibold text-truncate mb-1
+                    {{ $allQuestionsUsed ? 'text-danger' : ($pickerGroupId === $pg->id ? 'text-warning' : 'text-dark') }}"
+                                            title="{{ $pgTitle }}">
                                             {{ $pgTitle }}
                                         </div>
 
+                                        {{-- Badges Row --}}
                                         <div class="d-flex align-items-center gap-1 flex-wrap">
-                                            <span class="badge {{ $pg->questions_category === 'multiple' ? 'bg-info-subtle text-info' : 'bg-secondary-subtle text-secondary' }}"
-                                                  style="font-size:.65rem;">
+
+                                            {{-- Category badge --}}
+                                            <span
+                                                class="badge {{ $pg->questions_category === 'multiple' ? 'bg-info-subtle text-info' : 'bg-secondary-subtle text-secondary' }}"
+                                                style="font-size:.65rem;">
                                                 {{ ucfirst($pg->questions_category) }}
                                             </span>
+
+                                            {{-- Question count --}}
                                             <span class="badge bg-light text-dark border" style="font-size:.65rem;">
                                                 {{ $pg->questions_count }}Q
                                             </span>
-                                            @if ($isMultiUsed)
-                                                <span class="badge bg-warning-subtle text-warning" style="font-size:.65rem;">
-                                                    <i class="ri ri-lock-line"></i>Used
+
+                                            {{-- All questions used → red "All Added" badge --}}
+                                            @if ($allQuestionsUsed)
+                                                <span class="badge bg-danger text-white" style="font-size:.65rem;">
+                                                    <i class="ri ri-lock-fill me-1"></i>All Added
                                                 </span>
                                             @endif
+
+                                            {{-- Passage group already in assessment → warning "Used" badge --}}
+                                            @if ($isMultiUsed && !$allQuestionsUsed)
+                                                <span class="badge bg-warning text-dark" style="font-size:.65rem;">
+                                                    <i class="ri ri-lock-line me-1"></i>Used
+                                                </span>
+                                            @endif
+
+                                            {{-- Some (not all) questions used → partial indicator --}}
+                                            @if ($someUsed && !$allQuestionsUsed)
+                                                <span
+                                                    class="badge bg-warning-subtle text-warning border border-warning-subtle"
+                                                    style="font-size:.65rem;">
+                                                    {{ $usedCount }}/{{ $totalCount }} Used
+                                                </span>
+                                            @endif
+
                                         </div>
+
                                     </button>
+
                                 @empty
                                     <div class="text-center py-5 text-muted">
                                         <i class="ri ri-folder-open-line fs-3 opacity-30"></i>
@@ -649,11 +721,14 @@
                             <h6 class="mb-0 fw-semibold text-dark">
                                 <i class="ri ri-question-line text-primary me-2"></i>
                                 @if ($pickerMode === 'existing')
-                                    Questions from: <span class="text-primary">{{ $assessmentGroups[$pickerAgIndex]['group_title'] }}</span>
+                                    Questions from: <span
+                                        class="text-primary">{{ $assessmentGroups[$pickerAgIndex]['group_title'] }}</span>
                                 @elseif ($pickerGroupId)
                                     @php
                                         $selGroup = $pickerGroups->firstWhere('id', $pickerGroupId);
-                                        $selTitle = $selGroup?->group_content['title'][array_key_first($languages)] ?? $selGroup?->group_code;
+                                        $selTitle =
+                                            $selGroup?->group_content['title'][array_key_first($languages)] ??
+                                            $selGroup?->group_code;
                                     @endphp
                                     Questions from: <span class="text-primary">{{ $selTitle }}</span>
                                 @else
@@ -675,22 +750,21 @@
                                         ->filter(fn($pq) => !in_array($pq->id, $currentGroupQuestionIds))
                                         ->pluck('id')
                                         ->toArray();
-                                    $allSelected = count($selectableIds) > 0
-                                        && count(array_intersect($selectableIds, $pickerSelectedQIds)) === count($selectableIds);
+                                    $allSelected =
+                                        count($selectableIds) > 0 &&
+                                        count(array_intersect($selectableIds, $pickerSelectedQIds)) ===
+                                            count($selectableIds);
                                 @endphp
                                 @if (count($selectableIds) > 0)
-                                        <input
-                                            type="checkbox"
-                                            class="form-check-input"
-                                            id="selectAllQuestions"
-                                            {{ $allSelected ? 'checked' : '' }}
-                                            wire:click="{{ $allSelected ? 'deselectAllPickerQuestions' : 'selectAllPickerQuestions' }}"
-                                            style="cursor:pointer; width:1.1rem; height:1.1rem;">
-                                        <label class="form-check-label small fw-medium mb-0" for="selectAllQuestions" style="cursor:pointer;">
-                                            {{ $allSelected ? 'Deselect All' : 'Select All' }}
-                                            <span class="text-muted">({{ count($selectableIds) }})</span>
-                                        </label>
-
+                                    <input type="checkbox" class="form-check-input" id="selectAllQuestions"
+                                        {{ $allSelected ? 'checked' : '' }}
+                                        wire:click="{{ $allSelected ? 'deselectAllPickerQuestions' : 'selectAllPickerQuestions' }}"
+                                        style="cursor:pointer; width:1.1rem; height:1.1rem;">
+                                    <label class="form-check-label small fw-medium mb-0" for="selectAllQuestions"
+                                        style="cursor:pointer;">
+                                        {{ $allSelected ? 'Deselect All' : 'Select All' }}
+                                        <span class="text-muted">({{ count($selectableIds) }})</span>
+                                    </label>
                                 @endif
                             @endif
 
@@ -707,16 +781,16 @@
                                 <p class="mt-3 mb-0">Select a question group from the left panel</p>
                             </div>
                         @else
-
                             {{-- Passage Display (if exists) --}}
                             @php
                                 if ($pickerMode === 'new') {
-                                    $selGroup      = $pickerGroups->firstWhere('id', $pickerGroupId);
-                                    $selContent    = $selGroup?->group_content ?? [];
+                                    $selGroup = $pickerGroups->firstWhere('id', $pickerGroupId);
+                                    $selContent = $selGroup?->group_content ?? [];
                                     $isPassageMode = $selGroup?->questions_category === 'multiple';
                                 } else {
-                                    $selContent    = $assessmentGroups[$pickerAgIndex]['group_content'] ?? [];
-                                    $isPassageMode = $assessmentGroups[$pickerAgIndex]['questions_category'] === 'multiple';
+                                    $selContent = $assessmentGroups[$pickerAgIndex]['group_content'] ?? [];
+                                    $isPassageMode =
+                                        $assessmentGroups[$pickerAgIndex]['questions_category'] === 'multiple';
                                 }
                                 $passageEn = $selContent['content'][array_key_first($languages)] ?? '';
                             @endphp
@@ -726,7 +800,8 @@
                                     <p class="small fw-semibold text-info mb-2">
                                         <i class="ri ri-file-text-line me-1"></i>Group Passage
                                     </p>
-                                    <div class="bg-white rounded p-3 small border" style="max-height:150px;overflow-y:auto;">
+                                    <div class="bg-white rounded p-3 small border"
+                                        style="max-height:150px;overflow-y:auto;">
                                         {!! $passageEn !!}
                                     </div>
                                 </div>
@@ -736,99 +811,109 @@
                             <div class="p-3" style="max-height:600px;overflow-y:auto;">
 
                                 @if ($pickerQuestions && $pickerQuestions->count() > 0)
-
                                     @foreach ($pickerQuestions as $pq)
                                         @php
-                                            $content    = $pq->question_content ?? [];
-                                            $stemEn     = $content['stem'][array_key_first($languages)] ?? '(No stem)';
+                                            $content = $pq->question_content ?? [];
+                                            $stemEn = $content['stem'][array_key_first($languages)] ?? '(No stem)';
 
-                                            // Check if this question is already in the current group
-                                            $alreadyInGroup = $pickerMode === 'existing'
-                                                && in_array($pq->id, $currentGroupQuestionIds);
-
+                                            $alreadyInGroup = $pq->already_in_group ?? false;
                                             $isSelected = in_array($pq->id, $pickerSelectedQIds);
+
+                                            $rowClass = match (true) {
+                                                $alreadyInGroup => 'bg-secondary-subtle border-secondary opacity-60',
+                                                $isSelected => 'bg-primary-subtle border-primary',
+                                                default => 'bg-white',
+                                            };
                                         @endphp
 
                                         <label wire:key="pq-{{ $pq->id }}"
-                                               class="d-flex align-items-start gap-3 p-3 rounded-3 mb-2 border
-                          {{ $alreadyInGroup
-                              ? 'bg-secondary-subtle border-secondary opacity-60'
-                              : ($isSelected
-                                  ? 'bg-primary-subtle border-primary'
-                                  : 'bg-white') }}"
-                                               style="{{ $alreadyInGroup ? 'cursor:not-allowed;' : 'cursor:pointer;' }}">
+                                            class="d-flex align-items-start gap-3 p-3 rounded-3 mb-2 border {{ $rowClass }}"
+                                            style="{{ $alreadyInGroup ? 'cursor:not-allowed;' : 'cursor:pointer;' }}">
 
-                                            <input type="checkbox"
-                                                   class="form-check-input mt-1 flex-shrink-0"
-                                                   @if(!$alreadyInGroup)
-                                                       wire:click="togglePickerQuestion({{ $pq->id }})"
-                                                @endif
+                                            <input type="checkbox" class="form-check-input mt-1 flex-shrink-0"
+                                                @if (!$alreadyInGroup) wire:click="togglePickerQuestion({{ $pq->id }})" @endif
                                                 {{ $isSelected ? 'checked' : '' }}
                                                 {{ $alreadyInGroup ? 'disabled' : '' }}>
 
                                             <div class="flex-grow-1">
-                                                <p class="mb-1 small fw-medium {{ $alreadyInGroup ? 'text-muted' : 'text-dark' }}">
+                                                <p
+                                                    class="mb-1 small fw-medium {{ $alreadyInGroup ? 'text-muted' : 'text-dark' }}">
                                                     @php
-                                                        // Strip tags, decode HTML entities, then limit
                                                         $stemPreview = Str::limit(
-                                                            html_entity_decode(strip_tags($stemEn), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
-                                                            120
+                                                            html_entity_decode(
+                                                                strip_tags($stemEn),
+                                                                ENT_QUOTES | ENT_HTML5,
+                                                                'UTF-8',
+                                                            ),
+                                                            120,
                                                         );
                                                     @endphp
                                                     {{ $stemPreview }}
                                                 </p>
+
                                                 <div class="d-flex flex-wrap gap-2 align-items-center">
+
+                                                    {{-- Answer Category --}}
                                                     @if ($pq->answer_category === 'single_choice')
-                                                        <span class="badge bg-primary-subtle text-primary" style="font-size:.7rem;">Single Choice</span>
+                                                        <span class="badge bg-primary-subtle text-primary"
+                                                            style="font-size:.7rem;">Single Choice</span>
                                                     @elseif ($pq->answer_category === 'multi_choice')
-                                                        <span class="badge bg-info-subtle text-info" style="font-size:.7rem;">Multiple Choice</span>
+                                                        <span class="badge bg-info-subtle text-info"
+                                                            style="font-size:.7rem;">Multiple Choice</span>
                                                     @else
-                                                        <span class="badge bg-secondary-subtle text-secondary" style="font-size:.7rem;">Open Ended</span>
+                                                        <span class="badge bg-secondary-subtle text-secondary"
+                                                            style="font-size:.7rem;">Open Ended</span>
                                                     @endif
 
-                                                    <span class="badge bg-success-subtle text-success" style="font-size:.7rem;">
-
-                                                        {{ $pq->question_content['marks'] }}  Mark(s)
+                                                    {{-- Marks --}}
+                                                    <span class="badge bg-success-subtle text-success"
+                                                        style="font-size:.7rem;">
+                                                        {{ $pq->question_content['marks'] }} Mark(s)
                                                     </span>
 
-                                                    <code style="font-size:.7rem;color:#6c757d;">{{ $pq->question_code }}</code>
-                                                    <span class="badge bg-danger-subtle text-danger" style="font-size:.7rem;">
+                                                    <code
+                                                        style="font-size:.7rem; color:#6c757d;">{{ $pq->question_code }}</code>
+
+                                                    <span class="badge bg-danger-subtle text-danger"
+                                                        style="font-size:.7rem;">
                                                         {{ $pq->primarySkill->name }}
                                                     </span>
-                                                    <span class="badge bg-warning-subtle text-warning" style="font-size:.7rem;">
+                                                    <span class="badge bg-warning-subtle text-warning"
+                                                        style="font-size:.7rem;">
                                                         {{ $pq->subSkill->name }}
                                                     </span>
-                                                    <span class="badge bg-secondary-subtle text-dark" style="font-size:.7rem;">
-                                                       Age-Group-{{ $pq->ageGroup->name }}
+                                                    <span class="badge bg-secondary-subtle text-dark"
+                                                        style="font-size:.7rem;">
+                                                        Age-Group-{{ $pq->ageGroup->name }}
                                                     </span>
-                                                    <span class="badge bg-info-subtle text-primary" style="font-size:.7rem;">
+                                                    <span class="badge bg-info-subtle text-primary"
+                                                        style="font-size:.7rem;">
                                                         Level-{{ $pq->difficultyLevel->level }}
                                                     </span>
 
-                                                    {{-- Already added badge --}}
+                                                    {{-- Already in this section --}}
                                                     @if ($alreadyInGroup)
-                                                        <span class="badge bg-secondary text-white" style="font-size:.7rem;">
-                                                            <i class="ri ri-check-double-line me-1"></i>Already in this section
+                                                        <span class="badge bg-secondary text-white"
+                                                            style="font-size:.7rem;">
+                                                            <i class="ri ri-check-double-line me-1"></i>Already in this
+                                                            section
                                                         </span>
                                                     @endif
+
                                                 </div>
                                             </div>
 
-                                            {{-- Preview button - always available --}}
+                                            {{-- Preview Button --}}
                                             <div class="ms-auto">
-                                                <button
-                                                    type="button"
+                                                <button type="button"
                                                     wire:click.stop="viewQuestion({{ $pq->id }})"
-                                                    class="btn btn-sm btn-outline-info"
-                                                    data-bs-toggle="tooltip"
-                                                    title="View Full Question">
+                                                    class="btn btn-sm btn-outline-info" title="View Full Question">
                                                     <i class="ri ri-eye-line"></i>
                                                 </button>
                                             </div>
 
                                         </label>
                                     @endforeach
-
                                 @else
                                     <div class="text-center py-5 text-muted">
                                         <i class="ri ri-question-line fs-3 opacity-30"></i>
@@ -852,7 +937,7 @@
                     @if ($pickerGroupId && count($pickerSelectedQIds) > 0)
                         <div class="card-footer bg-white py-2">
                             <button type="button" wire:click="addGroupToAssessment" wire:loading.attr="disabled"
-                                    class="btn btn-primary w-100">
+                                class="btn btn-primary w-100">
                                 <span wire:loading wire:target="addGroupToAssessment">
                                     <span class="spinner-border spinner-border-sm me-1"></span>Adding…
                                 </span>
@@ -886,13 +971,12 @@
 
                     {{-- Modal Header --}}
                     <div class="modal-header border-bottom py-3"
-                         style="background:linear-gradient(135deg,#4f46e5,#7c3aed);">
+                        style="background:linear-gradient(135deg,#4f46e5,#7c3aed);">
                         <h5 class="modal-title text-white">
                             <i class="ri ri-eye-line me-2"></i>Question Preview
                         </h5>
-                        <button type="button"
-                                wire:click="closeQuestionPreview"
-                                class="btn-close btn-close-white"></button>
+                        <button type="button" wire:click="closeQuestionPreview"
+                            class="btn-close btn-close-white"></button>
                     </div>
 
                     {{-- Modal Body --}}
@@ -905,21 +989,22 @@
                                 {{-- Answer Category Badge --}}
                                 @if ($previewQuestion['answer_category'] === 'single_optional')
                                     <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
-                                    Single Choice
-                                </span>
+                                        Single Choice
+                                    </span>
                                 @elseif ($previewQuestion['answer_category'] === 'multi_optional')
                                     <span class="badge bg-info-subtle text-info border border-info-subtle">
-                                    Multiple Choice
-                                </span>
+                                        Multiple Choice
+                                    </span>
                                 @else
-                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">
-                                    Open Ended
-                                </span>
+                                    <span
+                                        class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">
+                                        Open Ended
+                                    </span>
                                 @endif
                             </div>
                             <span class="badge bg-success fs-6 px-3 py-2">
-                            <i class="ri ri-trophy-line me-1"></i>{{ $previewQuestion['marks'] }} Mark(s)
-                        </span>
+                                <i class="ri ri-trophy-line me-1"></i>{{ $previewQuestion['marks'] }} Mark(s)
+                            </span>
                         </div>
 
                         {{-- Passage (if exists) --}}
@@ -934,9 +1019,9 @@
 
                                 @foreach ($previewQuestion['stems'] as $lang => $stem)
                                     <div class="mb-3 p-3 bg-light rounded border">
-                                    <span class="badge bg-primary mb-2">
-                                        {{ strtoupper($lang) }}
-                                    </span>
+                                        <span class="badge bg-primary mb-2">
+                                            {{ strtoupper($lang) }}
+                                        </span>
                                         <div class="small fw-medium text-dark">
                                             {!! $stem !!}
                                         </div>
@@ -961,23 +1046,21 @@
                                 </h6>
 
                                 @foreach ($previewQuestion['options'] as $opt)
-                                    <div class="mb-3 rounded border overflow-hidden
-                                            {{ $opt['is_correct']
-                                                ? 'border-success'
-                                                : 'border-light' }}">
+                                    <div
+                                        class="mb-3 rounded border overflow-hidden
+                                            {{ $opt['is_correct'] ? 'border-success' : 'border-light' }}">
 
                                         {{-- Option Header --}}
-                                        <div class="px-3 py-2 d-flex justify-content-between align-items-center
-                                                {{ $opt['is_correct']
-                                                    ? 'bg-success text-white'
-                                                    : 'bg-light text-muted' }}">
-                                        <span class="fw-semibold small">
-                                            Option {{ $opt['index'] }}
-                                        </span>
+                                        <div
+                                            class="px-3 py-2 d-flex justify-content-between align-items-center
+                                                {{ $opt['is_correct'] ? 'bg-success text-white' : 'bg-light text-muted' }}">
+                                            <span class="fw-semibold small">
+                                                Option {{ $opt['index'] }}
+                                            </span>
                                             @if ($opt['is_correct'])
                                                 <span class="badge bg-white text-success">
-                                                <i class="ri ri-check-line me-1"></i>Correct Answer
-                                            </span>
+                                                    <i class="ri ri-check-line me-1"></i>Correct Answer
+                                                </span>
                                             @endif
                                         </div>
 
@@ -985,10 +1068,10 @@
                                         <div class="p-3 {{ $opt['is_correct'] ? 'bg-success-subtle' : 'bg-white' }}">
                                             @forelse ($opt['texts'] as $lang => $text)
                                                 <div class="d-flex align-items-start gap-2 mb-2">
-                                                <span class="badge bg-secondary flex-shrink-0"
-                                                      style="font-size:.65rem;margin-top:2px;">
-                                                    {{ strtoupper($lang) }}
-                                                </span>
+                                                    <span class="badge bg-secondary flex-shrink-0"
+                                                        style="font-size:.65rem;margin-top:2px;">
+                                                        {{ strtoupper($lang) }}
+                                                    </span>
                                                     <span class="small">{{ $text }}</span>
                                                 </div>
                                             @empty
@@ -1000,7 +1083,7 @@
                                 @endforeach
                             </div>
                         @endif
-                        @if(!empty($previewQuestion['admin_note']))
+                        @if (!empty($previewQuestion['admin_note']))
                             <div class="mt-6 border-t pt-4">
                                 <h6 class="text-sm font-semibold text-gray-700 mb-2">
                                     Admin Note
@@ -1015,9 +1098,7 @@
 
                     {{-- Modal Footer --}}
                     <div class="modal-footer border-top">
-                        <button type="button"
-                                wire:click="closeQuestionPreview"
-                                class="btn btn-secondary mt-4">
+                        <button type="button" wire:click="closeQuestionPreview" class="btn btn-secondary mt-4">
                             <i class="ri ri-close-line me-1"></i>Close
                         </button>
                     </div>
