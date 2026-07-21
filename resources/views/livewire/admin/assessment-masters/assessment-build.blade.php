@@ -619,41 +619,28 @@
                                         $pgContent = $pg->group_content ?? [];
                                         $pgTitle = $pgContent['title'][array_key_first($languages)] ?? $pg->group_code;
 
-                                        $isMultiUsed = $pg->is_used_multiple ?? false;
-                                        $allQuestionsUsed = $pg->all_questions_used ?? false;
                                         $usedCount = $pg->used_count ?? 0;
                                         $totalCount = $pg->total_count ?? 0;
-                                        $someUsed = $usedCount > 0 && !$allQuestionsUsed;
-
-                                        // Determine row style
-                                        $isFullyDisabled = $isMultiUsed || $allQuestionsUsed;
-
-                                        $rowBg = match (true) {
-                                            $allQuestionsUsed => 'bg-danger-subtle',
-                                            $isMultiUsed => 'bg-warning-subtle',
-                                            $pickerGroupId === $pg->id => 'active',
-                                            default => '',
-                                        };
+                                        $someUsed = $usedCount > 0;
+                                        $isSelected = $pickerGroupId === $pg->id;
 
                                         $borderStyle = match (true) {
-                                            $allQuestionsUsed => 'border-start border-danger border-3',
                                             $someUsed => 'border-start border-warning border-3',
-                                            $pickerGroupId === $pg->id => 'border-start border-primary border-3',
+                                            $isSelected => 'border-start border-primary border-3',
                                             default => '',
                                         };
                                     @endphp
 
-                                    <button type="button" wire:key="pg-{{ $pg->id }}"
-                                        @if (!$isFullyDisabled) wire:click="selectPickerGroup({{ $pg->id }})" @endif
+                                    <button type="button" wire:click="selectPickerGroup({{ $pg->id }})"
+                                        wire:key="pg-{{ $pg->id }}"
                                         class="list-group-item list-group-item-action px-3 py-2 border-0
-                   {{ $rowBg }} {{ $borderStyle }}
-                   {{ $isFullyDisabled ? 'disabled opacity-75' : '' }}"
-                                        {{ $isFullyDisabled ? 'disabled' : '' }}
-                                        style="font-size:.85rem; {{ $isFullyDisabled ? 'cursor:not-allowed;' : '' }}">
+                   {{ $isSelected ? 'active' : '' }}
+                   {{ $borderStyle }}"
+                                        style="font-size:.85rem;">
 
                                         {{-- Group Title --}}
                                         <div class="fw-semibold text-truncate mb-1
-                    {{ $allQuestionsUsed ? 'text-danger' : ($pickerGroupId === $pg->id ? 'text-warning' : 'text-dark') }}"
+                    {{ $isSelected ? 'text-warning' : 'text-dark' }}"
                                             title="{{ $pgTitle }}">
                                             {{ $pgTitle }}
                                         </div>
@@ -673,25 +660,12 @@
                                                 {{ $pg->questions_count }}Q
                                             </span>
 
-                                            {{-- All questions used → red "All Added" badge --}}
-                                            @if ($allQuestionsUsed)
-                                                <span class="badge bg-danger text-white" style="font-size:.65rem;">
-                                                    <i class="ri ri-lock-fill me-1"></i>All Added
-                                                </span>
-                                            @endif
-
-                                            {{-- Passage group already in assessment → warning "Used" badge --}}
-                                            @if ($isMultiUsed && !$allQuestionsUsed)
-                                                <span class="badge bg-warning text-dark" style="font-size:.65rem;">
-                                                    <i class="ri ri-lock-line me-1"></i>Used
-                                                </span>
-                                            @endif
-
                                             {{-- Some (not all) questions used → partial indicator --}}
-                                            @if ($someUsed && !$allQuestionsUsed)
+                                            @if ($someUsed)
                                                 <span
                                                     class="badge bg-warning-subtle text-warning border border-warning-subtle"
                                                     style="font-size:.65rem;">
+                                                    <i class="ri ri-information-line me-1"></i>
                                                     {{ $usedCount }}/{{ $totalCount }} Used
                                                 </span>
                                             @endif
@@ -703,7 +677,7 @@
                                 @empty
                                     <div class="text-center py-5 text-muted">
                                         <i class="ri ri-folder-open-line fs-3 opacity-30"></i>
-                                        <p class="small mt-2 mb-0">No groups found</p>
+                                        <p class="small mt-2 mb-0">No available groups found</p>
                                     </div>
                                 @endforelse
                             </div>

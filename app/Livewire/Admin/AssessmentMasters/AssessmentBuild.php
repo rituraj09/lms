@@ -664,7 +664,6 @@ class AssessmentBuild extends Component
     public function getPickerGroupsProperty()
     {
         // ── Only count NON-SOFT-DELETED assessment groups ───────────────
-        // Using DB table query to explicitly exclude soft-deleted
         $usedMultipleGroupIds = \DB::table('assessment_groups')
             ->join('question_groups', 'assessment_groups.question_group_id', '=', 'question_groups.id')
             ->where('question_groups.questions_category', 'multiple')
@@ -701,7 +700,7 @@ class AssessmentBuild extends Component
                 $totalQuestions   = count($groupQuestionIds);
 
                 if ($totalQuestions === 0) {
-                    $pg->all_questions_used = false;
+                    $pg->all_questions_used = true; // ← Hide empty groups too
                     $pg->used_count         = 0;
                     $pg->total_count        = 0;
                     return $pg;
@@ -718,7 +717,14 @@ class AssessmentBuild extends Component
                 $pg->total_count        = $totalQuestions;
 
                 return $pg;
-            });
+            })
+            ->filter(function ($pg) {
+                // ✅ HIDE groups where:
+                // 1. All questions are used
+                // 2. Multiple-category passage already in assessment (locked)
+                return !$pg->all_questions_used && !$pg->is_used_multiple;
+            })
+            ->values(); // ← Re-index array after filtering
     }
 
     /* ================================================================
