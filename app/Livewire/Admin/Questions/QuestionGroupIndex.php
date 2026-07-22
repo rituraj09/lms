@@ -14,15 +14,12 @@ class QuestionGroupIndex extends Component
 {
     use WithPagination;
 
-    // ─── Filters ──────────────────────────────────────────────────────
-    public string $search        = '';
+    public string $search = '';
     public string $categoryFilter = '';
-    public int    $perPage       = 10;
-
-    // ─── UI State ─────────────────────────────────────────────────────
-    public bool $confirmingDelete  = false;
-    public ?int $deletingGroupId   = null;
-    public array $expandedGroups   = [];   // track which groups show questions
+    public int $perPage = 10;
+    public bool $confirmingDelete = false;
+    public ?int $deletingGroupId = null;
+    public array $expandedGroups = [];
 
     protected $queryString = [
         'search'         => ['except' => ''],
@@ -30,13 +27,12 @@ class QuestionGroupIndex extends Component
         'perPage'        => ['except' => 10],
     ];
 
-    // ─── Listeners ────────────────────────────────────────────────────
     protected $listeners = [
         'groupSaved'    => '$refresh',
         'questionSaved' => '$refresh',
     ];
 
-    // ─── Reset pagination on filter change ───────────────────────────
+    // ── Reset page on ANY filter change ──────────────────────────
     public function updatingSearch(): void
     {
         $this->resetPage();
@@ -47,50 +43,53 @@ class QuestionGroupIndex extends Component
         $this->resetPage();
     }
 
-    // ─── Toggle question list visibility ─────────────────────────────
+    // ✅ ADD THIS - was missing!
+    public function updatingPerPage(): void
+    {
+        $this->resetPage();
+    }
+
     public function toggleGroup(int $groupId): void
     {
         if (in_array($groupId, $this->expandedGroups)) {
-            $this->expandedGroups = array_filter(
+            $this->expandedGroups = array_values(array_filter(
                 $this->expandedGroups,
                 fn($id) => $id !== $groupId
-            );
+            ));
         } else {
             $this->expandedGroups[] = $groupId;
         }
     }
 
-    // ─── Delete confirmation ───────────────────────────────────────────
     public function confirmDelete(int $groupId): void
     {
-        $this->deletingGroupId  = $groupId;
+        $this->deletingGroupId = $groupId;
         $this->confirmingDelete = true;
     }
 
     public function cancelDelete(): void
     {
         $this->confirmingDelete = false;
-        $this->deletingGroupId  = null;
+        $this->deletingGroupId = null;
     }
+
     public function deleteGroup(): void
     {
         $group = QuestionGroup::withCount('questions')
             ->findOrFail($this->deletingGroupId);
 
-        $groupTitle = $group->group_title; // ✅ uses accessor → group_content.title.en
+        $groupTitle = $group->group_title;
 
-        // ── Guard: cannot delete if questions exist ───────────────────
         if ($group->questions_count > 0) {
             session()->flash(
                 'error',
-                "Cannot delete \"{$groupTitle}\": it still has {$group->questions_count} question(s). Please remove all questions first."
+                "Cannot delete \"{$groupTitle}\": it still has {$group->questions_count} question(s)."
             );
             $this->cancelDelete();
             return;
         }
 
         $this->authorize('delete', $group);
-
         $group->update(['updated_by' => auth()->id()]);
         $group->delete();
 
@@ -104,35 +103,34 @@ class QuestionGroupIndex extends Component
                 'description' => "Deleted question group: {$group->group_code}",
                 'properties'  => [
                     'question_group_code'  => $group->group_code,
-                    'question_group_title' => $groupTitle, // ✅ added
+                    'question_group_title' => $groupTitle,
                 ],
             ]
         );
 
         $this->cancelDelete();
-        session()->flash('success', "Question group \"{$groupTitle}\" deleted successfully."); // ✅
+        session()->flash('success', "Question group \"{$groupTitle}\" deleted successfully.");
     }
 
-    // ─── Render ───────────────────────────────────────────────────────
     public function render()
     {
         $groups = QuestionGroup::with([
-            'questions' => fn($q) => $q->withCount('assessmentQuestions'),
+            'questions'  => fn($q) => $q->withCount('assessmentQuestions'),
             'createdBy:id,name',
             'updatedBy:id,name',
         ])
-            ->withCount(['questions', 'assessmentGroups'])
-            ->when($this->search, fn($q) => $q->search($this->search))
-            ->when(
-                $this->categoryFilter,
-                fn($q) => $q->byCategory($this->categoryFilter)
-            )
-            ->latest()
-            ->paginate($this->perPage);
+        ->withCount(['questions', 'assessmentGroups'])
+        ->when($this->search, fn($q) => $q->search($this->search))
+        ->when(
+            $this->categoryFilter,
+            fn($q) => $q->byCategory($this->categoryFilter)
+        )
+        ->latest()
+        ->paginate($this->perPage);
 
         $deletingGroup = $this->deletingGroupId
             ? $groups->firstWhere('id', $this->deletingGroupId)
-            ?? QuestionGroup::withCount('questions')->find($this->deletingGroupId)
+                ?? QuestionGroup::withCount('questions')->find($this->deletingGroupId)
             : null;
 
         return view(
