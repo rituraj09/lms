@@ -185,7 +185,10 @@ class AssessmentList extends Component
             session()->flash('error', 'Cannot delete a published assessment.');
             return;
         }
-
+        if($assessment->assessmentGroups()->exists()) {
+            session()->flash('error', 'Cannot delete this assessment because it has associated groups.');
+            return;
+        }
         $assessment->delete();
         session()->flash('success', 'Assessment deleted successfully.');
     }
