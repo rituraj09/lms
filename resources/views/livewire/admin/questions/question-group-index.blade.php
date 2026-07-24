@@ -74,7 +74,7 @@
     {{-- ───────────────── Groups List ───────────────── --}}
     @forelse ($groups as $group)
 
-        <div class="card border-0 shadow-sm mb-3">
+        <div class="card border-0 shadow-sm mb-3" wire:key="group-{{ $group->id }}">
 
             {{-- Group Header --}}
             <div class="card-body d-flex justify-content-between align-items-center">
@@ -148,7 +148,8 @@
                 <div class="card-body border-top bg-light">
 
                     @forelse ($group->questions as $question)
-                        <div class="d-flex justify-content-between align-items-start py-2 border-bottom">
+                        <div class="d-flex justify-content-between align-items-start py-2 border-bottom"
+                         wire:key="question-{{ $question->id }}">
 
                             <div class="text-muted small d-flex">
 
@@ -200,10 +201,115 @@
     @endforelse
 
 
+
     {{-- Pagination --}}
-    <div class="mt-4">
-        {{ $groups->links('pagination::bootstrap-5') }}
+    {{-- Pagination --}}
+@if ($groups->hasPages())
+    <div class="d-flex align-items-center justify-content-between mt-4 flex-wrap gap-2">
+
+        {{-- Left: Showing X to Y of Z --}}
+        <p class="text-muted small mb-0">
+            Showing
+            <span class="fw-semibold text-dark">{{ $groups->firstItem() }}</span>
+            to
+            <span class="fw-semibold text-dark">{{ $groups->lastItem() }}</span>
+            of
+            <span class="fw-semibold text-dark">{{ $groups->total() }}</span>
+            results
+        </p>
+
+        {{-- Right: Pagination Controls --}}
+        <nav aria-label="Question Groups Pagination">
+            <ul class="pagination pagination-sm mb-0">
+
+                {{-- Previous Button --}}
+                <li class="page-item {{ $groups->onFirstPage() ? 'disabled' : '' }}">
+                    @if ($groups->onFirstPage())
+                        <span class="page-link">
+                            <i class="ri ri-arrow-left-s-line" style="font-size:14px;"></i>
+                        </span>
+                    @else
+                        <button type="button" class="page-link"
+                                wire:click="previousPage"
+                                wire:loading.attr="disabled">
+                            <i class="ri ri-arrow-left-s-line" style="font-size:14px;"></i>
+                        </button>
+                    @endif
+                </li>
+
+                {{-- Page Numbers --}}
+                @php
+                    $current = $groups->currentPage();
+                    $last    = $groups->lastPage();
+                @endphp
+
+                @for ($page = 1; $page <= $last; $page++)
+
+                    @php
+                        $diff = abs($page - $current);
+                    @endphp
+
+                    @if ($page === 1 || $page === $last || $diff <= 1)
+                        {{-- Show page number --}}
+                        <li class="page-item {{ $page === $current ? 'active' : '' }}">
+                            @if ($page === $current)
+                                <span class="page-link" style="font-size:13px;">
+                                    {{ $page }}
+                                </span>
+                            @else
+                                <button type="button"
+                                        class="page-link"
+                                        style="font-size:13px;"
+                                        wire:click="gotoPage({{ $page }})">
+                                    {{ $page }}
+                                </button>
+                            @endif
+                        </li>
+
+                    @elseif ($diff === 2)
+                        {{-- Ellipsis --}}
+                        <li class="page-item disabled">
+                            <span class="page-link border-0 bg-transparent px-2"
+                                  style="font-size:13px;">
+                                …
+                            </span>
+                        </li>
+
+                    @endif
+
+                @endfor
+
+                {{-- Next Button --}}
+                <li class="page-item {{ !$groups->hasMorePages() ? 'disabled' : '' }}">
+                    @if ($groups->hasMorePages())
+                        <button type="button" class="page-link"
+                                wire:click="nextPage"
+                                wire:loading.attr="disabled">
+                            <i class="ri ri-arrow-right-s-line" style="font-size:14px;"></i>
+                        </button>
+                    @else
+                        <span class="page-link">
+                            <i class="ri ri-arrow-right-s-line" style="font-size:14px;"></i>
+                        </span>
+                    @endif
+                </li>
+
+            </ul>
+        </nav>
+
     </div>
+
+@else
+    {{-- All results fit on one page --}}
+    <p class="text-muted small mt-3 mb-0">
+        Showing all
+        <span class="fw-semibold text-dark">{{ $groups->total() }}</span>
+        {{ Str::plural('result', $groups->total()) }}
+    </p>
+@endif
+
+
+</div>
     {{-- ─── Flash Messages ──────────────────────────────────────────────── --}}
     @if (session()->has('success'))
         <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 mb-4"

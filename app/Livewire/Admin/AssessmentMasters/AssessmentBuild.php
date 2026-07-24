@@ -531,38 +531,38 @@ class AssessmentBuild extends Component
      |  REMOVE QUESTION  (Delete)
      * ================================================================*/
    public function removeQuestionFromGroup(int $agIndex, int $qIndex): void
-{
-    $q  = $this->assessmentGroups[$agIndex]['questions'][$qIndex] ?? null;
-    $ag = $this->assessmentGroups[$agIndex] ?? null;
+    {
+        $q  = $this->assessmentGroups[$agIndex]['questions'][$qIndex] ?? null;
+        $ag = $this->assessmentGroups[$agIndex] ?? null;
 
-    if ($q && ($q['assessment_question_id'] ?? null)) {
-        $assessmentQuestion = AssessmentQuestion::find($q['assessment_question_id']);
+        if ($q && ($q['assessment_question_id'] ?? null)) {
+            $assessmentQuestion = AssessmentQuestion::find($q['assessment_question_id']);
 
-        if ($assessmentQuestion) {
-            $assessmentQuestion->delete(); // ← soft delete
+            if ($assessmentQuestion) {
+                $assessmentQuestion->delete(); // ← soft delete
 
-            // ── Activity Log ─────────────────────────────────────────────
-            ActivityLogger::log(
-                userId:   auth('admin')->id(),
-                userType: 'admin',
-                action:   'delete',
-                extra: [
-                    'model_type'  => 'AssessmentQuestion',
-                    'model_id'    => $q['assessment_question_id'],
-                    'description' => "Soft deleted question [{$q['question_code']}] from group [{$ag['group_code']}] — assessment: {$this->title} [{$this->assessment_code}]",
-                    'properties'  => [
-                        'assessment_id' => $this->assessmentId,
-                        'question_id'   => $q['question_id'],
-                        'question_code' => $q['question_code'],
-                        'group_code'    => $ag['group_code'] ?? null,
-                    ],
-                ]
-            );
+                // ── Activity Log ─────────────────────────────────────────────
+                ActivityLogger::log(
+                    userId:   auth('admin')->id(),
+                    userType: 'admin',
+                    action:   'delete',
+                    extra: [
+                        'model_type'  => 'AssessmentQuestion',
+                        'model_id'    => $q['assessment_question_id'],
+                        'description' => "Soft deleted question [{$q['question_code']}] from group [{$ag['group_code']}] — assessment: {$this->title} [{$this->assessment_code}]",
+                        'properties'  => [
+                            'assessment_id' => $this->assessmentId,
+                            'question_id'   => $q['question_id'],
+                            'question_code' => $q['question_code'],
+                            'group_code'    => $ag['group_code'] ?? null,
+                        ],
+                    ]
+                );
+            }
         }
-    }
 
-    array_splice($this->assessmentGroups[$agIndex]['questions'], $qIndex, 1);
-}
+        array_splice($this->assessmentGroups[$agIndex]['questions'], $qIndex, 1);
+    }
 
     /* ================================================================
      |  QUESTION PREVIEW MODAL
