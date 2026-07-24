@@ -16,22 +16,32 @@
                 <a href="#" class="logo" style="color:#fff;margin-bottom:14px"><span
                         class="logo-mark"></span>MindShiksha EdTech Private Limited</a>
                 <p>CIN: U62011AS2026PTC030649</p>
-                <p style="font-size:.9rem">Smarter Minds, Stronger Future. AI Powered Learning Solution for Cognitive, Life and Leadership Skills</p>
+                <p style="font-size:.9rem">Smarter Minds, Stronger Future. AI Powered Learning Solution for Cognitive,
+                    Life and Leadership Skills</p>
                 <div class="socials" style="margin-top:18px">
                     <a href="#">in</a><a href="#">𝕏</a><a href="#">f</a><a href="#">▶</a>
                 </div>
             </div>
             <div>
-                <h4>Frameworks</h4><a href="{{route('cognitive')}}">Cognitive Skills</a><a href="{{route('life-skill')}}">Life
-                    Skills</a><a href="{{route('solutions')}}">Leadership Skills</a>
+                <h4>Frameworks</h4><a href="{{ route('cognitive') }}">Cognitive Skills</a><a
+                    href="{{ route('life-skill') }}">Life
+                    Skills</a><a href="{{ route('solutions') }}">Leadership Skills</a>
             </div>
             <div>
-                <h4>Company</h4><a href="{{route('about')}}">About</a><a href="{{route('use-cases')}}">Blogs</a><a
-                    href="{{route('resources')}}">Resources</a>
+                <h4>Company</h4><a href="{{ route('about') }}">About</a><a href="{{ route('use-cases') }}">Blogs</a><a
+                    href="{{ route('resources') }}">Resources</a>
             </div>
             <div>
-                <h4>Get Started</h4><a href="{{route('contact')}}">Request a Demo</a><a href="{{route('contact')}}">Contact</a>
+                <h4>Get Started</h4>
+                {{-- <a href="{{ route('contact') }}">Request a Demo</a> --}}
+                <a href="{{ route('contact') }}">Contact</a>
+                <a href="https://hub.mindshiksha.com/admin/login" target="_blank">Official Login</a>
+                <a href="https://app.mindshiksha.com/" target="_blank">Student Login</a>
             </div>
+
+
+
+
         </div>
         <div class="footer-bottom">
             <span>© {{ date('Y') }} MindShiksha EdTech Private Limited. All rights reserved.</span>

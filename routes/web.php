@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DemoRequestController;
 
 Route::view('/', 'website.index')->name('home');
 
@@ -25,3 +26,6 @@ Route::view('/resources', 'website.resources')
 
 Route::view('/contact', 'website.contact')
     ->name('contact');
+
+Route::post('/demo-request', [DemoRequestController::class, 'store'])
+    ->name('demo-request.store');

@@ -475,6 +475,24 @@ new class extends Component {
                         </ul>
                     </li>
                 @endif
+                @if ($canSystem('system.demo-request.view'))
+                    <li class="menu-item {{ request()->routeIs('admin.demo-requests.*') ? 'active open' : '' }}">
+                        <a href="javascript:void(0);" class="menu-link menu-toggle">
+                            <i class="menu-icon icon-base ri ri-calendar-check-line"></i>
+                            <div>Demo Requests</div>
+                            @livewire('admin.demo.pending-badge', ['mode' => 'dot'], key('demo-request-dot'))
+                        </a>
+                        <ul class="menu-sub">
+                            <li
+                                class="menu-item {{ request()->routeIs('admin.demo-requests.index') ? 'active' : '' }}">
+                                <a href="{{ route('admin.demo-requests.index') }}" class="menu-link">
+                                    <div>View Requests</div>
+                                    @livewire('admin.demo.pending-badge', ['mode' => 'badge'], key('demo-request-badge'))
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
                 {{-- ==================== COMMUNICATION ==================== --}}
                 {{--                <li class="menu-header small mt-4"> --}}
                 {{--                    <span class="menu-header-text text-uppercase" --}}
@@ -500,6 +518,10 @@ new class extends Component {
                 {{--                        </li> --}}
                 {{--                    </ul> --}}
                 {{--                </li> --}}
+
+
+
+
 
                 {{-- ==================== SYSTEM SETTINGS ==================== --}}
                 @if ($canSystem('system.settings.view'))

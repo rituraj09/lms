@@ -45,9 +45,7 @@
         </div>
 
         <div class="nav-actions">
-            <a href="https://hub.mindshiksha.com/admin/login" class="btn btn-secondary demo-btn">
-                <i class="fas fa-sign-in"></i>
-                Login</a>
+
             <a href="{{ route('contact') }}" class="btn btn-primary demo-btn">
                 <i class="fas fa-calendar-alt"></i>
                 Request a Demo
@@ -78,10 +76,6 @@
         Contact</a>
     <div style="margin-top:1rem;">
 
-        <a href="https://hub.mindshiksha.com/admin/login" class="btn btn-secondary  "
-            style="width:100%;justify-content:center;">
-            <i class="fas fa-sign-in"></i> Login
-        </a>
         <button class="btn btn-primary" style="margin-top:10px;width:100%;justify-content:center;"
             onclick="navigateTo('contact');toggleMobileMenu()">
             <i class="fas fa-calendar-alt"></i> Request a Demo

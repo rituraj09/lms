@@ -15,12 +15,12 @@ new class extends Component {
         $admin = Auth::guard('admin')->user();
         // ✅ Log before logout so we still have user id
         ActivityLogger::log(
-            userId:   $admin->id,
+            userId: $admin->id,
             userType: 'admin',
-            action:   'logout',
+            action: 'logout',
             extra: [
                 'description' => "Admin logged out: {$admin->email}",
-            ]
+            ],
         );
 
         Auth::guard('admin')->logout();
@@ -69,16 +69,7 @@ new class extends Component {
         {{-- Right Navbar --}}
         <div class="navbar-nav-right d-flex align-items-center justify-content-end w-100" id="navbar-collapse">
 
-            {{-- Search Bar --}}
-            <div class="navbar-search d-none d-md-flex align-items-center me-auto ms-3">
-                <div class="input-group input-group-sm" style="min-width: 260px;">
-                    <span class="input-group-text bg-transparent border-end-0">
-                        <i class="ri ri-search-line text-muted"></i>
-                    </span>
-                    <input type="text" class="form-control border-start-0 bg-transparent ps-0"
-                        placeholder="Search menu, users, courses...">
-                </div>
-            </div>
+
 
             <ul class="navbar-nav flex-row align-items-center gap-1 ms-md-3">
 

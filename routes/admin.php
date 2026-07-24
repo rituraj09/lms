@@ -155,7 +155,12 @@ Route::group(['middleware' => ['redirect.notauth:admin','auth:admin']], function
         $router->get('admin/activity-logs', ActivityLogs::class)
             ->name('activity-logs');
     });
+   Route::prefix('demo-requests')->name('demo-requests.')->group(function ($router) {
+        $router->get('/', \App\Livewire\Admin\Demo\View::class)
+            ->name('index')
+        ->middleware('can:system.demo-request.view');
 
+    });
     // ────────────────────────────────────────────────────────────
     // ORGANISATION LEVEL - ORGANISATION MANAGEMENT
     // ────────────────────────────────────────────────────────────
