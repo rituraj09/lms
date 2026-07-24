@@ -10,14 +10,15 @@
 
 <section>
     <div class="container grid grid-2" style="align-items:start;gap:48px">
-        <!-- FORM -->
-        <div class="card reveal">
 
-            <!-- Success State (hidden by default) -->
+        <!-- FORM -->
+        <div class="card">{{-- ✅ removed "reveal" to prevent re-hide on scroll --}}
+
+            <!-- Success State -->
             <div id="successState" style="display:none;text-align:center;padding:30px 10px;">
                 <div
                     style="width:70px;height:70px;border-radius:50%;background:rgba(34,197,94,.12);
-                                display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+                            display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
                     <span style="font-size:34px;">✅</span>
                 </div>
                 <h3 style="margin-bottom:10px;">Request Received!</h3>
@@ -29,15 +30,21 @@
                 </button>
             </div>
 
-            <!-- Error Message -->
-            <div id="errorMsg"
-                style="display:none;background:rgba(239,68,68,.12);
-                     color:#ef4444;padding:12px 16px;border-radius:10px;margin-bottom:16px;font-size:14px;">
-                ⚠️ <span id="errorText">Something went wrong. Please try again.</span>
-            </div>
-
             <!-- Form Wrapper -->
             <div id="formWrapper">
+
+                <!-- Error Summary Box — INSIDE formWrapper -->
+                <div id="errorMsg"
+                    style="display:none;background:rgba(239,68,68,.10);
+                     border:1px solid rgba(239,68,68,.25);color:#ef4444;padding:16px 18px;
+                     border-radius:12px;margin-bottom:20px;font-size:14px;">
+                    <div style="display:flex;align-items:center;gap:8px;font-weight:700;margin-bottom:8px;">
+                        <span style="font-size:16px;">⚠️</span>
+                        <span id="errorTitle">Please fix the following errors:</span>
+                    </div>
+                    <ul id="errorList" style="margin:0;padding-left:20px;display:grid;gap:4px;"></ul>
+                </div>
+
                 <form id="demoForm" novalidate>
                     @csrf
                     <div class="form-grid">
@@ -45,7 +52,6 @@
                         <div class="field">
                             <label>Full Name <span class="req">*</span></label>
                             <input type="text" name="full_name" id="full_name" placeholder="Your name">
-
                         </div>
 
                         <div class="field">
@@ -69,7 +75,6 @@
                         <div class="field">
                             <label>Email <span class="req">*</span></label>
                             <input type="email" name="email" id="email" placeholder="you@example.com">
-
                         </div>
 
                         <div class="field">
@@ -85,17 +90,20 @@
                         <div class="field full">
                             <label>Message</label>
                             <textarea rows="4" name="message" id="message" placeholder="Tell us what you're looking for..."></textarea>
-
                         </div>
 
                     </div>
 
                     <button type="submit" id="submitBtn" class="btn btn-primary"
-                        style="margin-top:18px;width:100%;justify-content:center">
+                        style="margin-top:18px;width:100%;justify-content:center;position:relative;overflow:hidden;">
                         <span id="btnText">Submit Request →</span>
-                        <span id="btnLoader" style="display:none;">Submitting...</span>
+                        <span id="btnLoader" style="display:none;align-items:center;gap:10px;">
+                            <span class="spinner"></span>
+                            <span>Sending...</span>
+                        </span>
                     </button>
                 </form>
+
             </div>
             <!-- /Form Wrapper -->
 
@@ -105,26 +113,27 @@
         <div class="reveal">
             <h2>Why Schedule a Demo?</h2>
             <ul style="list-style:none;display:grid;gap:16px;margin-top:20px">
-                <li class="card" style="display:flex;gap:12px;align-items:center"><span class="icon"
-                        style="margin:0">🎯</span>
+                <li class="card" style="display:flex;gap:12px;align-items:center">
+                    <span class="icon" style="margin:0">🎯</span>
                     <div><strong>Tailored Walkthrough</strong>
                         <p class="text-muted">See modules relevant to your learners.</p>
                     </div>
                 </li>
-                <li class="card" style="display:flex;gap:12px;align-items:center"><span class="icon"
-                        style="margin:0">📊</span>
+                <li class="card" style="display:flex;gap:12px;align-items:center">
+                    <span class="icon" style="margin:0">📊</span>
                     <div><strong>Live Analytics</strong>
                         <p class="text-muted">Explore real dashboards & reports.</p>
                     </div>
                 </li>
-                <li class="card" style="display:flex;gap:12px;align-items:center"><span class="icon"
-                        style="margin:0">🔒</span>
+                <li class="card" style="display:flex;gap:12px;align-items:center">
+                    <span class="icon" style="margin:0">🔒</span>
                     <div><strong>Data Privacy First</strong>
                         <p class="text-muted">Educational focus only. Your data stays protected.</p>
                     </div>
                 </li>
             </ul>
         </div>
+
     </div>
 </section>
 
@@ -135,7 +144,7 @@
             <div style="display:grid;grid-template-columns:1fr 1fr;min-height:320px;">
                 <div
                     style="padding:32px 28px;display:flex;flex-direction:column;justify-content:center;
-                                border-right:1px solid rgba(148,163,184,.15);">
+                            border-right:1px solid rgba(148,163,184,.15);">
                     <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
                         <span style="font-size:26px;">📍</span>
                         <div>
@@ -151,7 +160,8 @@
                             <span style="font-size:16px;min-width:24px;margin-top:2px;">🏢</span>
                             <div>
                                 <p
-                                    style="font-size:10px;font-weight:700;color:#94a3b8;margin:0 0 4px;letter-spacing:.8px;text-transform:uppercase;">
+                                    style="font-size:10px;font-weight:700;color:#94a3b8;margin:0 0 4px;
+                                          letter-spacing:.8px;text-transform:uppercase;">
                                     Registered Office</p>
                                 <p style="font-size:13px;color:var(--text);margin:0;line-height:1.7;">
                                     Ward No. 4, Bhehpara Baruah Chuk,<br>Dhemaji, Assam – 787057, India</p>
@@ -161,10 +171,12 @@
                             <span style="font-size:16px;min-width:24px;margin-top:2px;">🔢</span>
                             <div>
                                 <p
-                                    style="font-size:10px;font-weight:700;color:#94a3b8;margin:0 0 4px;letter-spacing:.8px;text-transform:uppercase;">
+                                    style="font-size:10px;font-weight:700;color:#94a3b8;margin:0 0 4px;
+                                          letter-spacing:.8px;text-transform:uppercase;">
                                     CIN</p>
                                 <p
-                                    style="font-size:13px;color:var(--text);margin:0;font-family:monospace;letter-spacing:.6px;">
+                                    style="font-size:13px;color:var(--text);margin:0;font-family:monospace;
+                                          letter-spacing:.6px;">
                                     U62011AS2026PTC030649</p>
                             </div>
                         </div>
@@ -172,21 +184,22 @@
                             <span style="font-size:16px;min-width:24px;margin-top:2px;">📅</span>
                             <div>
                                 <p
-                                    style="font-size:10px;font-weight:700;color:#94a3b8;margin:0 0 4px;letter-spacing:.8px;text-transform:uppercase;">
+                                    style="font-size:10px;font-weight:700;color:#94a3b8;margin:0 0 4px;
+                                          letter-spacing:.8px;text-transform:uppercase;">
                                     Date of Incorporation</p>
-                                <p style="font-size:13px;color:var(--text);margin:0;line-height:1.6;">18th June, 2026
-                                </p>
-                                <p style="font-size:12px;color:#94a3b8;margin:2px 0 0;">Under The Companies Act, 2013
-                                </p>
+                                <p style="font-size:13px;color:var(--text);margin:0;line-height:1.6;">
+                                    18th June, 2026</p>
+                                <p style="font-size:12px;color:#94a3b8;margin:2px 0 0;">
+                                    Under The Companies Act, 2013</p>
                             </div>
                         </div>
                     </div>
                     <hr style="border:none;border-top:1px solid rgba(148,163,184,.2);margin:20px 0;">
                     <a href="https://www.google.com/maps/search/Dhemaji,+Assam+787057,+India" target="_blank"
                         rel="noopener noreferrer"
-                        style="display:inline-flex;align-items:center;gap:8px;background:rgba(6,182,212,.12);color:#06B6D4;
-                                  padding:10px 18px;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;width:fit-content;
-                                  transition:background .2s,transform .2s;"
+                        style="display:inline-flex;align-items:center;gap:8px;background:rgba(6,182,212,.12);
+                               color:#06B6D4;padding:10px 18px;border-radius:10px;font-size:13px;
+                               font-weight:600;text-decoration:none;width:fit-content;transition:background .2s,transform .2s;"
                         onmouseover="this.style.background='rgba(6,182,212,.25)';this.style.transform='translateY(-1px)'"
                         onmouseout="this.style.background='rgba(6,182,212,.12)';this.style.transform='translateY(0)'">
                         🗺️ Get Directions
@@ -208,140 +221,213 @@
 @include('website.layouts.footer')
 
 <style>
-    .field-error {
-        color: #ef4444;
-        font-size: 12px;
-        margin-top: 4px;
-        display: block;
-        min-height: 16px;
+    /* ── Error box animation ── */
+    #errorMsg {
+        animation: slideDown 0.3s ease;
     }
 
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-8px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ── Invalid field highlight ── */
     .field input.is-invalid,
     .field select.is-invalid,
     .field textarea.is-invalid {
         border-color: #ef4444 !important;
+        background: rgba(239, 68, 68, 0.04) !important;
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12) !important;
+    }
+
+    /* ── Spinner ── */
+    .spinner {
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: #ffffff;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        display: inline-block;
+        flex-shrink: 0;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    #submitBtn.is-loading {
+        pointer-events: none;
+        opacity: 0.85;
+    }
+
+    #submitBtn.is-loading::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.08) 50%,
+                transparent 100%);
+        background-size: 200% 100%;
+        animation: shimmer 1.2s infinite;
+    }
+
+    @keyframes shimmer {
+        0% {
+            background-position: -200% 0;
+        }
+
+        100% {
+            background-position: 200% 0;
+        }
     }
 
     #submitBtn:disabled {
-        opacity: 0.7;
         cursor: not-allowed;
     }
 </style>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    (function() {
+        // 🛡️ Prevent duplicate binding if script runs more than once
+        if (window.__demoFormInitialized) return;
+        window.__demoFormInitialized = true;
 
-        const form = document.getElementById('demoForm');
-        const formWrapper = document.getElementById('formWrapper');
-        const successState = document.getElementById('successState');
-        const successText = document.getElementById('successText');
-        const backToRequestBtn = document.getElementById('backToRequestBtn');
-        const submitBtn = document.getElementById('submitBtn');
-        const btnText = document.getElementById('btnText');
-        const btnLoader = document.getElementById('btnLoader');
-        const errorMsg = document.getElementById('errorMsg');
-        const errorText = document.getElementById('errorText');
+        document.addEventListener('DOMContentLoaded', function() {
 
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
+            const form = document.getElementById('demoForm');
+            if (!form) return;
 
-            clearErrors();
-            errorMsg.style.display = 'none';
+            // 🛡️ Extra safety: remove any existing listeners by cloning the node
+            const freshForm = form.cloneNode(true);
+            form.parentNode.replaceChild(freshForm, form);
 
-            submitBtn.disabled = true;
-            btnText.style.display = 'none';
-            btnLoader.style.display = 'inline';
+            const formEl = freshForm; // use this instead of `form` from now on
+            const formWrapper = document.getElementById('formWrapper');
+            const successState = document.getElementById('successState');
+            const successText = document.getElementById('successText');
+            const backToRequestBtn = document.getElementById('backToRequestBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnLoader = document.getElementById('btnLoader');
+            const errorMsg = document.getElementById('errorMsg');
+            const errorTitle = document.getElementById('errorTitle');
+            const errorList = document.getElementById('errorList');
 
-            const formData = new FormData(form);
+            const fieldLabels = {
+                full_name: 'Full Name',
+                institution: 'Institution',
+                role: 'Role',
+                email: 'Email',
+                phone: 'Phone',
+                preferred_slot: 'Preferred Demo Slot',
+                message: 'Message',
+            };
 
-            fetch("{{ route('demo-request.store') }}", {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
-                        'Accept': 'application/json',
-                    },
-                    body: formData,
-                })
-                .then(async (response) => {
-                    const data = await response.json();
-
-                    if (response.ok && data.success) {
-                        // Show success state, hide form
-                        successText.textContent = data.message;
-                        formWrapper.style.display = 'none';
-                        successState.style.display = 'block';
-                        form.reset();
-                        successState.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'center'
-                        });
-
-                    } else if (response.status === 422) {
-                        showValidationErrors(data.errors);
-
-                    } else {
-                        errorText.textContent = data.message ||
-                            'Something went wrong. Please try again.';
-                        errorMsg.style.display = 'block';
-                    }
-                })
-                .catch((err) => {
-                    console.error(err);
-                    errorText.textContent =
-                        'Network error. Please check your connection and try again.';
-                    errorMsg.style.display = 'block';
-                })
-                .finally(() => {
+            function setLoading(state) {
+                if (state) {
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('is-loading');
+                    btnText.style.display = 'none';
+                    btnLoader.style.display = 'flex';
+                } else {
                     submitBtn.disabled = false;
+                    submitBtn.classList.remove('is-loading');
                     btnText.style.display = 'inline';
                     btnLoader.style.display = 'none';
-                });
-        });
-
-        // Back to Request button — reset UI to show the form again
-        backToRequestBtn.addEventListener('click', function() {
-            successState.style.display = 'none';
-            formWrapper.style.display = 'block';
-            errorMsg.style.display = 'none';
-            clearErrors();
-            formWrapper.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        });
-
-        function showValidationErrors(errors) {
-            for (const field in errors) {
-                const input = document.getElementById(field);
-                const errorSpan = document.querySelector(`[data-error="${field}"]`);
-
-                if (input) input.classList.add('is-invalid');
-                if (errorSpan) errorSpan.textContent = errors[field][0];
+                }
             }
 
-            const firstErrorField = Object.keys(errors)[0];
-            const firstInput = document.getElementById(firstErrorField);
-            if (firstInput) {
-                firstInput.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                });
-                firstInput.focus();
+            function showValidationErrors(errors) {
+                errorList.innerHTML = '';
+                errorTitle.textContent = 'Please fix the following errors:';
+
+                for (const field in errors) {
+                    const input = document.getElementById(field);
+                    if (input) input.classList.add('is-invalid');
+
+                    const li = document.createElement('li');
+                    const label = fieldLabels[field] || field;
+                    li.textContent = `${label}: ${errors[field][0]}`;
+                    errorList.appendChild(li);
+                }
+                errorMsg.style.display = 'block';
             }
-        }
 
-        function clearErrors() {
-            document.querySelectorAll('.field-error').forEach(el => el.textContent = '');
-            document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-        }
+            function showGenericError(message) {
+                errorList.innerHTML = '';
+                errorTitle.textContent = message || 'Something went wrong. Please try again.';
+                errorMsg.style.display = 'block';
+            }
 
-        form.querySelectorAll('input, select, textarea').forEach(el => {
-            el.addEventListener('input', function() {
-                this.classList.remove('is-invalid');
-                const errorSpan = document.querySelector(`[data-error="${this.name}"]`);
-                if (errorSpan) errorSpan.textContent = '';
+            function clearErrors() {
+                errorMsg.style.display = 'none';
+                errorList.innerHTML = '';
+                document.querySelectorAll('.is-invalid')
+                    .forEach(el => el.classList.remove('is-invalid'));
+            }
+
+            formEl.addEventListener('submit', function(e) {
+                e.preventDefault();
+                clearErrors();
+                setLoading(true);
+
+                fetch("{{ route('demo-request.store') }}", {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': formEl.querySelector('input[name="_token"]').value,
+                            'Accept': 'application/json',
+                        },
+                        body: new FormData(formEl),
+                    })
+                    .then(async (response) => {
+                        const data = await response.json();
+
+                        if (response.ok && data.success) {
+                            successText.textContent = data.message;
+                            formWrapper.style.display = 'none';
+                            successState.style.display = 'block';
+                            formEl.reset();
+                        } else if (response.status === 422) {
+                            showValidationErrors(data.errors);
+                        } else {
+                            showGenericError(data.message);
+                        }
+                    })
+                    .catch(() => {
+                        showGenericError(
+                            'Network error. Please check your connection and try again.');
+                    })
+                    .finally(() => {
+                        setLoading(false);
+                    });
             });
-        });
 
-    });
+            formEl.querySelectorAll('input, select, textarea').forEach(el => {
+                el.addEventListener('input', function() {
+                    this.classList.remove('is-invalid');
+                    if (!formEl.querySelector('.is-invalid')) {
+                        errorMsg.style.display = 'none';
+                    }
+                });
+            });
+
+            backToRequestBtn.addEventListener('click', function() {
+                successState.style.display = 'none';
+                formWrapper.style.display = 'block';
+                clearErrors();
+            });
+
+        });
+    })();
 </script>
