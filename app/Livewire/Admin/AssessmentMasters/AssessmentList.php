@@ -36,23 +36,21 @@ class AssessmentList extends Component
     {
         return Assessment::with(['ageGroup', 'createdBy'])
             ->withCount([
-                'assessmentQuestions',
+                // ✅ Use the scoped relationship directly — no extra callback needed
+                'activeAssessmentQuestions as assessment_questions_count',
+
                 'testAttempts as attempts_count',
                 'testAttempts as in_progress_count' => fn($q) =>
-                $q->where('status', 'in_progress'),
+                    $q->where('status', 'in_progress'),
                 'testAttempts as completed_count' => fn($q) =>
-                $q->whereIn('status', ['submitted', 'evaluated']),
+                    $q->whereIn('status', ['submitted', 'evaluated']),
             ])
             ->when($this->search, fn($q) =>
-            $q->where('title', 'like', "%{$this->search}%")
-                ->orWhere('assessment_code', 'like', "%{$this->search}%")
+                $q->where('title', 'like', "%{$this->search}%")
+                    ->orWhere('assessment_code', 'like', "%{$this->search}%")
             )
-            ->when($this->statusFilter, fn($q) =>
-            $q->where('status', $this->statusFilter)
-            )
-            ->when($this->typeFilter, fn($q) =>
-            $q->where('assessment_type_id', $this->typeFilter)
-            )
+            ->when($this->statusFilter, fn($q) => $q->where('status', $this->statusFilter))
+            ->when($this->typeFilter, fn($q) => $q->where('assessment_type_id', $this->typeFilter))
             ->latest()
             ->paginate($this->perPage);
     }
@@ -211,9 +209,12 @@ class AssessmentList extends Component
         }
 
         if ($newStatus === 'publish') {
-            $hasQuestions = $assessment->assessmentGroups()
-                ->whereHas('assessmentQuestions')
-                ->exists();
+          $hasQuestions = $assessment->assessmentGroups()
+    ->whereHas('assessmentQuestions', function ($query) {
+        $query->whereNull('assessment_questions.deleted_at')
+              ->whereNull('assessment_groups.deleted_at');
+    })
+    ->exists();
 
             if (! $hasQuestions) {
                 session()->flash('error', 'Cannot publish an assessment with no questions.');

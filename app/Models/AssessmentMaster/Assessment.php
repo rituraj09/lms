@@ -99,16 +99,18 @@ class Assessment extends Model
             }
         ]);
     }
-    public function assessmentQuestions(): HasManyThrough
+    public function activeAssessmentQuestions(): HasManyThrough
     {
         return $this->hasManyThrough(
             AssessmentQuestion::class,
             AssessmentGroup::class,
-            'assessment_id',       // Foreign key on assessment_groups
-            'assessment_group_id', // Foreign key on assessment_questions
-            'id',                  // Local key on assessments
-            'id'                   // Local key on assessment_groups
-        );
+            'assessment_id',
+            'assessment_group_id',
+            'id',
+            'id'
+        )
+        ->whereNull('assessment_questions.deleted_at')
+        ->whereNull('assessment_groups.deleted_at');
     }
     // ─── Accessors ────────────────────────────────────────────────
 
