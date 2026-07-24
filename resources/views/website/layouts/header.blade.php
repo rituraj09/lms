@@ -19,6 +19,7 @@
         href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,800;0,900;1,800&family=Poppins:ital,wght@0,700;0,800;1,700&family=Outfit:wght@700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,700;0,800;1,700&family=Sora:wght@700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('website/css/styles.css') }}">
+    <link rel="stylesheet" href="{{ asset('website/css/webhome.css') }}">
     <link rel="stylesheet" href="{{ asset('website/css/nav-styles.css') }}">
 </head>
 

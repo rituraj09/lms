@@ -116,6 +116,7 @@
         }
     });
 </script>
+@stack('scripts') {{-- 👈 add this --}}
 </body>
 
 </html>

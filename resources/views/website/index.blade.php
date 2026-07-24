@@ -7,45 +7,56 @@
         <div>
             <span class="eyebrow">⚡ Smarter Minds. Stronger Futures.</span>
             <h1>AI- Powered Learning Management System for Cognitive, Life & Leadership Skills Development</h1>
-            <p>MindShiksha provides personalized learning & assessment framework for continuous development of Intelligent Quotient (IQ), Emotional Quotient (EQ) and Leadership Quotient (LQ).
+            <p>MindShiksha provides personalized learning & assessment framework for continuous development of
+                Intelligent Quotient (IQ), Emotional Quotient (EQ) and Leadership Quotient (LQ).
             </p>
             <div class="hero-actions">
                 <a href="{{ route('contact') }}" class="btn btn-primary">Request a Demo →</a>
                 <a href="{{ route('cognitive') }}" class="btn btn-ghost">Explore the Framework</a>
             </div>
         </div>
-        <div class="hero-visual">
-            <!-- SVG brain-network visual (swap for image later) -->
-            <svg viewBox="0 0 300 240" width="100%" aria-label="Cognitive skill network">
-                <defs>
-                    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0" stop-color="#2563EB" />
-                        <stop offset="1" stop-color="#06B6D4" />
-                    </linearGradient>
-                </defs>
-                <circle cx="150" cy="120" r="46" fill="none" stroke="url(#g)" stroke-width="2" />
-                <circle cx="150" cy="120" r="8" fill="#06B6D4" />
-                <g stroke="rgba(255,255,255,.3)" stroke-width="1.2">
-                    <line x1="150" y1="120" x2="60" y2="50" />
-                    <line x1="150" y1="120" x2="250" y2="60" />
-                    <line x1="150" y1="120" x2="40" y2="180" />
-                    <line x1="150" y1="120" x2="260" y2="190" />
-                    <line x1="150" y1="120" x2="150" y2="30" />
-                    <line x1="150" y1="120" x2="150" y2="215" />
-                </g>
-                <g fill="#67e8f9">
-                    <circle cx="60" cy="50" r="6" />
-                    <circle cx="250" cy="60" r="6" />
-                    <circle cx="40" cy="180" r="6" />
-                    <circle cx="260" cy="190" r="6" />
-                    <circle cx="150" cy="30" r="6" />
-                    <circle cx="150" cy="215" r="6" />
-                </g>
-                <text x="150" y="125" text-anchor="middle" fill="#fff" font-size="9" font-family="Poppins">AI
-                    Core</text>
-            </svg>
-            <p style="color:#94a3b8;font-size:.82rem;text-align:center;margin-top:12px">Attention · Memory ·
-                Reasoning · Empathy · Decision-Making</p>
+        <!-- Replace the hero-visual div with this -->
+        <div class="hero-visual reveal">
+            <div class="visual-glow"></div>
+            <div class="brain-network">
+                <div class="brain-core">
+                    <div class="core-pulse"></div>
+                    <div class="core-inner">
+                        <span>AI</span>
+                    </div>
+                </div>
+
+                <div class="skill-orb orb-1" data-skill="Attention">
+                    <div class="orb-inner">🎯</div>
+                </div>
+                <div class="skill-orb orb-2" data-skill="Memory">
+                    <div class="orb-inner">🧩</div>
+                </div>
+                <div class="skill-orb orb-3" data-skill="Logic">
+                    <div class="orb-inner">⚡</div>
+                </div>
+                <div class="skill-orb orb-4" data-skill="Empathy">
+                    <div class="orb-inner">💚</div>
+                </div>
+                <div class="skill-orb orb-5" data-skill="Decision">
+                    <div class="orb-inner">🎲</div>
+                </div>
+                <div class="skill-orb orb-6" data-skill="Creative">
+                    <div class="orb-inner">🎨</div>
+                </div>
+
+                <svg class="network-connections" viewBox="0 0 300 300">
+                    <g stroke="rgba(103,232,249,0.3)" stroke-width="1.5">
+                        <line class="conn-line" x1="150" y1="150" x2="80" y2="80" />
+                        <line class="conn-line" x1="150" y1="150" x2="220" y2="80" />
+                        <line class="conn-line" x1="150" y1="150" x2="60" y2="180" />
+                        <line class="conn-line" x1="150" y1="150" x2="240" y2="180" />
+                        <line class="conn-line" x1="150" y1="150" x2="100" y2="250" />
+                        <line class="conn-line" x1="150" y1="150" x2="200" y2="250" />
+                    </g>
+                </svg>
+            </div>
+            <p class="visual-caption">6 Core Skills · AI-Powered Assessment</p>
         </div>
     </div>
 </header>
@@ -103,9 +114,9 @@
                         <span class="pill">Attention</span><span class="pill">Memory</span><span
                             class="pill">Logical Thinking</span>
                         <span class="pill">Critical Thinking</span><span class="pill">Abstract
-                                Thinking</span><span class="pill">Creative Thinking</span>
+                            Thinking</span><span class="pill">Creative Thinking</span>
                         <span class="pill">Problem Solving</span><span class="pill">Decision
-                                Making</span><span class="pill">Metacognition</span>
+                            Making</span><span class="pill">Metacognition</span>
                         <span class="pill">Hypothetical Thinking</span>
                     </div>
                     <a href="{{ route('cognitive') }}" class="btn btn-secondary" style="margin-top:22px">View
@@ -120,11 +131,11 @@
                         <span class="pill">Self-Awareness</span><span class="pill">Empathy</span><span
                             class="pill">Critical Thinking</span>
                         <span class="pill">Creative Thinking</span><span class="pill">Decision
-                                Making</span><span class="pill">Problem Solving</span>
+                            Making</span><span class="pill">Problem Solving</span>
                         <span class="pill">Communication</span><span class="pill">Interpersonal
-                                Relationship</span>
+                            Relationship</span>
                         <span class="pill">Coping with Stress</span><span class="pill">Managing
-                                Emotions</span>
+                            Emotions</span>
                     </div>
                     <a href="{{ route('life-skill') }}" class="btn btn-secondary" style="margin-top:22px">View
                         Life Skill Framework →</a>
@@ -133,7 +144,8 @@
             <div class="tab-panel">
                 <div class="card reveal">
                     <h3>Leadership Skill Development Framework</h3>
-                    <p>A structured framework developing 10 essential leadership competencies for academic, professional, and entrepreneurial success.</p>
+                    <p>A structured framework developing 10 essential leadership competencies for academic,
+                        professional, and entrepreneurial success.</p>
                     <div class="skill-pills">
                         <span class="pill">Collaboration & Teamwork</span>
                         <span class="pill">Time Management</span>
@@ -146,7 +158,8 @@
                         <span class="pill">Delegation</span>
                         <span class="pill">Self-Regulation</span>
                     </div>
-                    <a href="{{ route('leadership-skill') }}" class="btn btn-secondary" style="margin-top:22px">View Leadership Framework →</a>
+                    <a href="{{ route('leadership-skill') }}" class="btn btn-secondary" style="margin-top:22px">View
+                        Leadership Framework →</a>
                 </div>
             </div>
         </div>
@@ -236,23 +249,57 @@
                 <li>✅ Built for Indian, multilingual classrooms</li>
             </ul>
         </div>
+        <!-- Replace the hero-visual div with this -->
         <div class="hero-visual reveal">
-            <svg viewBox="0 0 300 180" width="100%">
-                <defs>
-                    <linearGradient id="b" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0" stop-color="#2563EB" />
-                        <stop offset="1" stop-color="#06B6D4" />
-                    </linearGradient>
-                </defs>
-                <rect x="20" y="120" width="40" height="40" rx="6" fill="url(#b)" />
-                <rect x="80" y="90" width="40" height="70" rx="6" fill="url(#b)"
-                      opacity=".8" />
-                <rect x="140" y="60" width="40" height="100" rx="6" fill="url(#b)"
-                      opacity=".9" />
-                <rect x="200" y="40" width="40" height="120" rx="6" fill="#06B6D4" />
-                <text x="150" y="25" text-anchor="middle" fill="#fff" font-size="11"
-                      font-family="Poppins">Skill Growth Over Time</text>
-            </svg>
+            <div class="visual-glow"></div>
+            <div class="learning-flow">
+                <div class="flow-node node-start">
+                    <div class="node-inner">
+                        <span class="node-icon">👤</span>
+                    </div>
+                    <span class="node-label">Learner</span>
+                </div>
+
+                <svg class="flow-path" viewBox="0 0 300 200">
+                    <path class="path-line" d="M 50,100 Q 100,40 150,100 T 250,100" stroke="url(#flowGradient)"
+                        stroke-width="3" fill="none" stroke-dasharray="8 4" />
+                    <defs>
+                        <linearGradient id="flowGradient" x1="0" y1="0" x2="1"
+                            y2="0">
+                            <stop offset="0%" stop-color="#06B6D4" />
+                            <stop offset="100%" stop-color="#2563EB" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+
+                <div class="flow-node node-assess">
+                    <div class="node-inner">
+                        <span class="node-icon">📊</span>
+                    </div>
+                    <span class="node-label">Assess</span>
+                </div>
+
+                <div class="flow-node node-learn">
+                    <div class="node-inner">
+                        <span class="node-icon">🎓</span>
+                    </div>
+                    <span class="node-label">Learn</span>
+                </div>
+
+                <div class="flow-node node-grow">
+                    <div class="node-inner">
+                        <span class="node-icon">🚀</span>
+                    </div>
+                    <span class="node-label">Grow</span>
+                </div>
+
+                <div class="flow-particles">
+                    <span class="particle p-1"></span>
+                    <span class="particle p-2"></span>
+                    <span class="particle p-3"></span>
+                </div>
+            </div>
+            <p class="visual-caption">Personalized AI-Driven Learning Journey</p>
         </div>
     </div>
 </section>
