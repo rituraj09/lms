@@ -11,7 +11,7 @@
     @if (session()->has('success'))
         <div class="alert alert-success alert-dismissible fade show
                     d-flex align-items-center mb-4"
-             role="alert">
+            role="alert">
             <i class="ri ri-checkbox-circle-line me-2 fs-5"></i>
             <div>{{ session('success') }}</div>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -21,7 +21,7 @@
     @if (session()->has('error'))
         <div class="alert alert-danger alert-dismissible fade show
                     d-flex align-items-center mb-4"
-             role="alert">
+            role="alert">
             <i class="ri ri-error-warning-line me-2 fs-5"></i>
             <div>{{ session('error') }}</div>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -85,7 +85,7 @@
                 @endif
 
                 <button type="button" wire:click="saveGroup" wire:loading.attr="disabled"
-                        class="btn btn-primary btn-sm shadow-sm">
+                    class="btn btn-primary btn-sm shadow-sm">
                     <span wire:loading wire:target="saveGroup">
                         <span class="spinner-border spinner-border-sm me-1"></span>
                         Saving…
@@ -136,12 +136,12 @@
                                         <span class="text-danger">*</span>
                                     </label>
                                     <select wire:model.live="questions_category"
-                                            class="form-select @error('questions_category') is-invalid @enderror">
+                                        class="form-select @error('questions_category') is-invalid @enderror">
                                         <option value="single">Single</option>
                                         <option value="multiple">Multiple</option>
                                     </select>
                                     @error('questions_category')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                        <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
 
                                     {{-- Helper text --}}
@@ -185,8 +185,8 @@
                                 @foreach ($languages as $langCode => $lang)
                                     <li class="nav-item">
                                         <button type="button" @click="activeTab = '{{ $langCode }}'"
-                                                class="nav-link py-1 px-3"
-                                                :class="{ 'active': activeTab === '{{ $langCode }}' }">
+                                            class="nav-link py-1 px-3"
+                                            :class="{ 'active': activeTab === '{{ $langCode }}' }">
                                             {{ $lang['flag'] }} {{ $lang['label'] }}
                                         </button>
                                     </li>
@@ -201,7 +201,7 @@
                                         {{ $lang['flag'] }} {{ $lang['label'] }} — Group Title
                                     </label>
                                     <textarea wire:model="group_content.title.{{ $langCode }}" class="form-control" rows="2"
-                                              placeholder="Enter group title in {{ $lang['label'] }}...">
+                                        placeholder="Enter group title in {{ $lang['label'] }}...">
                                 </textarea>
                                 </div>
                             @endforeach
@@ -243,8 +243,8 @@
                                     @foreach ($languages as $langCode => $lang)
                                         <li class="nav-item">
                                             <button type="button" @click="contentTab = '{{ $langCode }}'"
-                                                    class="nav-link py-1 px-3"
-                                                    :class="{ 'active': contentTab === '{{ $langCode }}' }">
+                                                class="nav-link py-1 px-3"
+                                                :class="{ 'active': contentTab === '{{ $langCode }}' }">
                                                 {{ $lang['flag'] }} {{ $lang['label'] }}
                                                 @if ($langCode === 'en')
                                                     <span class="text-danger ms-1">*</span>
@@ -258,10 +258,10 @@
                             <div class="card-body p-4">
 
                                 @error('group_content.content.en')
-                                <div class="alert alert-danger py-2 small mb-3">
-                                    <i class="ri ri-error-warning-line me-1"></i>
-                                    {{ $message }}
-                                </div>
+                                    <div class="alert alert-danger py-2 small mb-3">
+                                        <i class="ri ri-error-warning-line me-1"></i>
+                                        {{ $message }}
+                                    </div>
                                 @enderror
 
                                 @foreach ($languages as $langCode => $lang)
@@ -303,12 +303,12 @@
                                                 }
                                             }
                                         );
-
+                                        
                                         {{-- Pre-fill editor with existing content --}}
                                         if (content) {
                                             groupQuill_{{ $langCode }}.root.innerHTML = content;
                                         }
-
+                                        
                                         {{-- Sync to Livewire on blur / focus-out --}}
                                         groupQuill_{{ $langCode }}.on('selection-change', function(range) {
                                             if (range === null) {
@@ -318,7 +318,7 @@
                                                 );
                                             }
                                         });
-
+                                        
                                         {{-- Also sync on text-change for real-time safety --}}
                                         groupQuill_{{ $langCode }}.on('text-change', function() {
                                             $wire.set(
@@ -327,7 +327,7 @@
                                             );
                                         });">
                                             <div x-ref="groupContentEditor_{{ $langCode }}"
-                                                 style="min-height: 280px;"></div>
+                                                style="min-height: 280px;"></div>
                                         </div>
 
                                     </div>
@@ -347,22 +347,19 @@
 
 
                         {{-- Show existing saved image --}}
-                        @if($existingGroupContentImage && !$groupContentImage)
+                        @if ($existingGroupContentImage && !$groupContentImage)
                             <div class="border rounded p-3 mb-3 bg-light">
                                 <div class="d-flex align-items-start gap-3">
-                                    <img src="{{ Storage::url($existingGroupContentImage) }}"
-                                         alt="Passage Image"
-                                         class="rounded border"
-                                         style="width:120px;height:90px;object-fit:cover;">
+                                    <img src="{{ Storage::url($existingGroupContentImage) }}" alt="Passage Image"
+                                        class="rounded border" style="width:120px;height:90px;object-fit:cover;">
                                     <div class="flex-grow-1">
                                         <p class="mb-1 fw-semibold small">Current Image</p>
                                         <p class="text-muted x-small mb-2">
                                             {{ basename($existingGroupContentImage) }}
                                         </p>
-                                        @if(!$isGroupLocked)
-                                            <button type="button"
-                                                    wire:click="removeGroupContentImagePath"
-                                                    class="btn btn-sm btn-outline-danger">
+                                        @if (!$isGroupLocked)
+                                            <button type="button" wire:click="removeGroupContentImagePath"
+                                                class="btn btn-sm btn-outline-danger">
                                                 <i class="ri ri-delete-bin-line me-1"></i>
                                                 Remove
                                             </button>
@@ -373,22 +370,19 @@
                         @endif
 
                         {{-- Show newly selected preview --}}
-                        @if($groupContentImage)
+                        @if ($groupContentImage)
                             <div class="border rounded p-3 mb-3 bg-light">
                                 <div class="d-flex align-items-start gap-3">
-                                    <img src="{{ $groupContentImage->temporaryUrl() }}"
-                                         alt="New Image Preview"
-                                         class="rounded border"
-                                         style="width:120px;height:90px;object-fit:cover;">
+                                    <img src="{{ $groupContentImage->temporaryUrl() }}" alt="New Image Preview"
+                                        class="rounded border" style="width:120px;height:90px;object-fit:cover;">
                                     <div class="flex-grow-1">
                                         <p class="mb-1 fw-semibold small">New Image (not saved yet)</p>
                                         <p class="text-muted x-small mb-2">
                                             {{ $groupContentImage->getClientOriginalName() }}
                                             ({{ number_format($groupContentImage->getSize() / 1024, 1) }} KB)
                                         </p>
-                                        <button type="button"
-                                                wire:click="removeGroupContentImageUpload"
-                                                class="btn btn-sm btn-outline-danger">
+                                        <button type="button" wire:click="removeGroupContentImageUpload"
+                                            class="btn btn-sm btn-outline-danger">
                                             <i class="ri ri-close-line me-1"></i>
                                             Discard
                                         </button>
@@ -398,12 +392,12 @@
                         @endif
 
                         {{-- Upload area --}}
-                        @if(!$isGroupLocked && !$groupContentImage)
+                        @if (!$isGroupLocked && !$groupContentImage)
                             <label for="groupContentImageInput"
-                                   class="border border-2 border-dashed rounded p-4 d-flex flex-column
+                                class="border border-2 border-dashed rounded p-4 d-flex flex-column
                                               align-items-center justify-content-center text-center cursor-pointer
                                               bg-light hover-bg-white"
-                                   style="min-height:120px;transition:all .2s ease;">
+                                style="min-height:120px;transition:all .2s ease;">
 
                                 {{-- Loading state --}}
                                 <div wire:loading wire:target="groupContentImage">
@@ -420,63 +414,60 @@
                                     <p class="text-muted x-small mb-0">JPG, PNG, WEBP — max 5 MB</p>
                                 </div>
 
-                                <input id="groupContentImageInput"
-                                       type="file"
-                                       wire:model="groupContentImage"
-                                       accept="image/*"
-                                       class="d-none">
+                                <input id="groupContentImageInput" type="file" wire:model="groupContentImage"
+                                    accept="image/*" class="d-none">
                             </label>
                         @endif
 
                         @error('groupContentImage')
-                        <div class="alert alert-danger alert-sm mt-2 mb-0">
-                            <i class="ri ri-error-warning-line me-1"></i>
-                            {{ $message }}
-                        </div>
+                            <div class="alert alert-danger alert-sm mt-2 mb-0">
+                                <i class="ri ri-error-warning-line me-1"></i>
+                                {{ $message }}
+                            </div>
                         @enderror
 
-                {{-- /Passage Image Upload --}}
-                @endif
-                {{-- /group_content quill --}}
+                        {{-- /Passage Image Upload --}}
+                    @endif
+                    {{-- /group_content quill --}}
 
-                <div class="card shadow-sm border-0 mb-4">
-                    <div
-                        class="card-header bg-white border-bottom py-3
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div
+                            class="card-header bg-white border-bottom py-3
                                 d-flex align-items-center justify-content-between">
-                        <h6 class="mb-0 fw-semibold text-dark">
-                            <i class="ri ri-admin-fill text-primary me-2"></i>
-                            Admin Note
-                        </h6>
+                            <h6 class="mb-0 fw-semibold text-dark">
+                                <i class="ri ri-admin-fill text-primary me-2"></i>
+                                Admin Note
+                            </h6>
 
-                    </div>
-                    {{-- Admin Note --}}
-                    <div class="card-body p-4">
-                        <label class="form-label fw-medium small">Admin Note</label>
-                        <textarea wire:model="admin_note" class="form-control border-0 bg-light" rows="2"
-                                  placeholder="Internal note...">
+                        </div>
+                        {{-- Admin Note --}}
+                        <div class="card-body p-4">
+                            <label class="form-label fw-medium small">Admin Note</label>
+                            <textarea wire:model="admin_note" class="form-control border-0 bg-light" rows="2"
+                                placeholder="Internal note...">
                             </textarea>
 
+                        </div>
                     </div>
                 </div>
-            </div>
-            {{-- /left --}}
+                {{-- /left --}}
 
 
-            {{-- ── RIGHT COLUMN ────────────────────────────────── --}}
-            <div class="col-lg-4">
+                {{-- ── RIGHT COLUMN ────────────────────────────────── --}}
+                <div class="col-lg-4">
 
-                {{-- How it works --}}
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-header bg-white border-bottom py-3">
-                        <h6 class="mb-0 fw-semibold text-dark">
-                            <i class="ri ri-information-2-line text-primary me-2"></i>
-                            How it works
-                        </h6>
-                    </div>
-                    <div class="card-body p-3">
-                        <ul class="list-unstyled mb-0 small">
+                    {{-- How it works --}}
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-header bg-white border-bottom py-3">
+                            <h6 class="mb-0 fw-semibold text-dark">
+                                <i class="ri ri-information-2-line text-primary me-2"></i>
+                                How it works
+                            </h6>
+                        </div>
+                        <div class="card-body p-3">
+                            <ul class="list-unstyled mb-0 small">
 
-                            <li class="mb-3 d-flex gap-2">
+                                <li class="mb-3 d-flex gap-2">
                                     <span
                                         class="badge bg-primary rounded-pill
                                              flex-shrink-0 mt-1"
@@ -486,12 +477,12 @@
                                              justify-content:center;">
                                         1
                                     </span>
-                                <span class="text-muted">
+                                    <span class="text-muted">
                                         Fill in group details and save.
                                     </span>
-                            </li>
+                                </li>
 
-                            <li class="mb-3 d-flex gap-2">
+                                <li class="mb-3 d-flex gap-2">
                                     <span
                                         class="badge bg-primary rounded-pill
                                              flex-shrink-0 mt-1"
@@ -501,12 +492,12 @@
                                              justify-content:center;">
                                         2
                                     </span>
-                                <span class="text-muted">
+                                    <span class="text-muted">
                                         Add questions one by one.
                                     </span>
-                            </li>
+                                </li>
 
-                            <li class="mb-3 d-flex gap-2">
+                                <li class="mb-3 d-flex gap-2">
                                     <span
                                         class="badge bg-primary rounded-pill
                                              flex-shrink-0 mt-1"
@@ -516,432 +507,438 @@
                                              justify-content:center;">
                                         3
                                     </span>
-                                <span class="text-muted">
+                                    <span class="text-muted">
                                         Edit group or questions anytime.
                                     </span>
-                            </li>
+                                </li>
 
-                            {{-- Extra tip for multiple --}}
-                            @if ($questions_category === 'multiple')
-                                <li class="mt-3 pt-3 border-top d-flex gap-2">
-                                    <i class="ri ri-lightbulb-line text-warning flex-shrink-0 mt-1"></i>
-                                    <span class="text-muted">
+                                {{-- Extra tip for multiple --}}
+                                @if ($questions_category === 'multiple')
+                                    <li class="mt-3 pt-3 border-top d-flex gap-2">
+                                        <i class="ri ri-lightbulb-line text-warning flex-shrink-0 mt-1"></i>
+                                        <span class="text-muted">
                                             <strong>Multiple category:</strong>
                                             The passage you write will be shown
                                             above all questions in this group
                                             during the assessment.
                                         </span>
-                                </li>
-                            @endif
+                                    </li>
+                                @endif
 
-                        </ul>
-                    </div>
+                            </ul>
+                        </div>
 
-                    <div class="card-footer bg-white p-3">
-                        <button type="button" wire:click="saveGroup" wire:loading.attr="disabled"
+                        <div class="card-footer bg-white p-3">
+                            <button type="button" wire:click="saveGroup" wire:loading.attr="disabled"
                                 class="btn btn-primary w-100">
                                 <span wire:loading wire:target="saveGroup">
                                     <span class="spinner-border spinner-border-sm me-1"></span>
                                     Saving…
                                 </span>
-                            <span wire:loading.remove wire:target="saveGroup">
+                                <span wire:loading.remove wire:target="saveGroup">
                                     <i class="ri ri-save-line me-1"></i>
                                     {{ $groupId ? 'Update Group' : 'Save & Continue' }}
                                 </span>
-                        </button>
+                            </button>
+                        </div>
                     </div>
-                </div>
 
-                {{-- Category Info Card --}}
-                <div
-                    class="card border-0 mb-4
+                    {{-- Category Info Card --}}
+                    <div
+                        class="card border-0 mb-4
                     {{ $questions_category === 'multiple' ? 'bg-info-subtle border border-info-subtle' : 'bg-light' }}">
-                    <div class="card-body p-3">
+                        <div class="card-body p-3">
 
-                        @if ($questions_category === 'multiple')
-                            <div class="d-flex gap-2">
-                                <i class="ri ri-file-copy-2-line text-info fs-5 flex-shrink-0"></i>
-                                <div>
-                                    <p class="fw-semibold text-info mb-1 small">
-                                        Multiple Category Selected
-                                    </p>
-                                    <p class="text-muted small mb-0">
-                                        A rich text passage editor is available
-                                        in 4 languages. Students will read this
-                                        passage before answering questions.
-                                    </p>
+                            @if ($questions_category === 'multiple')
+                                <div class="d-flex gap-2">
+                                    <i class="ri ri-file-copy-2-line text-info fs-5 flex-shrink-0"></i>
+                                    <div>
+                                        <p class="fw-semibold text-info mb-1 small">
+                                            Multiple Category Selected
+                                        </p>
+                                        <p class="text-muted small mb-0">
+                                            A rich text passage editor is available
+                                            in 4 languages. Students will read this
+                                            passage before answering questions.
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
-                        @else
-                            <div class="d-flex gap-2">
-                                <i class="ri ri-question-line text-muted fs-5 flex-shrink-0"></i>
-                                <div>
-                                    <p class="fw-semibold text-muted mb-1 small">
-                                        Single Category Selected
-                                    </p>
-                                    <p class="text-muted small mb-0">
-                                        Each question is standalone.
-                                        No passage/context is needed.
-                                    </p>
+                            @else
+                                <div class="d-flex gap-2">
+                                    <i class="ri ri-question-line text-muted fs-5 flex-shrink-0"></i>
+                                    <div>
+                                        <p class="fw-semibold text-muted mb-1 small">
+                                            Single Category Selected
+                                        </p>
+                                        <p class="text-muted small mb-0">
+                                            Each question is standalone.
+                                            No passage/context is needed.
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
-                        @endif
+                            @endif
 
+                        </div>
                     </div>
+
                 </div>
+                {{-- /right --}}
 
             </div>
-        {{-- /right --}}
+        </form>
 
-</div>
-</form>
-
-@endif
-{{-- /group_form --}}
+    @endif
+    {{-- /group_form --}}
 
 
-{{-- ══════════════════════════════════════════════════════════════
+    {{-- ══════════════════════════════════════════════════════════════
      ██████  VIEW 2 — GROUP VIEW  (Readonly Group + Questions List)
 ══════════════════════════════════════════════════════════════ --}}
-@if ($view === 'group_view')
+    @if ($view === 'group_view')
 
-    {{-- Header --}}
-    <div class="d-flex align-items-center justify-content-between mb-4">
-        <div>
-            <h4 class="fw-bold mb-1 text-dark">
-                <i class="ri ri-folder-2-fill text-primary me-2"></i>
-                {{ $group_content['title'][array_key_first($languages)] ?? $group_code }}
-            </h4>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0 small">
-                    <li class="breadcrumb-item">
-                        <a href="{{ route('admin.questions.index') }}">
-                            Question Groups
-                        </a>
-                    </li>
-                    <li class="breadcrumb-item active">Group Detail</li>
-                </ol>
-            </nav>
-        </div>
+        {{-- Header --}}
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h4 class="fw-bold mb-1 text-dark">
+                    <i class="ri ri-folder-2-fill text-primary me-2"></i>
+                    {{ $group_content['title'][array_key_first($languages)] ?? $group_code }}
+                </h4>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0 small">
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('admin.questions.index') }}">
+                                Question Groups
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active">Group Detail</li>
+                    </ol>
+                </nav>
+            </div>
 
-        <div class="d-flex gap-2">
-            <a href="{{ route('admin.questions.index') }}" class="btn btn-outline-secondary btn-sm">
-                <i class="ri ri-arrow-left-line me-1"></i> Back to List
-            </a>
+            <div class="d-flex gap-2">
+                <a href="{{ route('admin.questions.index') }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="ri ri-arrow-left-line me-1"></i> Back to List
+                </a>
 
-            @if (!$isGroupLocked)
-                <button type="button" wire:click="editGroup" class="btn btn-outline-primary btn-sm">
-                    <i class="ri ri-pencil-line me-1"></i> Edit Group
+                @if (!$isGroupLocked)
+                    <button type="button" wire:click="editGroup" class="btn btn-outline-primary btn-sm">
+                        <i class="ri ri-pencil-line me-1"></i> Edit Group
+                    </button>
+                @endif
+
+                <button type="button" wire:click="addNewQuestion" class="btn btn-primary btn-sm shadow-sm">
+                    <i class="ri ri-add-large-line me-1"></i> Add Question
                 </button>
-            @endif
-
-            <button type="button" wire:click="addNewQuestion" class="btn btn-primary btn-sm shadow-sm">
-                <i class="ri ri-add-large-line me-1"></i> Add Question
-            </button>
+            </div>
         </div>
-    </div>
 
-    <div class="row g-4">
+        <div class="row g-4">
 
-        {{-- Left — Questions List --}}
-        <div class="col-lg-8">
+            {{-- Left — Questions List --}}
+            <div class="col-lg-8">
 
-            <div class="card shadow-sm border-0">
-                <div
-                    class="card-header bg-white border-bottom py-3
+                <div class="card shadow-sm border-0">
+                    <div
+                        class="card-header bg-white border-bottom py-3
                                 d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0 fw-semibold text-dark">
-                        <i class="ri ri-questionnaire-line text-primary me-2"></i>
-                        Questions
-                        <span class="badge bg-primary ms-1">
+                        <h6 class="mb-0 fw-semibold text-dark">
+                            <i class="ri ri-questionnaire-line text-primary me-2"></i>
+                            Questions
+                            <span class="badge bg-primary ms-1">
                                 {{ count($questionsList) }}
                             </span>
-                    </h6>
-                    <button type="button" wire:click="addNewQuestion" class="btn btn-sm btn-outline-primary">
-                        <i class="ri ri-add-large-line me-1"></i> Add Question
-                    </button>
-                </div>
 
-                <div class="card-body p-0">
+                            {{-- ✅ Total Marks Badge added here --}}
+                            <span class="badge bg-success ms-1">
+                                <i class="ri ri-trophy-line me-1"></i>
+                                {{ collect($questionsList)->sum('marks') }} Marks
+                            </span>
+                        </h6>
+                        <button type="button" wire:click="addNewQuestion" class="btn btn-sm btn-outline-primary">
+                            <i class="ri ri-add-large-line me-1"></i> Add Question
+                        </button>
+                    </div>
 
-                    @forelse ($questionsList as $qi => $q)
-                        <div class="border-bottom px-4 py-3
+                    <div class="card-body p-0">
+
+                        @forelse ($questionsList as $qi => $q)
+                            <div class="border-bottom px-4 py-3
                                         hover-bg-light transition
                                         {{ $q['in_assessment'] ? 'bg-warning-subtle' : '' }}"
-                             wire:key="qlist-{{ $q['id'] }}">
+                                wire:key="qlist-{{ $q['id'] }}">
 
-                            <div class="d-flex align-items-start justify-content-between gap-3">
+                                <div class="d-flex align-items-start justify-content-between gap-3">
 
-                                {{-- Left info --}}
-                                <div class="d-flex align-items-start gap-3">
+                                    {{-- Left info --}}
+                                    <div class="d-flex align-items-start gap-3">
 
-                                    {{-- Number --}}
-                                    <span
-                                        class="badge bg-primary-subtle text-primary
+                                        {{-- Number --}}
+                                        <span
+                                            class="badge bg-primary-subtle text-primary
                                                      fw-bold rounded-circle d-inline-flex
                                                      align-items-center justify-content-center
                                                      flex-shrink-0 mt-1"
-                                        style="width:32px;height:32px;">
+                                            style="width:32px;height:32px;">
                                             {{ $qi + 1 }}
                                         </span>
 
-                                    <div>
-                                        {{-- Stem preview --}}
-                                        <p class="mb-1 fw-medium text-dark small">
-                                            {{ Str::limit($q['stem_en'] ?: '(No English stem)', 80) }}
-                                        </p>
+                                        <div>
+                                            {{-- Stem preview --}}
+                                            <p class="mb-1 fw-medium text-dark small">
+                                                {{ Str::limit($q['stem_en'] ?: '(No English stem)', 80) }}
+                                            </p>
 
-                                        <div class="d-flex flex-wrap gap-2">
+                                            <div class="d-flex flex-wrap gap-2">
 
-                                            {{-- Answer category --}}
-                                            @if ($q['answer_category'] === 'single_choice')
-                                                <span
-                                                    class="badge bg-primary-subtle text-primary border border-primary-subtle small">
+                                                {{-- Answer category --}}
+                                                @if ($q['answer_category'] === 'single_choice')
+                                                    <span
+                                                        class="badge bg-primary-subtle text-primary border border-primary-subtle small">
                                                         <i class="ri ri-record-circle-line me-1"></i>Single
                                                     </span>
-                                            @elseif ($q['answer_category'] === 'multi_choice')
-                                                <span
-                                                    class="badge bg-info-subtle text-info border border-info-subtle small">
+                                                @elseif ($q['answer_category'] === 'multi_choice')
+                                                    <span
+                                                        class="badge bg-info-subtle text-info border border-info-subtle small">
                                                         <i class="ri ri-checkbox-multiple-line me-1"></i>Multi
                                                     </span>
-                                            @else
-                                                <span
-                                                    class="badge bg-secondary-subtle text-secondary border border-secondary-subtle small">
+                                                @else
+                                                    <span
+                                                        class="badge bg-secondary-subtle text-secondary border border-secondary-subtle small">
                                                         <i class="ri ri-text me-1"></i>Open Text
                                                     </span>
-                                            @endif
+                                                @endif
 
-                                            {{-- Marks --}}
-                                            <span
-                                                class="badge bg-success-subtle text-success border border-success-subtle small">
+                                                {{-- Marks --}}
+                                                <span
+                                                    class="badge bg-success-subtle text-success border border-success-subtle small">
                                                     <i class="ri ri-trophy-line me-1"></i>
                                                     {{ $q['marks'] }} Mark(s)
                                                 </span>
 
-                                            {{-- Options count --}}
-                                            @if ($q['answer_category'] !== 'open_text')
-                                                <span class="badge bg-light text-dark border small">
+                                                {{-- Options count --}}
+                                                @if ($q['answer_category'] !== 'open_text')
+                                                    <span class="badge bg-light text-dark border small">
                                                         <i class="ri ri-list-check-3 me-1"></i>
                                                         {{ $q['options_count'] }} Options
                                                     </span>
-                                            @endif
+                                                @endif
 
-                                            {{-- Difficulty --}}
-                                            <span class="badge bg-light text-dark border small">
+                                                {{-- Difficulty --}}
+                                                <span class="badge bg-light text-dark border small">
                                                     {{ $q['difficulty'] }}
                                                 </span>
 
-                                            {{-- In assessment --}}
-                                            @if ($q['in_assessment'])
-                                                <span
-                                                    class="badge bg-warning-subtle text-warning border border-warning-subtle small">
+                                                {{-- In assessment --}}
+                                                @if ($q['in_assessment'])
+                                                    <span
+                                                        class="badge bg-warning-subtle text-warning border border-warning-subtle small">
                                                         <i class="ri ri-lock-line me-1"></i>In Assessment
                                                     </span>
-                                            @endif
+                                                @endif
 
+                                            </div>
+
+                                            <p class="mb-0 mt-1 text-muted" style="font-size:.75rem;">
+                                                {{ $q['question_code'] }} •
+                                                {{ $q['primary_skill'] }} •
+                                                {{ $q['age_group'] }}
+                                            </p>
                                         </div>
 
-                                        <p class="mb-0 mt-1 text-muted" style="font-size:.75rem;">
-                                            {{ $q['question_code'] }} •
-                                            {{ $q['primary_skill'] }} •
-                                            {{ $q['age_group'] }}
-                                        </p>
                                     </div>
 
-                                </div>
+                                    {{-- Actions --}}
+                                    <div class="d-flex gap-2 flex-shrink-0">
 
-                                {{-- Actions --}}
-                                <div class="d-flex gap-2 flex-shrink-0">
-
-                                    @if (!$q['in_assessment'])
-                                        <button type="button" wire:click="editQuestion({{ $q['id'] }})"
+                                        @if (!$q['in_assessment'])
+                                            <button type="button" wire:click="editQuestion({{ $q['id'] }})"
                                                 class="btn btn-sm btn-outline-primary">
-                                            <i class="ri ri-pencil-line"></i>
-                                        </button>
+                                                <i class="ri ri-pencil-line"></i>
+                                            </button>
 
-                                        <button type="button" wire:click="deleteQuestion({{ $q['id'] }})"
+                                            <button type="button" wire:click="deleteQuestion({{ $q['id'] }})"
                                                 wire:confirm="Delete this question permanently?"
                                                 class="btn btn-sm btn-outline-danger">
-                                            <i class="ri ri-delete-bin-line"></i>
-                                        </button>
-                                    @else
-                                        <button type="button"   wire:click.stop="viewQuestion({{ $q['id'] }})"
-                                                class="btn btn-sm btn-outline-secondary"
-                                                title="Used in assessment">
-                                            <i class="ri ri-eye-line"></i>
-                                        </button>
-                                    @endif
+                                                <i class="ri ri-delete-bin-line"></i>
+                                            </button>
+                                        @else
+                                            <button type="button"
+                                                wire:click.stop="viewQuestion({{ $q['id'] }})"
+                                                class="btn btn-sm btn-outline-secondary" title="Used in assessment">
+                                                <i class="ri ri-eye-line"></i>
+                                            </button>
+                                        @endif
 
+                                    </div>
                                 </div>
+
                             </div>
 
-                        </div>
+                        @empty
+                            <div class="text-center py-5 text-muted">
+                                <i class="ri ri-questionnaire-line" style="font-size:3rem;opacity:.3;"></i>
+                                <h6 class="mt-3 fw-semibold">No Questions Yet</h6>
+                                <p class="small mb-4">
+                                    Click "Add Question" to start building this group.
+                                </p>
+                                <button type="button" wire:click="addNewQuestion" class="btn btn-primary btn-sm">
+                                    <i class="ri ri-add-large-line me-1"></i>
+                                    Add First Question
+                                </button>
+                            </div>
+                        @endforelse
 
-                    @empty
-                        <div class="text-center py-5 text-muted">
-                            <i class="ri ri-questionnaire-line" style="font-size:3rem;opacity:.3;"></i>
-                            <h6 class="mt-3 fw-semibold">No Questions Yet</h6>
-                            <p class="small mb-4">
-                                Click "Add Question" to start building this group.
-                            </p>
-                            <button type="button" wire:click="addNewQuestion" class="btn btn-primary btn-sm">
-                                <i class="ri ri-add-large-line me-1"></i>
-                                Add First Question
-                            </button>
-                        </div>
-                    @endforelse
-
+                    </div>
                 </div>
+
             </div>
 
-        </div>
+            {{-- Right — Group Info Card --}}
+            <div class="col-lg-4">
 
-        {{-- Right — Group Info Card --}}
-        <div class="col-lg-4">
-
-            {{-- Group Info --}}
-            <div class="card shadow-sm border-0 mb-4">
-                <div
-                    class="card-header bg-white border-bottom py-3
+                {{-- Group Info --}}
+                <div class="card shadow-sm border-0 mb-4">
+                    <div
+                        class="card-header bg-white border-bottom py-3
                                 d-flex align-items-center justify-content-between">
-                    <h6 class="mb-0 fw-semibold text-dark">
-                        <i class="ri ri-folder-info-line text-primary me-2"></i>
-                        Group Info
-                    </h6>
-                    @if (!$isGroupLocked)
-                        <button type="button" wire:click="editGroup" class="btn btn-sm btn-outline-primary">
-                            <i class="ri ri-pencil-line me-1"></i>Edit
-                        </button>
-                    @endif
-                </div>
+                        <h6 class="mb-0 fw-semibold text-dark">
+                            <i class="ri ri-folder-info-line text-primary me-2"></i>
+                            Group Info
+                        </h6>
+                        @if (!$isGroupLocked)
+                            <button type="button" wire:click="editGroup" class="btn btn-sm btn-outline-primary">
+                                <i class="ri ri-pencil-line me-1"></i>Edit
+                            </button>
+                        @endif
+                    </div>
 
-                <div class="card-body p-3">
-                    <ul class="list-group list-group-flush">
+                    <div class="card-body p-3">
+                        <ul class="list-group list-group-flush">
 
-                        <li
-                            class="list-group-item px-0 d-flex
-                                       justify-content-between align-items-center">
-                            <span class="small text-muted">Code</span>
-                            <code class="small">{{ $group_code }}</code>
-                        </li>
-
-                        <li
-                            class="list-group-item px-0 d-flex
-                                       justify-content-between align-items-center">
-                            <span class="small text-muted">Category</span>
-                            <span class="badge bg-primary-subtle text-primary">
-                                    {{ ucfirst($questions_category) }}
-                                </span>
-                        </li>
-
-                        @if ($isGroupLocked)
                             <li
                                 class="list-group-item px-0 d-flex
+                                       justify-content-between align-items-center">
+                                <span class="small text-muted">Code</span>
+                                <code class="small">{{ $group_code }}</code>
+                            </li>
+
+                            <li
+                                class="list-group-item px-0 d-flex
+                                       justify-content-between align-items-center">
+                                <span class="small text-muted">Category</span>
+                                <span class="badge bg-primary-subtle text-primary">
+                                    {{ ucfirst($questions_category) }}
+                                </span>
+                            </li>
+
+                            @if ($isGroupLocked)
+                                <li
+                                    class="list-group-item px-0 d-flex
                                            justify-content-between align-items-center">
-                                <span class="small text-muted">Status</span>
-                                <span class="badge bg-warning-subtle text-warning">
+                                    <span class="small text-muted">Status</span>
+                                    <span class="badge bg-warning-subtle text-warning">
                                         <i class="ri ri-lock-line me-1"></i>
                                         In Assessment
                                     </span>
-                            </li>
-                        @endif
+                                </li>
+                            @endif
 
-                        @if ($admin_note)
-                            <li class="list-group-item px-0">
+                            @if ($admin_note)
+                                <li class="list-group-item px-0">
                                     <span class="small text-muted d-block mb-1">
                                         Admin Note
                                     </span>
-                                <span class="small">{{ $admin_note }}</span>
-                            </li>
-                        @endif
+                                    <span class="small">{{ $admin_note }}</span>
+                                </li>
+                            @endif
 
-                        {{-- Titles per language --}}
-                        @foreach ($languages as $langCode => $lang)
-                            @if (!empty($group_content['title'][$langCode]))
-                                <li class="list-group-item px-0">
+                            {{-- Titles per language --}}
+                            @foreach ($languages as $langCode => $lang)
+                                @if (!empty($group_content['title'][$langCode]))
+                                    <li class="list-group-item px-0">
                                         <span class="small text-muted d-block mb-1">
                                             {{ $lang['flag'] }} {{ $lang['label'] }} Title
                                         </span>
-                                    <span class="small fw-medium">
+                                        <span class="small fw-medium">
                                             {{ $group_content['title'][$langCode] }}
                                         </span>
-                                </li>
-                            @endif
-                        @endforeach
+                                    </li>
+                                @endif
+                            @endforeach
 
-                    </ul>
+                        </ul>
+                    </div>
                 </div>
-            </div>
 
-            {{-- Summary --}}
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white border-bottom py-3">
-                    <h6 class="mb-0 fw-semibold text-dark">
-                        <i class="ri ri-bar-chart-box-line text-info me-2"></i>
-                        Summary
-                    </h6>
-                </div>
-                <div class="card-body p-3">
-                    <ul class="list-group list-group-flush">
+                {{-- Summary --}}
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h6 class="mb-0 fw-semibold text-dark">
+                            <i class="ri ri-bar-chart-box-line text-info me-2"></i>
+                            Summary
+                        </h6>
+                    </div>
+                    <div class="card-body p-3">
+                        <ul class="list-group list-group-flush">
 
-                        <li
-                            class="list-group-item px-0 d-flex
+                            <li
+                                class="list-group-item px-0 d-flex
                                        justify-content-between align-items-center">
-                            <span class="small text-muted">Total Questions</span>
-                            <span class="badge bg-primary rounded-pill">
+                                <span class="small text-muted">Total Questions</span>
+                                <span class="badge bg-primary rounded-pill">
                                     {{ count($questionsList) }}
                                 </span>
-                        </li>
+                            </li>
 
-                        <li
-                            class="list-group-item px-0 d-flex
+                            <li
+                                class="list-group-item px-0 d-flex
                                        justify-content-between align-items-center">
-                            <span class="small text-muted">Single Optional</span>
-                            <span class="badge bg-primary-subtle text-primary rounded-pill">
+                                <span class="small text-muted">Single Optional</span>
+                                <span class="badge bg-primary-subtle text-primary rounded-pill">
                                     {{ collect($questionsList)->where('answer_category', 'single_choice')->count() }}
                                 </span>
-                        </li>
+                            </li>
 
-                        <li
-                            class="list-group-item px-0 d-flex
+                            <li
+                                class="list-group-item px-0 d-flex
                                        justify-content-between align-items-center">
-                            <span class="small text-muted">Multi Optional</span>
-                            <span class="badge bg-info-subtle text-info rounded-pill">
+                                <span class="small text-muted">Multi Optional</span>
+                                <span class="badge bg-info-subtle text-info rounded-pill">
                                     {{ collect($questionsList)->where('answer_category', 'multi_choice')->count() }}
                                 </span>
-                        </li>
+                            </li>
 
-                        <li
-                            class="list-group-item px-0 d-flex
+                            <li
+                                class="list-group-item px-0 d-flex
                                        justify-content-between align-items-center">
-                            <span class="small text-muted">Open Text</span>
-                            <span class="badge bg-secondary-subtle text-secondary rounded-pill">
+                                <span class="small text-muted">Open Text</span>
+                                <span class="badge bg-secondary-subtle text-secondary rounded-pill">
                                     {{ collect($questionsList)->where('answer_category', 'open_text')->count() }}
                                 </span>
-                        </li>
+                            </li>
 
-                        <li
-                            class="list-group-item px-0 d-flex
+                            <li
+                                class="list-group-item px-0 d-flex
                                        justify-content-between align-items-center">
-                            <span class="small text-muted">Total Marks</span>
-                            <span class="badge bg-success rounded-pill">
+                                <span class="small text-muted">Total Marks</span>
+                                <span class="badge bg-success rounded-pill">
                                     {{ collect($questionsList)->sum('marks') }}
                                 </span>
-                        </li>
+                            </li>
 
-                    </ul>
+                        </ul>
+                    </div>
                 </div>
+
             </div>
 
         </div>
 
-    </div>
-
-@endif
-{{-- /group_view --}}
+    @endif
+    {{-- /group_view --}}
 
 
-{{-- ══════════════════════════════════════════════════════════════
+    {{-- ══════════════════════════════════════════════════════════════
   ██████  VIEW 3 — QUESTION FORM  (Add / Edit single question)
 ══════════════════════════════════════════════════════════════ --}}
 
@@ -958,13 +955,12 @@
 
                     {{-- Modal Header --}}
                     <div class="modal-header border-bottom py-3"
-                         style="background:linear-gradient(135deg,#4f46e5,#7c3aed);">
+                        style="background:linear-gradient(135deg,#4f46e5,#7c3aed);">
                         <h5 class="modal-title text-white">
                             <i class="ri ri-eye-line me-2"></i>Question Preview
                         </h5>
-                        <button type="button"
-                                wire:click="closeQuestionPreview"
-                                class="btn-close btn-close-white"></button>
+                        <button type="button" wire:click="closeQuestionPreview"
+                            class="btn-close btn-close-white"></button>
                     </div>
 
                     {{-- Modal Body --}}
@@ -977,21 +973,22 @@
                                 {{-- Answer Category Badge --}}
                                 @if ($previewQuestion['answer_category'] === 'single_optional')
                                     <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
-                                    Single Choice
-                                </span>
+                                        Single Choice
+                                    </span>
                                 @elseif ($previewQuestion['answer_category'] === 'multi_optional')
                                     <span class="badge bg-info-subtle text-info border border-info-subtle">
-                                    Multiple Choice
-                                </span>
+                                        Multiple Choice
+                                    </span>
                                 @else
-                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">
-                                    Open Ended
-                                </span>
+                                    <span
+                                        class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">
+                                        Open Ended
+                                    </span>
                                 @endif
                             </div>
                             <span class="badge bg-success fs-6 px-3 py-2">
-                            <i class="ri ri-trophy-line me-1"></i>{{ $previewQuestion['marks'] }} Mark(s)
-                        </span>
+                                <i class="ri ri-trophy-line me-1"></i>{{ $previewQuestion['marks'] }} Mark(s)
+                            </span>
                         </div>
 
                         {{-- Passage (if exists) --}}
@@ -1006,9 +1003,9 @@
 
                                 @foreach ($previewQuestion['stems'] as $lang => $stem)
                                     <div class="mb-3 p-3 bg-light rounded border">
-                                    <span class="badge bg-primary mb-2">
-                                        {{ strtoupper($lang) }}
-                                    </span>
+                                        <span class="badge bg-primary mb-2">
+                                            {{ strtoupper($lang) }}
+                                        </span>
                                         <div class="small fw-medium text-dark">
                                             {!! $stem !!}
                                         </div>
@@ -1033,23 +1030,21 @@
                                 </h6>
 
                                 @foreach ($previewQuestion['options'] as $opt)
-                                    <div class="mb-3 rounded border overflow-hidden
-                                            {{ $opt['is_correct']
-                                                ? 'border-success'
-                                                : 'border-light' }}">
+                                    <div
+                                        class="mb-3 rounded border overflow-hidden
+                                            {{ $opt['is_correct'] ? 'border-success' : 'border-light' }}">
 
                                         {{-- Option Header --}}
-                                        <div class="px-3 py-2 d-flex justify-content-between align-items-center
-                                                {{ $opt['is_correct']
-                                                    ? 'bg-success text-white'
-                                                    : 'bg-light text-muted' }}">
-                                        <span class="fw-semibold small">
-                                            Option {{ $opt['index'] }}
-                                        </span>
+                                        <div
+                                            class="px-3 py-2 d-flex justify-content-between align-items-center
+                                                {{ $opt['is_correct'] ? 'bg-success text-white' : 'bg-light text-muted' }}">
+                                            <span class="fw-semibold small">
+                                                Option {{ $opt['index'] }}
+                                            </span>
                                             @if ($opt['is_correct'])
                                                 <span class="badge bg-white text-success">
-                                                <i class="ri ri-check-line me-1"></i>Correct Answer
-                                            </span>
+                                                    <i class="ri ri-check-line me-1"></i>Correct Answer
+                                                </span>
                                             @endif
                                         </div>
 
@@ -1057,10 +1052,10 @@
                                         <div class="p-3 {{ $opt['is_correct'] ? 'bg-success-subtle' : 'bg-white' }}">
                                             @forelse ($opt['texts'] as $lang => $text)
                                                 <div class="d-flex align-items-start gap-2 mb-2">
-                                                <span class="badge bg-secondary flex-shrink-0"
-                                                      style="font-size:.65rem;margin-top:2px;">
-                                                    {{ strtoupper($lang) }}
-                                                </span>
+                                                    <span class="badge bg-secondary flex-shrink-0"
+                                                        style="font-size:.65rem;margin-top:2px;">
+                                                        {{ strtoupper($lang) }}
+                                                    </span>
                                                     <span class="small">{{ $text }}</span>
                                                 </div>
                                             @empty
@@ -1072,7 +1067,7 @@
                                 @endforeach
                             </div>
                         @endif
-                        @if(!empty($previewQuestion['admin_note']))
+                        @if (!empty($previewQuestion['admin_note']))
                             <div class="mt-6 border-t pt-4">
                                 <h6 class="text-sm font-semibold text-gray-700 mb-2">
                                     Admin Note
@@ -1087,9 +1082,7 @@
 
                     {{-- Modal Footer --}}
                     <div class="modal-footer border-top">
-                        <button type="button"
-                                wire:click="closeQuestionPreview"
-                                class="btn btn-secondary mt-4">
+                        <button type="button" wire:click="closeQuestionPreview" class="btn btn-secondary mt-4">
                             <i class="ri ri-close-line me-1"></i>Close
                         </button>
                     </div>
@@ -1103,357 +1096,352 @@
     @endif
     {{-- /question preview modal --}}
 
-@if ($view === 'question_form' && !empty($activeQuestion))
+    @if ($view === 'question_form' && !empty($activeQuestion))
 
-    {{-- ── Page Header ─────────────────────────────────────── --}}
-    <div class="d-flex align-items-center justify-content-between mb-4">
-        <div>
-            <h4 class="fw-bold mb-1 text-dark">
-                <i class="ri ri-questionnaire-fill text-primary me-2"></i>
-                {{ !empty($activeQuestion['id']) ? 'Edit Question' : 'Add New Question' }}
-            </h4>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0 small">
-                    <li class="breadcrumb-item">
-                        <a href="{{ route('admin.questions.index') }}">
-                            Question Groups
-                        </a>
-                    </li>
-                    <li class="breadcrumb-item">
-                        <a href="#" wire:click.prevent="cancelQuestion">
-                            {{ $group_content['title']['en'] ?? $group_code }}
-                        </a>
-                    </li>
-                    <li class="breadcrumb-item active">
-                        {{ !empty($activeQuestion['id']) ? 'Edit Question' : 'New Question' }}
-                    </li>
-                </ol>
-            </nav>
-        </div>
+        {{-- ── Page Header ─────────────────────────────────────── --}}
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h4 class="fw-bold mb-1 text-dark">
+                    <i class="ri ri-questionnaire-fill text-primary me-2"></i>
+                    {{ !empty($activeQuestion['id']) ? 'Edit Question' : 'Add New Question' }}
+                </h4>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0 small">
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('admin.questions.index') }}">
+                                Question Groups
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="#" wire:click.prevent="cancelQuestion">
+                                {{ $group_content['title']['en'] ?? $group_code }}
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active">
+                            {{ !empty($activeQuestion['id']) ? 'Edit Question' : 'New Question' }}
+                        </li>
+                    </ol>
+                </nav>
+            </div>
 
-        <div class="d-flex gap-2">
-            <button type="button" wire:click="cancelQuestion" class="btn btn-outline-secondary btn-sm">
-                <i class="ri ri-arrow-left-line me-1"></i>
-                Back to Group
-            </button>
+            <div class="d-flex gap-2">
+                <button type="button" wire:click="cancelQuestion" class="btn btn-outline-secondary btn-sm">
+                    <i class="ri ri-arrow-left-line me-1"></i>
+                    Back to Group
+                </button>
 
-            <button type="button" wire:click="saveQuestion" wire:loading.attr="disabled"
+                <button type="button" wire:click="saveQuestion" wire:loading.attr="disabled"
                     class="btn btn-primary btn-sm shadow-sm">
                     <span wire:loading wire:target="saveQuestion">
                         <span class="spinner-border spinner-border-sm me-1"></span>
                         Saving…
                     </span>
-                <span wire:loading.remove wire:target="saveQuestion">
+                    <span wire:loading.remove wire:target="saveQuestion">
                         <i class="ri ri-save-line me-1"></i>
                         {{ !empty($activeQuestion['id']) ? 'Update Question' : 'Save Question' }}
                     </span>
-            </button>
-        </div>
-    </div>
-
-
-    {{-- ── Edit mode notice ─────────────────────────────────── --}}
-    @if (!empty($activeQuestion['id']))
-        <div class="alert alert-info alert-dismissible fade show
-                    d-flex align-items-center gap-2 mb-4"
-             role="alert">
-            <i class="ri ri-edit-box-line fs-5 flex-shrink-0"></i>
-            <div>
-                <strong>Edit Mode</strong> —
-                You are editing
-                <code>{{ $activeQuestion['question_code'] }}</code>.
-                Changes will be saved when you click "Update Question".
+                </button>
             </div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
-    @endif
 
 
-    <form wire:submit.prevent="saveQuestion">
-        <div class="row g-4">
+        {{-- ── Edit mode notice ─────────────────────────────────── --}}
+        @if (!empty($activeQuestion['id']))
+            <div class="alert alert-info alert-dismissible fade show
+                    d-flex align-items-center gap-2 mb-4"
+                role="alert">
+                <i class="ri ri-edit-box-line fs-5 flex-shrink-0"></i>
+                <div>
+                    <strong>Edit Mode</strong> —
+                    You are editing
+                    <code>{{ $activeQuestion['question_code'] }}</code>.
+                    Changes will be saved when you click "Update Question".
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
 
-            {{-- ══════════════════════════════════════════════════
+
+        <form wire:submit.prevent="saveQuestion">
+            <div class="row g-4">
+
+                {{-- ══════════════════════════════════════════════════
                  LEFT COLUMN
             ══════════════════════════════════════════════════ --}}
-            <div class="col-lg-8">
+                <div class="col-lg-8">
 
-                {{-- ┌──────────────────────────────────────────┐
+                    {{-- ┌──────────────────────────────────────────┐
                      │  BASIC INFORMATION                       │
                      └──────────────────────────────────────────┘ --}}
-                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card shadow-sm border-0 mb-4">
 
-                    <div class="card-header bg-white border-bottom py-3">
-                        <h6 class="mb-0 fw-semibold text-dark">
-                            <i class="ri ri-information-line text-primary me-2"></i>
-                            Basic Information
-                        </h6>
-                    </div>
+                        <div class="card-header bg-white border-bottom py-3">
+                            <h6 class="mb-0 fw-semibold text-dark">
+                                <i class="ri ri-information-line text-primary me-2"></i>
+                                Basic Information
+                            </h6>
+                        </div>
 
-                    <div class="card-body p-4">
-                        <div class="row g-3">
+                        <div class="card-body p-4">
+                            <div class="row g-3">
 
-                            {{-- Question Code --}}
-                            <div class="col-md-4">
-                                <label class="form-label fw-medium small">
-                                    Question Code
-                                </label>
-                                <div
-                                    class="form-control bg-light text-muted small
+                                {{-- Question Code --}}
+                                <div class="col-md-4">
+                                    <label class="form-label fw-medium small">
+                                        Question Code
+                                    </label>
+                                    <div
+                                        class="form-control bg-light text-muted small
                                             d-flex align-items-center gap-2">
-                                    <i class="ri ri-barcode-line text-muted"></i>
-                                    {{ $activeQuestion['question_code'] }}
+                                        <i class="ri ri-barcode-line text-muted"></i>
+                                        {{ $activeQuestion['question_code'] }}
+                                    </div>
                                 </div>
-                            </div>
 
-                            {{-- Answer Category --}}
-                            <div class="col-md-4">
-                                <label class="form-label fw-medium small">
-                                    Answer Category
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <select wire:model.live="activeQuestion.answer_category"
+                                {{-- Answer Category --}}
+                                <div class="col-md-4">
+                                    <label class="form-label fw-medium small">
+                                        Answer Category
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <select wire:model.live="activeQuestion.answer_category"
                                         class="form-select
                                            @error('activeQuestion.answer_category')
                                                is-invalid
                                            @enderror">
-                                    <option value="single_choice">
-                                        Single Choice
-                                    </option>
-                                    <option value="multi_choice">
-                                        Multi Choice
-                                    </option>
-                                    <option value="open_text">
-                                        Open Text
-                                    </option>
-                                </select>
-                                @error('activeQuestion.answer_category')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                                @enderror
-                                {{-- Helper --}}
-                                <div class="mt-1">
-                                    @if (($activeQuestion['answer_category'] ?? '') === 'single_choice')
-                                        <small class="text-primary">
-                                            <i class="ri ri-record-circle-line me-1"></i>
-                                            One correct answer (radio).
-                                        </small>
-                                    @elseif (($activeQuestion['answer_category'] ?? '') === 'multi_choice')
-                                        <small class="text-info">
-                                            <i class="ri ri-checkbox-circle-line me-1"></i>
-                                            Multiple correct answers with weightage.
-                                        </small>
-                                    @else
-                                        <small class="text-secondary">
-                                            <i class="ri ri-text me-1"></i>
-                                            Student types a text answer.
-                                        </small>
-                                    @endif
-                                </div>
-                            </div>
-
-                            {{-- Marks --}}
-                            <div class="col-md-4">
-                                <label class="form-label fw-medium small">
-                                    Marks
-                                    <span class="text-danger">*</span>
-                                    @if (in_array(($activeQuestion['answer_category'] ?? ''), ['single_choice', 'multi_choice']))
-                                        <span class="badge bg-info-subtle text-info border border-info-subtle ms-1"
-                                              style="font-size:.65rem;">
-                Auto from Weightage
-            </span>
-                                    @endif
-                                </label>
-                                <div class="input-group">
-        <span class="input-group-text bg-light">
-            <i class="ri ri-trophy-line text-muted"></i>
-        </span>
-                                    <input type="number"
-                                           wire:model="activeQuestion.marks"
-                                           class="form-control @error('activeQuestion.marks') is-invalid @enderror
-                      {{ in_array(($activeQuestion['answer_category'] ?? ''), ['single_choice', 'multi_choice']) ? 'bg-light text-muted' : '' }}"
-                                           min="0"
-                                           step="0.5"
-                                           placeholder="0"
-                                           value="{{ $activeQuestion['marks'] ?? 0 }}"
-                                           @if (in_array(($activeQuestion['answer_category'] ?? ''), ['single_choice', 'multi_choice']))
-                                               readonly
-                                           title="Calculated automatically from option weightages"
-                                        @endif>
-                                    @error('activeQuestion.marks')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                        <option value="single_choice">
+                                            Single Choice
+                                        </option>
+                                        <option value="multi_choice">
+                                            Multi Choice
+                                        </option>
+                                        <option value="open_text">
+                                            Open Text
+                                        </option>
+                                    </select>
+                                    @error('activeQuestion.answer_category')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
                                     @enderror
+                                    {{-- Helper --}}
+                                    <div class="mt-1">
+                                        @if (($activeQuestion['answer_category'] ?? '') === 'single_choice')
+                                            <small class="text-primary">
+                                                <i class="ri ri-record-circle-line me-1"></i>
+                                                One correct answer (radio).
+                                            </small>
+                                        @elseif (($activeQuestion['answer_category'] ?? '') === 'multi_choice')
+                                            <small class="text-info">
+                                                <i class="ri ri-checkbox-circle-line me-1"></i>
+                                                Multiple correct answers with weightage.
+                                            </small>
+                                        @else
+                                            <small class="text-secondary">
+                                                <i class="ri ri-text me-1"></i>
+                                                Student types a text answer.
+                                            </small>
+                                        @endif
+                                    </div>
                                 </div>
-                                {{-- Helper --}}
-                                <div class="mt-1">
-                                    @if (($activeQuestion['answer_category'] ?? '') === 'single_choice')
-                                        <small class="text-primary">
-                                            <i class="ri ri-information-line me-1"></i>
-                                            Marks = sum of correct option's weightage.
-                                        </small>
-                                    @elseif (($activeQuestion['answer_category'] ?? '') === 'multi_choice')
-                                        <small class="text-info">
-                                            <i class="ri ri-information-line me-1"></i>
-                                            Marks = sum of all correct options' weightages.
-                                        </small>
-                                    @else
-                                        <small class="text-secondary">
-                                            <i class="ri ri-text me-1"></i>
-                                            Manually enter marks for open text answer.
-                                        </small>
-                                    @endif
-                                </div>
-                            </div>
 
-                            {{-- Primary Skill --}}
-                            <div class="col-md-4">
-                                <label class="form-label fw-medium small">
-                                    Primary Skill
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <select wire:model="activeQuestion.primary_skill_id"
+                                {{-- Marks --}}
+                                <div class="col-md-4">
+                                    <label class="form-label fw-medium small">
+                                        Marks
+                                        <span class="text-danger">*</span>
+                                        @if (in_array($activeQuestion['answer_category'] ?? '', ['single_choice', 'multi_choice']))
+                                            <span class="badge bg-info-subtle text-info border border-info-subtle ms-1"
+                                                style="font-size:.65rem;">
+                                                Auto from Weightage
+                                            </span>
+                                        @endif
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light">
+                                            <i class="ri ri-trophy-line text-muted"></i>
+                                        </span>
+                                        <input type="number" wire:model="activeQuestion.marks"
+                                            class="form-control @error('activeQuestion.marks') is-invalid @enderror
+                      {{ in_array($activeQuestion['answer_category'] ?? '', ['single_choice', 'multi_choice']) ? 'bg-light text-muted' : '' }}"
+                                            min="0" step="0.5" placeholder="0"
+                                            value="{{ $activeQuestion['marks'] ?? 0 }}"
+                                            @if (in_array($activeQuestion['answer_category'] ?? '', ['single_choice', 'multi_choice'])) readonly
+                                           title="Calculated automatically from option weightages" @endif>
+                                        @error('activeQuestion.marks')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    {{-- Helper --}}
+                                    <div class="mt-1">
+                                        @if (($activeQuestion['answer_category'] ?? '') === 'single_choice')
+                                            <small class="text-primary">
+                                                <i class="ri ri-information-line me-1"></i>
+                                                Marks = sum of correct option's weightage.
+                                            </small>
+                                        @elseif (($activeQuestion['answer_category'] ?? '') === 'multi_choice')
+                                            <small class="text-info">
+                                                <i class="ri ri-information-line me-1"></i>
+                                                Marks = sum of all correct options' weightages.
+                                            </small>
+                                        @else
+                                            <small class="text-secondary">
+                                                <i class="ri ri-text me-1"></i>
+                                                Manually enter marks for open text answer.
+                                            </small>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                {{-- Primary Skill --}}
+                                <div class="col-md-4">
+                                    <label class="form-label fw-medium small">
+                                        Primary Skill
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <select wire:model="activeQuestion.primary_skill_id"
                                         class="form-select
                                            @error('activeQuestion.primary_skill_id')
                                                is-invalid
                                            @enderror">
-                                    <option value="">— Select Skill —</option>
-                                    @foreach ($primarySkillTypes as $skill)
-                                        <option value="{{ $skill['id'] }}">
-                                            {{ $skill['name'] }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('activeQuestion.primary_skill_id')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
+                                        <option value="">— Select Skill —</option>
+                                        @foreach ($primarySkillTypes as $skill)
+                                            <option value="{{ $skill['id'] }}">
+                                                {{ $skill['name'] }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('activeQuestion.primary_skill_id')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
                                 </div>
-                                @enderror
-                            </div>
 
-                            {{-- Sub Skill --}}
-                            <div class="col-md-4">
-                                <label class="form-label fw-medium small">
-                                    Sub Skill
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <select wire:model="activeQuestion.sub_skill_id"
+                                {{-- Sub Skill --}}
+                                <div class="col-md-4">
+                                    <label class="form-label fw-medium small">
+                                        Sub Skill
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <select wire:model="activeQuestion.sub_skill_id"
                                         class="form-select
                                            @error('activeQuestion.sub_skill_id')
                                                is-invalid
                                            @enderror">
-                                    <option value="">— Select Sub Skill —</option>
-                                    @foreach ($subSkillTypes as $skill)
-                                        <option value="{{ $skill['id'] }}">
-                                            {{ $skill['name'] }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('activeQuestion.sub_skill_id')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
+                                        <option value="">— Select Sub Skill —</option>
+                                        @foreach ($subSkillTypes as $skill)
+                                            <option value="{{ $skill['id'] }}">
+                                                {{ $skill['name'] }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('activeQuestion.sub_skill_id')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
                                 </div>
-                                @enderror
-                            </div>
 
-                            {{-- Difficulty Level --}}
-                            <div class="col-md-4">
-                                <label class="form-label fw-medium small">
-                                    Difficulty Level
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <select wire:model="activeQuestion.difficulty_level_id"
+                                {{-- Difficulty Level --}}
+                                <div class="col-md-4">
+                                    <label class="form-label fw-medium small">
+                                        Difficulty Level
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <select wire:model="activeQuestion.difficulty_level_id"
                                         class="form-select
                                            @error('activeQuestion.difficulty_level_id')
                                                is-invalid
                                            @enderror">
-                                    <option value="">— Select Difficulty —</option>
-                                    @foreach ($difficultyLevels as $level)
-                                        <option value="{{ $level['id'] }}">
-                                            {{ $level['name'] }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('activeQuestion.difficulty_level_id')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
+                                        <option value="">— Select Difficulty —</option>
+                                        @foreach ($difficultyLevels as $level)
+                                            <option value="{{ $level['id'] }}">
+                                                {{ $level['name'] }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('activeQuestion.difficulty_level_id')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
                                 </div>
-                                @enderror
-                            </div>
 
-                            {{-- Age Group --}}
-                            <div class="col-md-4">
-                                <label class="form-label fw-medium small">
-                                    Age Group
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <select wire:model="activeQuestion.age_group_id"
+                                {{-- Age Group --}}
+                                <div class="col-md-4">
+                                    <label class="form-label fw-medium small">
+                                        Age Group
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <select wire:model="activeQuestion.age_group_id"
                                         class="form-select
                                            @error('activeQuestion.age_group_id')
                                                is-invalid
                                            @enderror">
-                                    <option value="">— Select Age Group —</option>
-                                    @foreach ($ageGroups as $group)
-                                        <option value="{{ $group['id'] }}">
-                                            {{ $group['name'] }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('activeQuestion.age_group_id')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
+                                        <option value="">— Select Age Group —</option>
+                                        @foreach ($ageGroups as $group)
+                                            <option value="{{ $group['id'] }}">
+                                                {{ $group['name'] }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('activeQuestion.age_group_id')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
                                 </div>
-                                @enderror
-                            </div>
 
+                            </div>
                         </div>
                     </div>
-                </div>
 
 
-                {{-- ┌──────────────────────────────────────────┐
+                    {{-- ┌──────────────────────────────────────────┐
                      │  QUESTION STEM  (Multilingual Quill)     │
                      └──────────────────────────────────────────┘ --}}
-                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card shadow-sm border-0 mb-4">
 
-                    <div
-                        class="card-header bg-white border-bottom py-3
+                        <div
+                            class="card-header bg-white border-bottom py-3
                                 d-flex align-items-center justify-content-between">
-                        <h6 class="mb-0 fw-semibold text-dark">
-                            <i class="ri ri-translate-2 text-primary me-2"></i>
-                            Question Stem
-                        </h6>
+                            <h6 class="mb-0 fw-semibold text-dark">
+                                <i class="ri ri-translate-2 text-primary me-2"></i>
+                                Question Stem
+                            </h6>
 
-                        <ul class="nav nav-pills nav-sm mb-0">
-                            @foreach ($languages as $langCode => $lang)
-                                <li class="nav-item">
-                                    <button type="button" @click="activeTab = '{{ $langCode }}'"
+                            <ul class="nav nav-pills nav-sm mb-0">
+                                @foreach ($languages as $langCode => $lang)
+                                    <li class="nav-item">
+                                        <button type="button" @click="activeTab = '{{ $langCode }}'"
                                             class="nav-link py-1 px-3"
                                             :class="{ 'active': activeTab === '{{ $langCode }}' }">
-                                        {{ $lang['flag'] }} {{ $lang['label'] }}
+                                            {{ $lang['flag'] }} {{ $lang['label'] }}
+                                            @if ($langCode === 'en')
+                                                <span class="text-danger ms-1">*</span>
+                                            @endif
+                                        </button>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+
+                        <div class="card-body p-4" wire:key="stem-body-{{ $questionFormKey }}">
+
+                            @foreach ($languages as $langCode => $lang)
+                                <div x-show="activeTab === '{{ $langCode }}'" x-cloak>
+
+                                    <label class="form-label fw-medium small mb-2">
+                                        {{ $lang['flag'] }} {{ $lang['label'] }} — Question Stem
                                         @if ($langCode === 'en')
-                                            <span class="text-danger ms-1">*</span>
+                                            <span class="text-danger">*</span>
                                         @endif
-                                    </button>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
+                                    </label>
 
-                    <div class="card-body p-4" wire:key="stem-body-{{ $questionFormKey }}">
-
-                        @foreach ($languages as $langCode => $lang)
-                            <div x-show="activeTab === '{{ $langCode }}'" x-cloak>
-
-                                <label class="form-label fw-medium small mb-2">
-                                    {{ $lang['flag'] }} {{ $lang['label'] }} — Question Stem
-                                    @if ($langCode === 'en')
-                                        <span class="text-danger">*</span>
-                                    @endif
-                                </label>
-
-                                {{-- Quill with wire:ignore + pre-fill on edit --}}
-                                <div wire:ignore wire:key="quill-{{ $langCode }}-{{ $questionFormKey }}"
-                                     x-data="{
+                                    {{-- Quill with wire:ignore + pre-fill on edit --}}
+                                    <div wire:ignore wire:key="quill-{{ $langCode }}-{{ $questionFormKey }}"
+                                        x-data="{
                                             quillInstance: null,
                                             content: @js($activeQuestion['stem'][$langCode] ?? ''),
                                             syncToWire() {
@@ -1487,390 +1475,385 @@
                                                 }
                                             }
                                         );
-
+                                        
                                         {{-- Pre-fill existing content (edit mode) --}}
                                         if (content) {
                                             quillInstance.root.innerHTML = content;
                                         }
-
+                                        
                                         {{-- Sync on focus-out --}}
                                         quillInstance.on('selection-change', function(range) {
                                             if (range === null) {
                                                 syncToWire();
                                             }
                                         });">
-                                    <div x-ref="stemEditor_{{ $langCode }}" style="min-height: 220px;">
+                                        <div x-ref="stemEditor_{{ $langCode }}" style="min-height: 220px;">
+                                        </div>
                                     </div>
+
+                                    @error("activeQuestion.stem.{$langCode}")
+                                        <div class="text-danger small mt-2">
+                                            <i class="ri ri-error-warning-line me-1"></i>
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+
                                 </div>
+                            @endforeach
 
-                                @error("activeQuestion.stem.{$langCode}")
-                                <div class="text-danger small mt-2">
-                                    <i class="ri ri-error-warning-line me-1"></i>
-                                    {{ $message }}
-                                </div>
-                                @enderror
-
-                            </div>
-                        @endforeach
-
+                        </div>
                     </div>
-                </div>
 
 
-                {{-- ┌──────────────────────────────────────────┐
+                    {{-- ┌──────────────────────────────────────────┐
                      │  STEM IMAGE                              │
                      └──────────────────────────────────────────┘ --}}
-                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card shadow-sm border-0 mb-4">
 
-                    <div
-                        class="card-header bg-white border-bottom py-3
+                        <div
+                            class="card-header bg-white border-bottom py-3
                                 d-flex align-items-center gap-2">
-                        <i class="ri ri-image-line text-primary"></i>
-                        <h6 class="mb-0 fw-semibold text-dark">
-                            Question Image
-                        </h6>
-                        <span class="badge bg-secondary fw-normal ms-1">
+                            <i class="ri ri-image-line text-primary"></i>
+                            <h6 class="mb-0 fw-semibold text-dark">
+                                Question Image
+                            </h6>
+                            <span class="badge bg-secondary fw-normal ms-1">
                                 Optional
                             </span>
-                    </div>
+                        </div>
 
-                    <div class="card-body p-4">
+                        <div class="card-body p-4">
 
-                        {{-- ── Existing persisted image ─────── --}}
-                        @if (!empty($activeQuestion['existing_image']))
-                            <div class="mb-3">
-                                <p class="small text-muted mb-2">
-                                    <i class="ri ri-image-line me-1"></i>
-                                    Current image:
-                                </p>
-                                <div class="position-relative d-inline-block">
-                                    <img src="{{ Storage::url($activeQuestion['existing_image']) }}"
-                                         alt="Question image" class="img-thumbnail rounded shadow-sm"
-                                         style="max-height:200px;
+                            {{-- ── Existing persisted image ─────── --}}
+                            @if (!empty($activeQuestion['existing_image']))
+                                <div class="mb-3">
+                                    <p class="small text-muted mb-2">
+                                        <i class="ri ri-image-line me-1"></i>
+                                        Current image:
+                                    </p>
+                                    <div class="position-relative d-inline-block">
+                                        <img src="{{ Storage::url($activeQuestion['existing_image']) }}"
+                                            alt="Question image" class="img-thumbnail rounded shadow-sm"
+                                            style="max-height:200px;
                                                 object-fit:contain;">
 
-                                    <button type="button" wire:click="removeStemImagePath"
+                                        <button type="button" wire:click="removeStemImagePath"
                                             class="btn btn-danger btn-sm
                                                    position-absolute top-0 end-0
                                                    m-1 rounded-circle p-0"
                                             style="width:26px;height:26px;line-height:1;" title="Remove image">
-                                        <i class="ri ri-close-line"></i>
-                                    </button>
+                                            <i class="ri ri-close-line"></i>
+                                        </button>
+                                    </div>
+
+                                    <p class="small text-muted mt-2 mb-0">
+                                        <i class="ri ri-information-line me-1"></i>
+                                        Click ✕ to remove and upload a new image.
+                                    </p>
                                 </div>
+                            @endif
 
-                                <p class="small text-muted mt-2 mb-0">
-                                    <i class="ri ri-information-line me-1"></i>
-                                    Click ✕ to remove and upload a new image.
-                                </p>
-                            </div>
-                        @endif
-
-                        {{-- ── Upload dropzone (when no existing image) ── --}}
-                        @if (empty($activeQuestion['existing_image']))
-                            <div x-data="{ dragging: false }" @dragover.prevent="dragging = true"
-                                 @dragleave.prevent="dragging = false"
-                                 @drop.prevent="
+                            {{-- ── Upload dropzone (when no existing image) ── --}}
+                            @if (empty($activeQuestion['existing_image']))
+                                <div x-data="{ dragging: false }" @dragover.prevent="dragging = true"
+                                    @dragleave.prevent="dragging = false"
+                                    @drop.prevent="
                                      dragging = false;
                                      $refs.stemFileInput.files = $event.dataTransfer.files;
                                      $refs.stemFileInput.dispatchEvent(new Event('change'))
                                  "
-                                 :class="dragging
+                                    :class="dragging
                                         ?
                                         'border-primary bg-primary bg-opacity-5' :
                                         'border-secondary'"
-                                 class="upload-dropzone border border-2 border-dashed
+                                    class="upload-dropzone border border-2 border-dashed
                                         rounded-3 text-center p-4"
-                                 style="cursor:pointer;" @click="$refs.stemFileInput.click()">
+                                    style="cursor:pointer;" @click="$refs.stemFileInput.click()">
 
-                                <input type="file" x-ref="stemFileInput" wire:model="stemImageUpload"
-                                       accept="image/jpeg,image/png,image/gif,image/webp" class="d-none">
+                                    <input type="file" x-ref="stemFileInput" wire:model="stemImageUpload"
+                                        accept="image/jpeg,image/png,image/gif,image/webp" class="d-none">
 
-                                {{-- Uploading state --}}
-                                <div wire:loading wire:target="stemImageUpload" class="text-muted small">
-                                    <div class="spinner-border spinner-border-sm me-1"></div>
-                                    Uploading…
+                                    {{-- Uploading state --}}
+                                    <div wire:loading wire:target="stemImageUpload" class="text-muted small">
+                                        <div class="spinner-border spinner-border-sm me-1"></div>
+                                        Uploading…
+                                    </div>
+
+                                    {{-- Default state --}}
+                                    <div wire:loading.remove wire:target="stemImageUpload">
+                                        <i class="ri ri-upload-cloud-2-line fs-2 text-muted"></i>
+                                        <p class="mb-1 small fw-medium text-dark mt-1">
+                                            Click or drag &amp; drop
+                                        </p>
+                                        <p class="mb-0 small text-muted">
+                                            JPEG, PNG, GIF, WEBP — max 2 MB
+                                        </p>
+                                    </div>
                                 </div>
 
-                                {{-- Default state --}}
-                                <div wire:loading.remove wire:target="stemImageUpload">
-                                    <i class="ri ri-upload-cloud-2-line fs-2 text-muted"></i>
-                                    <p class="mb-1 small fw-medium text-dark mt-1">
-                                        Click or drag &amp; drop
-                                    </p>
-                                    <p class="mb-0 small text-muted">
-                                        JPEG, PNG, GIF, WEBP — max 2 MB
-                                    </p>
-                                </div>
-                            </div>
+                                @error('stemImageUpload')
+                                    <div class="text-danger small mt-2">
+                                        <i class="ri ri-error-warning-line me-1"></i>
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            @endif
 
-                            @error('stemImageUpload')
-                            <div class="text-danger small mt-2">
-                                <i class="ri ri-error-warning-line me-1"></i>
-                                {{ $message }}
-                            </div>
-                            @enderror
-                        @endif
-
-                        {{-- ── Staged preview ───────────────── --}}
-                        @if ($stemImageUpload)
-                            <div
-                                class="mt-3 p-3 bg-light rounded-3
+                            {{-- ── Staged preview ───────────────── --}}
+                            @if ($stemImageUpload)
+                                <div
+                                    class="mt-3 p-3 bg-light rounded-3
                                         d-flex align-items-start gap-3">
-                                <img src="{{ $stemImageUpload->temporaryUrl() }}" alt="Preview"
-                                     class="img-thumbnail rounded shadow-sm"
-                                     style="max-height:140px;object-fit:contain;">
-                                <div>
-                                    <p class="small fw-semibold mb-1 text-dark">
-                                        <i class="ri ri-file-image-line me-1"></i>
-                                        {{ $stemImageUpload->getClientOriginalName() }}
-                                    </p>
-                                    <p class="small text-muted mb-3">
-                                        {{ number_format($stemImageUpload->getSize() / 1024, 1) }} KB
-                                    </p>
-                                    <button type="button" wire:click="removeStemImageUpload"
+                                    <img src="{{ $stemImageUpload->temporaryUrl() }}" alt="Preview"
+                                        class="img-thumbnail rounded shadow-sm"
+                                        style="max-height:140px;object-fit:contain;">
+                                    <div>
+                                        <p class="small fw-semibold mb-1 text-dark">
+                                            <i class="ri ri-file-image-line me-1"></i>
+                                            {{ $stemImageUpload->getClientOriginalName() }}
+                                        </p>
+                                        <p class="small text-muted mb-3">
+                                            {{ number_format($stemImageUpload->getSize() / 1024, 1) }} KB
+                                        </p>
+                                        <button type="button" wire:click="removeStemImageUpload"
                                             class="btn btn-outline-danger btn-sm">
-                                        <i class="ri ri-delete-bin-line me-1"></i>
-                                        Remove
-                                    </button>
+                                            <i class="ri ri-delete-bin-line me-1"></i>
+                                            Remove
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        @endif
+                            @endif
 
+                        </div>
                     </div>
-                </div>
 
-                {{-- ┌──────────────────────────────────────────┐
+                    {{-- ┌──────────────────────────────────────────┐
                      │  ANSWER OPTIONS                          │
                      │  Hidden for open_text                    │
                      └──────────────────────────────────────────┘ --}}
-                @if (($activeQuestion['answer_category'] ?? '') !== 'open_text')
+                    @if (($activeQuestion['answer_category'] ?? '') !== 'open_text')
 
-                    @php
-                        $isMultiCat = ($activeQuestion['answer_category'] ?? '') === 'multi_choice';
-                    @endphp
+                        @php
+                            $isMultiCat = ($activeQuestion['answer_category'] ?? '') === 'multi_choice';
+                        @endphp
 
-                    <div class="card shadow-sm border-0 mb-4" wire:key="options-card-{{ $questionFormKey }}">
+                        <div class="card shadow-sm border-0 mb-4" wire:key="options-card-{{ $questionFormKey }}">
 
-                        {{-- Options Card Header --}}
-                        <div class="card-header bg-white border-bottom py-3">
-                            <div
-                                class="d-flex align-items-center
+                            {{-- Options Card Header --}}
+                            <div class="card-header bg-white border-bottom py-3">
+                                <div
+                                    class="d-flex align-items-center
                                         justify-content-between flex-wrap gap-2">
 
-                                <div>
-                                    <h6 class="mb-0 fw-semibold text-dark">
-                                        <i class="ri ri-list-check-3 text-primary me-2"></i>
-                                        Answer Options
-                                        <span class="badge bg-primary ms-1">
+                                    <div>
+                                        <h6 class="mb-0 fw-semibold text-dark">
+                                            <i class="ri ri-list-check-3 text-primary me-2"></i>
+                                            Answer Options
+                                            <span class="badge bg-primary ms-1">
                                                 {{ count($activeQuestion['options'] ?? []) }}
                                             </span>
-                                    </h6>
-                                    <small class="text-muted mt-1 d-block">
-                                        @if ($isMultiCat)
-                                            <i class="ri ri-information-line me-1"></i>
-                                            Multi-select — mark all correct answers
-                                            and set weightage for each.
-                                        @else
-                                            <i class="ri ri-information-line me-1"></i>
-                                            Single-select — mark one correct answer.
-                                        @endif
-                                    </small>
-                                </div>
+                                        </h6>
+                                        <small class="text-muted mt-1 d-block">
+                                            @if ($isMultiCat)
+                                                <i class="ri ri-information-line me-1"></i>
+                                                Multi-select — mark all correct answers
+                                                and set weightage for each.
+                                            @else
+                                                <i class="ri ri-information-line me-1"></i>
+                                                Single-select — mark one correct answer.
+                                            @endif
+                                        </small>
+                                    </div>
 
-                                <button type="button" wire:click="addOption"
+                                    <button type="button" wire:click="addOption"
                                         class="btn btn-outline-primary btn-sm"
                                         @if (count($activeQuestion['options'] ?? []) >= 8) disabled title="Maximum 8 options" @endif>
-                                    <i class="ri ri-add-large-line me-1"></i>
-                                    Add Option
-                                </button>
+                                        <i class="ri ri-add-large-line me-1"></i>
+                                        Add Option
+                                    </button>
 
+                                </div>
                             </div>
-                        </div>
 
-                        {{-- Options Card Body --}}
-                        <div class="card-body p-4">
+                            {{-- Options Card Body --}}
+                            <div class="card-body p-4">
 
-                            @error('activeQuestion.options')
-                            <div
-                                class="alert alert-warning py-2 small mb-3
+                                @error('activeQuestion.options')
+                                    <div
+                                        class="alert alert-warning py-2 small mb-3
                                             d-flex align-items-center gap-2">
-                                <i class="ri ri-error-warning-fill text-warning"></i>
-                                {{ $message }}
-                            </div>
-                            @enderror
+                                        <i class="ri ri-error-warning-fill text-warning"></i>
+                                        {{ $message }}
+                                    </div>
+                                @enderror
 
-                            @error('options_min')
-                            <div
-                                class="alert alert-warning py-2 small mb-3
+                                @error('options_min')
+                                    <div
+                                        class="alert alert-warning py-2 small mb-3
                                             d-flex align-items-center gap-2">
-                                <i class="ri ri-error-warning-fill text-warning"></i>
-                                {{ $message }}
-                            </div>
-                            @enderror
+                                        <i class="ri ri-error-warning-fill text-warning"></i>
+                                        {{ $message }}
+                                    </div>
+                                @enderror
 
-                            {{-- Options Loop --}}
-                            @foreach ($activeQuestion['options'] as $optIndex => $option)
-                                @php
-                                    $optIsImage = ($option['option_type'] ?? 'text') === 'image';
-                                    $optIsCorrect = (bool) ($option['is_correct'] ?? false);
-                                @endphp
+                                {{-- Options Loop --}}
+                                @foreach ($activeQuestion['options'] as $optIndex => $option)
+                                    @php
+                                        $optIsImage = ($option['option_type'] ?? 'text') === 'image';
+                                        $optIsCorrect = (bool) ($option['is_correct'] ?? false);
+                                    @endphp
 
-                                <div class="option-card rounded-3 border mb-3
+                                    <div class="option-card rounded-3 border mb-3
                                             overflow-hidden transition
                                             {{ $optIsCorrect ? 'border-success' : 'border-light' }}"
-                                     wire:key="opt-{{ $optIndex }}-{{ $activeQuestion['id'] ?? 'new' }}-{{ $questionFormKey }}">
+                                        wire:key="opt-{{ $optIndex }}-{{ $activeQuestion['id'] ?? 'new' }}-{{ $questionFormKey }}">
 
-                                    {{-- Option Header --}}
-                                    <div
-                                        class="d-flex align-items-center gap-2
+                                        {{-- Option Header --}}
+                                        <div
+                                            class="d-flex align-items-center gap-2
                                                 px-3 py-2 flex-wrap
                                                 {{ $optIsCorrect ? 'bg-success-subtle' : 'bg-light' }}">
 
-                                        {{-- Correct Toggle --}}
-                                        <button type="button" wire:click="toggleCorrect({{ $optIndex }})"
+                                            {{-- Correct Toggle --}}
+                                            <button type="button" wire:click="toggleCorrect({{ $optIndex }})"
                                                 class="btn btn-sm rounded-circle p-0 flex-shrink-0
                                                        {{ $optIsCorrect ? 'btn-success' : 'btn-outline-secondary' }}"
                                                 style="width:34px;height:34px;"
                                                 title="{{ $optIsCorrect ? 'Click to mark as incorrect' : 'Click to mark as correct' }}">
-                                            @if ($isMultiCat)
-                                                <i
-                                                    class="ri {{ $optIsCorrect ? 'ri-checkbox-circle-fill' : 'ri-checkbox-circle-line' }}"></i>
-                                            @else
-                                                <i
-                                                    class="ri {{ $optIsCorrect ? 'ri-record-circle-fill' : 'ri-circle-line' }}"></i>
-                                            @endif
-                                        </button>
+                                                @if ($isMultiCat)
+                                                    <i
+                                                        class="ri {{ $optIsCorrect ? 'ri-checkbox-circle-fill' : 'ri-checkbox-circle-line' }}"></i>
+                                                @else
+                                                    <i
+                                                        class="ri {{ $optIsCorrect ? 'ri-record-circle-fill' : 'ri-circle-line' }}"></i>
+                                                @endif
+                                            </button>
 
-                                        {{-- Option Letter Badge --}}
-                                        <span
-                                            class="badge bg-secondary fw-bold
+                                            {{-- Option Letter Badge --}}
+                                            <span
+                                                class="badge bg-secondary fw-bold
                                                      d-inline-flex align-items-center
                                                      justify-content-center flex-shrink-0"
-                                            style="width:32px;height:32px;
+                                                style="width:32px;height:32px;
                                                      font-size:.9rem;">
                                                 {{ chr(65 + $optIndex) }}
                                             </span>
 
-                                        {{-- Correct badge --}}
-                                        @if ($optIsCorrect)
-                                            <span class="badge bg-success">
+                                            {{-- Correct badge --}}
+                                            @if ($optIsCorrect)
+                                                <span class="badge bg-success">
                                                     <i class="ri ri-check-fill me-1"></i>
                                                     Correct
                                                 </span>
-                                        @endif
+                                            @endif
 
-                                        {{-- Text / Image Type Toggle --}}
-                                        <div
-                                            class="d-flex align-items-center gap-1
+                                            {{-- Text / Image Type Toggle --}}
+                                            <div
+                                                class="d-flex align-items-center gap-1
                                                     bg-white rounded p-1 border ms-1">
-                                            <button type="button"
+                                                <button type="button"
                                                     wire:click="setOptionType({{ $optIndex }}, 'text')"
                                                     class="btn btn-sm py-0 px-2
                                                            {{ !$optIsImage ? 'btn-primary' : 'btn-light' }}">
-                                                <i class="ri ri-text me-1"></i>Text
-                                            </button>
-                                            <button type="button"
+                                                    <i class="ri ri-text me-1"></i>Text
+                                                </button>
+                                                <button type="button"
                                                     wire:click="setOptionType({{ $optIndex }}, 'image')"
                                                     class="btn btn-sm py-0 px-2
                                                            {{ $optIsImage ? 'btn-primary' : 'btn-light' }}">
-                                                <i class="ri ri-image-line me-1"></i>Image
-                                            </button>
-                                        </div>
-
-                                        <div class="ms-auto d-flex align-items-center gap-2">
-
-                                            {{-- Weightage — enabled only when correct --}}
-                                            <div class="d-flex align-items-center gap-1">
-                                                <label class="small text-muted mb-0 text-nowrap">
-                                                    Weightage:
-                                                </label>
-                                                @if ($optIsCorrect)
-                                                    <input type="number"
-                                                           wire:model="activeQuestion.options.{{ $optIndex }}.weightage"
-                                                           x-on:input.debounce.300ms="$wire.updateWeightage({{ $optIndex }}, parseFloat($event.target.value) || 0)"
-                                                           class="form-control form-control-sm text-center border-success"
-                                                           style="width:72px;"
-                                                           step="0.5"
-                                                           min="0"
-                                                           max="100"
-                                                           placeholder="0">
-                                                @else
-                                                    <input type="number"
-                                                           class="form-control form-control-sm text-center bg-light"
-                                                           style="width:72px;"
-                                                           placeholder="—"
-                                                           disabled
-                                                           title="Mark as correct to enable weightage">
-                                                @endif
+                                                    <i class="ri ri-image-line me-1"></i>Image
+                                                </button>
                                             </div>
-                                            {{-- Remove Option --}}
-                                            <button type="button"
+
+                                            <div class="ms-auto d-flex align-items-center gap-2">
+
+                                                {{-- Weightage — enabled only when correct --}}
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <label class="small text-muted mb-0 text-nowrap">
+                                                        Weightage:
+                                                    </label>
+                                                    @if ($optIsCorrect)
+                                                        <input type="number"
+                                                            wire:model="activeQuestion.options.{{ $optIndex }}.weightage"
+                                                            x-on:input.debounce.300ms="$wire.updateWeightage({{ $optIndex }}, parseFloat($event.target.value) || 0)"
+                                                            class="form-control form-control-sm text-center border-success"
+                                                            style="width:72px;" step="0.5" min="0"
+                                                            max="100" placeholder="0">
+                                                    @else
+                                                        <input type="number"
+                                                            class="form-control form-control-sm text-center bg-light"
+                                                            style="width:72px;" placeholder="—" disabled
+                                                            title="Mark as correct to enable weightage">
+                                                    @endif
+                                                </div>
+                                                {{-- Remove Option --}}
+                                                <button type="button"
                                                     wire:click="removeOption({{ $optIndex }})"
                                                     class="btn btn-sm btn-outline-danger"
                                                     @if (count($activeQuestion['options']) <= 4) disabled title="Minimum 4 options required" @endif>
-                                                <i class="ri ri-delete-bin-fill"></i>
-                                            </button>
+                                                    <i class="ri ri-delete-bin-fill"></i>
+                                                </button>
+
+                                            </div>
 
                                         </div>
-
-                                    </div>
-                                    {{-- /option header --}}
+                                        {{-- /option header --}}
 
 
-                                    {{-- Option Body --}}
-                                    <div class="p-3 bg-white">
+                                        {{-- Option Body --}}
+                                        <div class="p-3 bg-white">
 
-                                        @if (!$optIsImage)
-                                            {{-- TEXT MODE --}}
-                                            @foreach ($languages as $langCode => $lang)
-                                                <div x-show="activeTab === '{{ $langCode }}'"
-                                                     wire:key="opttext-{{ $optIndex }}-{{ $langCode }}-{{ $questionFormKey }}">
-                                                    <div class="input-group">
+                                            @if (!$optIsImage)
+                                                {{-- TEXT MODE --}}
+                                                @foreach ($languages as $langCode => $lang)
+                                                    <div x-show="activeTab === '{{ $langCode }}'"
+                                                        wire:key="opttext-{{ $optIndex }}-{{ $langCode }}-{{ $questionFormKey }}">
+                                                        <div class="input-group">
                                                             <span
                                                                 class="input-group-text bg-light
                                                                      text-muted small"
                                                                 style="min-width:38px;">
                                                                 {{ $lang['flag'] }}
                                                             </span>
-                                                        <input type="text"
-                                                               wire:model="activeQuestion.options.{{ $optIndex }}.text.{{ $langCode }}"
-                                                               class="form-control form-control-sm
+                                                            <input type="text"
+                                                                wire:model="activeQuestion.options.{{ $optIndex }}.text.{{ $langCode }}"
+                                                                class="form-control form-control-sm
                                                                       @error("activeQuestion.options.{$optIndex}.text.{$langCode}")
                                                                           is-invalid
                                                                       @enderror"
-                                                               placeholder="Option {{ chr(65 + $optIndex) }} in {{ $lang['label'] }}...">
-                                                        @error("activeQuestion.options.{$optIndex}.text.{$langCode}")
-                                                        <div class="invalid-feedback">
-                                                            {{ $message }}
+                                                                placeholder="Option {{ chr(65 + $optIndex) }} in {{ $lang['label'] }}...">
+                                                            @error("activeQuestion.options.{$optIndex}.text.{$langCode}")
+                                                                <div class="invalid-feedback">
+                                                                    {{ $message }}
+                                                                </div>
+                                                            @enderror
                                                         </div>
-                                                        @enderror
                                                     </div>
-                                                </div>
-                                            @endforeach
-                                        @else
-                                            {{-- IMAGE MODE --}}
-                                            <div class="row g-3 align-items-start">
+                                                @endforeach
+                                            @else
+                                                {{-- IMAGE MODE --}}
+                                                <div class="row g-3 align-items-start">
 
-                                                {{-- Image Upload Column --}}
-                                                <div class="col-md-5" x-data="{ dragging: false }"
-                                                     @dragover.prevent="dragging = true"
-                                                     @dragleave.prevent="dragging = false"
-                                                     @drop.prevent="
+                                                    {{-- Image Upload Column --}}
+                                                    <div class="col-md-5" x-data="{ dragging: false }"
+                                                        @dragover.prevent="dragging = true"
+                                                        @dragleave.prevent="dragging = false"
+                                                        @drop.prevent="
                                                          dragging = false;
                                                          $refs.optFile_{{ $optIndex }}.files = $event.dataTransfer.files;
                                                          $refs.optFile_{{ $optIndex }}.dispatchEvent(new Event('change'))
                                                      ">
 
-                                                    {{-- Existing stored image --}}
-                                                    @if (!empty($option['image_path']))
-                                                        <div
-                                                            class="position-relative
+                                                        {{-- Existing stored image --}}
+                                                        @if (!empty($option['image_path']))
+                                                            <div
+                                                                class="position-relative
                                                                     d-inline-block mb-2">
-                                                            <img src="{{ Storage::url($option['image_path']) }}"
-                                                                 alt="Option image" class="img-thumbnail rounded"
-                                                                 style="max-height:120px;
+                                                                <img src="{{ Storage::url($option['image_path']) }}"
+                                                                    alt="Option image" class="img-thumbnail rounded"
+                                                                    style="max-height:120px;
                                                                         object-fit:contain;">
-                                                            <button type="button"
+                                                                <button type="button"
                                                                     wire:click="removeOptionImagePath({{ $optIndex }})"
                                                                     class="btn btn-danger btn-sm
                                                                            position-absolute top-0
@@ -1878,299 +1861,296 @@
                                                                     style="width:22px;height:22px;
                                                                            line-height:1;"
                                                                     title="Remove image">
-                                                                <i class="ri ri-close-line"
-                                                                   style="font-size:.75rem;"></i>
-                                                            </button>
-                                                        </div>
-                                                    @endif
+                                                                    <i class="ri ri-close-line"
+                                                                        style="font-size:.75rem;"></i>
+                                                                </button>
+                                                            </div>
+                                                        @endif
 
-                                                    {{-- Upload dropzone --}}
-                                                    @if (empty($option['image_path']))
-                                                        <div :class="dragging
+                                                        {{-- Upload dropzone --}}
+                                                        @if (empty($option['image_path']))
+                                                            <div :class="dragging
                                                                 ?
                                                                 'border-primary bg-primary bg-opacity-5' :
                                                                 'border-secondary'"
-                                                             class="upload-dropzone border border-2
+                                                                class="upload-dropzone border border-2
                                                                     border-dashed rounded-3
                                                                     text-center p-3"
-                                                             style="cursor:pointer;min-height:90px;"
-                                                             @click="$refs.optFile_{{ $optIndex }}.click()">
+                                                                style="cursor:pointer;min-height:90px;"
+                                                                @click="$refs.optFile_{{ $optIndex }}.click()">
 
-                                                            <input type="file"
-                                                                   x-ref="optFile_{{ $optIndex }}"
-                                                                   wire:model="optionImages.{{ $optIndex }}"
-                                                                   accept="image/jpeg,image/png,image/gif"
-                                                                   class="d-none">
+                                                                <input type="file"
+                                                                    x-ref="optFile_{{ $optIndex }}"
+                                                                    wire:model="optionImages.{{ $optIndex }}"
+                                                                    accept="image/jpeg,image/png,image/gif"
+                                                                    class="d-none">
 
-                                                            <div wire:loading
-                                                                 wire:target="optionImages.{{ $optIndex }}"
-                                                                 class="text-muted small">
+                                                                <div wire:loading
+                                                                    wire:target="optionImages.{{ $optIndex }}"
+                                                                    class="text-muted small">
                                                                     <span
                                                                         class="spinner-border
                                                                              spinner-border-sm">
                                                                     </span>
-                                                            </div>
-                                                            <div wire:loading.remove
-                                                                 wire:target="optionImages.{{ $optIndex }}">
-                                                                <i
-                                                                    class="ri ri-upload-cloud-2-line
+                                                                </div>
+                                                                <div wire:loading.remove
+                                                                    wire:target="optionImages.{{ $optIndex }}">
+                                                                    <i
+                                                                        class="ri ri-upload-cloud-2-line
                                                                           fs-4 text-muted"></i>
-                                                                <p class="mb-0 small text-muted mt-1">
-                                                                    JPEG / PNG / GIF
-                                                                </p>
+                                                                    <p class="mb-0 small text-muted mt-1">
+                                                                        JPEG / PNG / GIF
+                                                                    </p>
+                                                                </div>
                                                             </div>
-                                                        </div>
 
-                                                        @error("optionImages.{$optIndex}")
-                                                        <div class="text-danger small mt-1">
-                                                            <i class="ri ri-error-warning-line me-1"></i>
-                                                            {{ $message }}
-                                                        </div>
-                                                        @enderror
-                                                    @endif
+                                                            @error("optionImages.{$optIndex}")
+                                                                <div class="text-danger small mt-1">
+                                                                    <i class="ri ri-error-warning-line me-1"></i>
+                                                                    {{ $message }}
+                                                                </div>
+                                                            @enderror
+                                                        @endif
 
-                                                    {{-- Staged upload preview --}}
-                                                    @if (!empty($optionImages[$optIndex]))
-                                                        <div
-                                                            class="mt-2 d-flex
+                                                        {{-- Staged upload preview --}}
+                                                        @if (!empty($optionImages[$optIndex]))
+                                                            <div
+                                                                class="mt-2 d-flex
                                                                     align-items-start gap-2">
-                                                            <img src="{{ $optionImages[$optIndex]->temporaryUrl() }}"
-                                                                 alt="Preview" class="img-thumbnail rounded"
-                                                                 style="max-height:80px;
+                                                                <img src="{{ $optionImages[$optIndex]->temporaryUrl() }}"
+                                                                    alt="Preview" class="img-thumbnail rounded"
+                                                                    style="max-height:80px;
                                                                         object-fit:contain;">
-                                                            <button type="button"
+                                                                <button type="button"
                                                                     wire:click="removeOptionImageUpload({{ $optIndex }})"
                                                                     class="btn btn-outline-danger btn-sm">
-                                                                <i class="ri ri-close-line"></i>
-                                                            </button>
-                                                        </div>
-                                                    @endif
+                                                                    <i class="ri ri-close-line"></i>
+                                                                </button>
+                                                            </div>
+                                                        @endif
 
-                                                </div>
-                                                {{-- /image upload col --}}
+                                                    </div>
+                                                    {{-- /image upload col --}}
 
-                                                {{-- Optional text label column --}}
-                                                <div class="col-md-7">
-                                                    <label
-                                                        class="form-label small
+                                                    {{-- Optional text label column --}}
+                                                    <div class="col-md-7">
+                                                        <label
+                                                            class="form-label small
                                                                   text-muted mb-2">
-                                                        <i class="ri ri-text me-1"></i>
-                                                        Label
-                                                        <span class="fw-normal">(optional)</span>
-                                                    </label>
+                                                            <i class="ri ri-text me-1"></i>
+                                                            Label
+                                                            <span class="fw-normal">(optional)</span>
+                                                        </label>
 
-                                                    @foreach ($languages as $langCode => $lang)
-                                                        <div x-show="activeTab === '{{ $langCode }}'"
-                                                             class="mb-1">
-                                                            <div class="input-group">
+                                                        @foreach ($languages as $langCode => $lang)
+                                                            <div x-show="activeTab === '{{ $langCode }}'"
+                                                                class="mb-1">
+                                                                <div class="input-group">
                                                                     <span
                                                                         class="input-group-text
                                                                              bg-light text-muted small"
                                                                         style="min-width:38px;">
                                                                         {{ $lang['flag'] }}
                                                                     </span>
-                                                                <input type="text"
-                                                                       wire:model="activeQuestion.options.{{ $optIndex }}.text.{{ $langCode }}"
-                                                                       class="form-control form-control-sm"
-                                                                       placeholder="Label in {{ $lang['label'] }}...">
+                                                                    <input type="text"
+                                                                        wire:model="activeQuestion.options.{{ $optIndex }}.text.{{ $langCode }}"
+                                                                        class="form-control form-control-sm"
+                                                                        placeholder="Label in {{ $lang['label'] }}...">
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    @endforeach
-                                                </div>
+                                                        @endforeach
+                                                    </div>
 
-                                            </div>
-                                            {{-- /image mode row --}}
-                                        @endif
+                                                </div>
+                                                {{-- /image mode row --}}
+                                            @endif
+
+                                        </div>
+                                        {{-- /option body --}}
 
                                     </div>
-                                    {{-- /option body --}}
+                                    {{-- /option-card --}}
+                                @endforeach
 
-                                </div>
-                                {{-- /option-card --}}
-                            @endforeach
-
-                            {{-- Options Summary Bar --}}
-                            <div
-                                class="d-flex align-items-center gap-4
+                                {{-- Options Summary Bar --}}
+                                <div
+                                    class="d-flex align-items-center gap-4
                                         pt-3 border-top mt-1">
 
-                                <small class="text-muted">
-                                    <i class="ri ri-check-circle-fill text-success me-1"></i>
-                                    Correct:
-                                    <strong class="text-success">
-                                        {{ collect($activeQuestion['options'])->where('is_correct', true)->count() }}
-                                    </strong>
-                                </small>
-
-                                <small class="text-muted">
-                                    <i class="ri ri-close-circle-fill text-danger me-1"></i>
-                                    Incorrect:
-                                    <strong class="text-danger">
-                                        {{ collect($activeQuestion['options'])->where('is_correct', false)->count() }}
-                                    </strong>
-                                </small>
-
-                                <small class="text-muted">
-                                    <i class="ri ri-list-ordered-2 me-1"></i>
-                                    Total:
-                                    <strong>
-                                        {{ count($activeQuestion['options']) }}
-                                    </strong>
-                                </small>
-
-                                @if ($isMultiCat)
-                                    <small class="text-muted ms-auto">
-                                        <i class="ri ri-trophy-line text-warning me-1"></i>
-                                        Total Weightage:
-                                        <strong class="text-warning">
-                                            {{ collect($activeQuestion['options'])->where('is_correct', true)->sum('weightage') }}
+                                    <small class="text-muted">
+                                        <i class="ri ri-check-circle-fill text-success me-1"></i>
+                                        Correct:
+                                        <strong class="text-success">
+                                            {{ collect($activeQuestion['options'])->where('is_correct', true)->count() }}
                                         </strong>
                                     </small>
-                                @endif
+
+                                    <small class="text-muted">
+                                        <i class="ri ri-close-circle-fill text-danger me-1"></i>
+                                        Incorrect:
+                                        <strong class="text-danger">
+                                            {{ collect($activeQuestion['options'])->where('is_correct', false)->count() }}
+                                        </strong>
+                                    </small>
+
+                                    <small class="text-muted">
+                                        <i class="ri ri-list-ordered-2 me-1"></i>
+                                        Total:
+                                        <strong>
+                                            {{ count($activeQuestion['options']) }}
+                                        </strong>
+                                    </small>
+
+                                    @if ($isMultiCat)
+                                        <small class="text-muted ms-auto">
+                                            <i class="ri ri-trophy-line text-warning me-1"></i>
+                                            Total Weightage:
+                                            <strong class="text-warning">
+                                                {{ collect($activeQuestion['options'])->where('is_correct', true)->sum('weightage') }}
+                                            </strong>
+                                        </small>
+                                    @endif
+
+                                </div>
 
                             </div>
+                        </div>
 
+                    @endif
+                    {{-- /options --}}
+
+
+                    {{-- ┌──────────────────────────────────────────┐
+                     │  EXPLANATION  (Multilingual)             │
+                     └──────────────────────────────────────────┘ --}}
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-header bg-white border-bottom py-3">
+                            <h6 class="mb-0 fw-semibold text-dark">
+                                <i class="ri ri-lightbulb-fill text-warning me-2"></i>
+                                Explanation
+                                <span class="text-muted fw-normal small ms-1">
+                                    (Optional)
+                                </span>
+                            </h6>
+                        </div>
+                        <div class="card-body p-4">
+                            @foreach ($languages as $langCode => $lang)
+                                <div x-show="activeTab === '{{ $langCode }}'" x-cloak
+                                    wire:key="expl-{{ $langCode }}-{{ $questionFormKey }}">
+                                    <label class="form-label fw-medium small mb-2">
+                                        {{ $lang['flag'] }} {{ $lang['label'] }}
+                                    </label>
+                                    <textarea wire:model="activeQuestion.explanation.{{ $langCode }}" class="form-control" rows="3"
+                                        placeholder="{{ $lang['flag'] }} Explain the correct answer in {{ $lang['label'] }}...">
+                                </textarea>
+                                </div>
+                            @endforeach
                         </div>
                     </div>
 
-                @endif
-                {{-- /options --}}
-
-
-                {{-- ┌──────────────────────────────────────────┐
-                     │  EXPLANATION  (Multilingual)             │
-                     └──────────────────────────────────────────┘ --}}
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-header bg-white border-bottom py-3">
-                        <h6 class="mb-0 fw-semibold text-dark">
-                            <i class="ri ri-lightbulb-fill text-warning me-2"></i>
-                            Explanation
-                            <span class="text-muted fw-normal small ms-1">
-                                    (Optional)
-                                </span>
-                        </h6>
-                    </div>
-                    <div class="card-body p-4">
-                        @foreach ($languages as $langCode => $lang)
-                            <div x-show="activeTab === '{{ $langCode }}'" x-cloak
-                                 wire:key="expl-{{ $langCode }}-{{ $questionFormKey }}">
-                                <label class="form-label fw-medium small mb-2">
-                                    {{ $lang['flag'] }} {{ $lang['label'] }}
-                                </label>
-                                <textarea wire:model="activeQuestion.explanation.{{ $langCode }}" class="form-control" rows="3"
-                                          placeholder="{{ $lang['flag'] }} Explain the correct answer in {{ $lang['label'] }}...">
-                                </textarea>
-                            </div>
-                        @endforeach
-                    </div>
                 </div>
-
-            </div>
-            {{-- /left column --}}
+                {{-- /left column --}}
 
 
-            {{-- ══════════════════════════════════════════════════
+                {{-- ══════════════════════════════════════════════════
                  RIGHT COLUMN
             ══════════════════════════════════════════════════ --}}
 
-            <div class="col-lg-4">
-                {{-- ── Admin Note ──────────────────────────── --}}
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-header bg-white border-bottom py-3">
-                        <h6 class="mb-0 fw-semibold text-dark">
-                            <i class="ri ri-edit-2-line text-primary me-2"></i>
-                            Admin Note
-                        </h6>
-                    </div>
-                    <div class="card-body p-3">
-                         <textarea
-                             wire:model.defer="admin_note"
-                             rows="4"
-                             class="form-control"
-                             placeholder="Internal note for administrators only...">
+                <div class="col-lg-4">
+                    {{-- ── Admin Note ──────────────────────────── --}}
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-header bg-white border-bottom py-3">
+                            <h6 class="mb-0 fw-semibold text-dark">
+                                <i class="ri ri-edit-2-line text-primary me-2"></i>
+                                Admin Note
+                            </h6>
+                        </div>
+                        <div class="card-body p-3">
+                            <textarea wire:model.defer="admin_note" rows="4" class="form-control"
+                                placeholder="Internal note for administrators only...">
                   </textarea>
 
-                        <p class="mt-1 text-xs text-gray-500">
-                            This note is not visible to learners.
-                        </p>
+                            <p class="mt-1 text-xs text-gray-500">
+                                This note is not visible to learners.
+                            </p>
+                        </div>
                     </div>
-                </div>
 
 
-                {{-- ── Group Context ──────────────────────────── --}}
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-header bg-white border-bottom py-3">
-                        <h6 class="mb-0 fw-semibold text-dark">
-                            <i class="ri ri-folder-info-line text-primary me-2"></i>
-                            Group Context
-                        </h6>
-                    </div>
-                    <div class="card-body p-3">
-                        <ul class="list-group list-group-flush">
+                    {{-- ── Group Context ──────────────────────────── --}}
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-header bg-white border-bottom py-3">
+                            <h6 class="mb-0 fw-semibold text-dark">
+                                <i class="ri ri-folder-info-line text-primary me-2"></i>
+                                Group Context
+                            </h6>
+                        </div>
+                        <div class="card-body p-3">
+                            <ul class="list-group list-group-flush">
 
-                            <li
-                                class="list-group-item px-0 d-flex
+                                <li
+                                    class="list-group-item px-0 d-flex
                                        justify-content-between align-items-center">
-                                <span class="small text-muted">Group Code</span>
-                                <code class="small">{{ $group_code }}</code>
-                            </li>
+                                    <span class="small text-muted">Group Code</span>
+                                    <code class="small">{{ $group_code }}</code>
+                                </li>
 
-                            <li
-                                class="list-group-item px-0 d-flex
+                                <li
+                                    class="list-group-item px-0 d-flex
                                        justify-content-between align-items-center">
-                                <span class="small text-muted">Category</span>
-                                <span class="badge bg-primary-subtle text-primary">
+                                    <span class="small text-muted">Category</span>
+                                    <span class="badge bg-primary-subtle text-primary">
                                         {{ ucfirst($questions_category) }}
                                     </span>
-                            </li>
+                                </li>
 
-                            <li
-                                class="list-group-item px-0 d-flex
+                                <li
+                                    class="list-group-item px-0 d-flex
                                        justify-content-between align-items-center">
-                                <span class="small text-muted">Questions so far</span>
-                                <span class="badge bg-primary rounded-pill">
+                                    <span class="small text-muted">Questions so far</span>
+                                    <span class="badge bg-primary rounded-pill">
                                         {{ count($questionsList) }}
                                     </span>
-                            </li>
+                                </li>
 
-                            <li
-                                class="list-group-item px-0 d-flex
+                                <li
+                                    class="list-group-item px-0 d-flex
                                        justify-content-between align-items-center">
-                                <span class="small text-muted">Total Marks</span>
-                                <span class="badge bg-success rounded-pill">
+                                    <span class="small text-muted">Total Marks</span>
+                                    <span class="badge bg-success rounded-pill">
                                         {{ collect($questionsList)->sum('marks') }}
                                     </span>
-                            </li>
+                                </li>
 
-                            @foreach ($languages as $langCode => $lang)
-                                @if (!empty($group_content['title'][$langCode]))
-                                    <li class="list-group-item px-0">
+                                @foreach ($languages as $langCode => $lang)
+                                    @if (!empty($group_content['title'][$langCode]))
+                                        <li class="list-group-item px-0">
                                             <span class="small text-muted d-block mb-1">
                                                 {{ $lang['flag'] }} Title
                                             </span>
-                                        <span class="small fw-medium">
+                                            <span class="small fw-medium">
                                                 {{ $group_content['title'][$langCode] }}
                                             </span>
-                                    </li>
-                                @endif
-                            @endforeach
+                                        </li>
+                                    @endif
+                                @endforeach
 
-                        </ul>
+                            </ul>
+                        </div>
                     </div>
-                </div>
 
-                {{-- ── Language Switcher ──────────────────────── --}}
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-header bg-white border-bottom py-3">
-                        <h6 class="mb-0 fw-semibold text-dark">
-                            <i class="ri ri-global-line text-success me-2"></i>
-                            Language
-                        </h6>
-                    </div>
-                    <div class="card-body p-3">
-                        @foreach ($languages as $langCode => $lang)
-                            <div class="mb-2">
-                                <button type="button" @click="activeTab = '{{ $langCode }}'"
+                    {{-- ── Language Switcher ──────────────────────── --}}
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-header bg-white border-bottom py-3">
+                            <h6 class="mb-0 fw-semibold text-dark">
+                                <i class="ri ri-global-line text-success me-2"></i>
+                                Language
+                            </h6>
+                        </div>
+                        <div class="card-body p-3">
+                            @foreach ($languages as $langCode => $lang)
+                                <div class="mb-2">
+                                    <button type="button" @click="activeTab = '{{ $langCode }}'"
                                         class="btn btn-sm w-100 text-start d-flex
                                                align-items-center justify-content-between"
                                         :class="activeTab === '{{ $langCode }}'
@@ -2180,206 +2160,206 @@
                                         <span>
                                             {{ $lang['flag'] }} {{ $lang['label'] }}
                                         </span>
-                                    <span class="badge ms-1"
-                                          :class="activeTab === '{{ $langCode }}'
+                                        <span class="badge ms-1"
+                                            :class="activeTab === '{{ $langCode }}'
                                                 ?
                                                 'bg-white text-primary' :
                                                 'bg-secondary text-white'">
                                             {{ strtoupper($langCode) }}
                                         </span>
-                                </button>
+                                    </button>
+                                </div>
+                            @endforeach
+
+                            <div class="mt-2 pt-2 border-top">
+                                <small class="text-muted">
+                                    <i class="ri ri-information-line me-1"></i>
+                                    English is required. Other languages are optional.
+                                </small>
                             </div>
-                        @endforeach
-
-                        <div class="mt-2 pt-2 border-top">
-                            <small class="text-muted">
-                                <i class="ri ri-information-line me-1"></i>
-                                English is required. Other languages are optional.
-                            </small>
                         </div>
                     </div>
-                </div>
 
-                {{-- ── Save Card ─────────────────────────────── --}}
-                <div class="card shadow-sm border-0 mb-4">
+                    {{-- ── Save Card ─────────────────────────────── --}}
+                    <div class="card shadow-sm border-0 mb-4">
 
-                    <div class="card-header bg-white border-bottom py-3">
-                        <h6 class="mb-0 fw-semibold text-dark">
-                            <i class="ri ri-save-line text-primary me-2"></i>
-                            {{ !empty($activeQuestion['id']) ? 'Update Question' : 'Save Question' }}
-                        </h6>
-                    </div>
+                        <div class="card-header bg-white border-bottom py-3">
+                            <h6 class="mb-0 fw-semibold text-dark">
+                                <i class="ri ri-save-line text-primary me-2"></i>
+                                {{ !empty($activeQuestion['id']) ? 'Update Question' : 'Save Question' }}
+                            </h6>
+                        </div>
 
-                    <div class="card-body p-3">
+                        <div class="card-body p-3">
 
-                        {{-- Status row --}}
-                        <div
-                            class="d-flex align-items-center gap-2 mb-3
+                            {{-- Status row --}}
+                            <div
+                                class="d-flex align-items-center gap-2 mb-3
                                     p-2 rounded-2 bg-light">
-                            @if (!empty($activeQuestion['id']))
-                                <i class="ri ri-edit-box-line text-warning fs-5"></i>
-                                <div>
-                                    <p class="mb-0 small fw-semibold text-dark">
-                                        Editing existing question
-                                    </p>
-                                    <p class="mb-0 small text-muted">
-                                        <code>{{ $activeQuestion['question_code'] }}</code>
-                                    </p>
-                                </div>
-                            @else
-                                <i class="ri ri-add-circle-line text-success fs-5"></i>
-                                <div>
-                                    <p class="mb-0 small fw-semibold text-dark">
-                                        Adding new question
-                                    </p>
-                                    <p class="mb-0 small text-muted">
-                                        Will be saved to group
-                                        <code>{{ $group_code }}</code>
-                                    </p>
-                                </div>
-                            @endif
+                                @if (!empty($activeQuestion['id']))
+                                    <i class="ri ri-edit-box-line text-warning fs-5"></i>
+                                    <div>
+                                        <p class="mb-0 small fw-semibold text-dark">
+                                            Editing existing question
+                                        </p>
+                                        <p class="mb-0 small text-muted">
+                                            <code>{{ $activeQuestion['question_code'] }}</code>
+                                        </p>
+                                    </div>
+                                @else
+                                    <i class="ri ri-add-circle-line text-success fs-5"></i>
+                                    <div>
+                                        <p class="mb-0 small fw-semibold text-dark">
+                                            Adding new question
+                                        </p>
+                                        <p class="mb-0 small text-muted">
+                                            Will be saved to group
+                                            <code>{{ $group_code }}</code>
+                                        </p>
+                                    </div>
+                                @endif
+                            </div>
+
+                            <p class="small text-muted mb-0">
+                                After saving you'll return to the group view
+                                where you can add more questions or edit this one again.
+                            </p>
+
                         </div>
 
-                        <p class="small text-muted mb-0">
-                            After saving you'll return to the group view
-                            where you can add more questions or edit this one again.
-                        </p>
-
-                    </div>
-
-                    <div class="card-footer bg-white p-3 d-flex flex-column gap-2">
-                        <button type="button" wire:click="saveQuestion" wire:loading.attr="disabled"
+                        <div class="card-footer bg-white p-3 d-flex flex-column gap-2">
+                            <button type="button" wire:click="saveQuestion" wire:loading.attr="disabled"
                                 class="btn btn-primary w-100">
                                 <span wire:loading wire:target="saveQuestion">
                                     <span class="spinner-border spinner-border-sm me-1"></span>
                                     Saving…
                                 </span>
-                            <span wire:loading.remove wire:target="saveQuestion">
+                                <span wire:loading.remove wire:target="saveQuestion">
                                     <i class="ri ri-save-line me-1"></i>
                                     {{ !empty($activeQuestion['id']) ? 'Update Question' : 'Save Question' }}
                                 </span>
-                        </button>
+                            </button>
 
-                        <button type="button" wire:click="cancelQuestion"
+                            <button type="button" wire:click="cancelQuestion"
                                 class="btn btn-outline-secondary w-100 btn-sm">
-                            <i class="ri ri-arrow-left-line me-1"></i>
-                            Cancel — Back to Group
-                        </button>
+                                <i class="ri ri-arrow-left-line me-1"></i>
+                                Cancel — Back to Group
+                            </button>
+                        </div>
                     </div>
+
                 </div>
+                {{-- /right column --}}
 
             </div>
-            {{-- /right column --}}
-
-        </div>
-    </form>
+        </form>
 
     @endif
     {{-- /question_form --}}
 
-    </div>
-    @push('style')
-        <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/typography.css') }}">
-        <link rel="stylesheet" href="{{ asset('assets/vendor/libs/highlight/highlight.css') }}">
-        <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/katex.css') }}">
-        <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/editor.css') }}">
-        <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/table.css') }}">
+</div>
+@push('style')
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/typography.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/highlight/highlight.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/katex.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/editor.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/table.css') }}">
 
-        <style>
-            .ql-container {
-                min-height: 150px;
-                height: auto !important;
-            }
+    <style>
+        .ql-container {
+            min-height: 150px;
+            height: auto !important;
+        }
 
-            .ql-editor {
-                min-height: 150px;
-                overflow-y: visible;
-            }
+        .ql-editor {
+            min-height: 150px;
+            overflow-y: visible;
+        }
 
-            .ql-editor table,
-            .ql-editor td,
-            .ql-editor th {
-                border: 1px solid #000 !important;
-                border-collapse: collapse;
-            }
+        .ql-editor table,
+        .ql-editor td,
+        .ql-editor th {
+            border: 1px solid #000 !important;
+            border-collapse: collapse;
+        }
 
-            .ql-editor img {
-                max-width: 100%;
-                height: auto;
-                display: block;
-            }
+        .ql-editor img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
 
-            .upload-dropzone {
-                transition: border-color .2s, background .2s;
-            }
+        .upload-dropzone {
+            transition: border-color .2s, background .2s;
+        }
 
-            .upload-dropzone:hover {
-                border-color: var(--bs-primary) !important;
-                background: rgba(var(--bs-primary-rgb), .03);
-            }
-        </style>
-    @endpush
-    @push('script')
-        <script src="{{ asset('assets/vendor/libs/quill/katex.js') }}"></script>
-        <script src="{{ asset('assets/vendor/libs/highlight/highlight.js') }}"></script>
-        <script src="{{ asset('assets/vendor/libs/quill/quill.js') }}"></script>
-        <script src="{{ asset('assets/vendor/libs/quill/table.js') }}"></script>
-        <script>
-            Quill.register({
-                'modules/table-better': QuillTableBetter
-            }, true);
+        .upload-dropzone:hover {
+            border-color: var(--bs-primary) !important;
+            background: rgba(var(--bs-primary-rgb), .03);
+        }
+    </style>
+@endpush
+@push('script')
+    <script src="{{ asset('assets/vendor/libs/quill/katex.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/highlight/highlight.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/quill/quill.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/quill/table.js') }}"></script>
+    <script>
+        Quill.register({
+            'modules/table-better': QuillTableBetter
+        }, true);
 
-            const fullToolbar = [
-                [{
+        const fullToolbar = [
+            [{
                     font: []
                 },
-                    {
-                        size: []
-                    }
-                ],
-                ['bold', 'italic', 'underline', 'strike'],
-                ['table-better'],
-                [{
+                {
+                    size: []
+                }
+            ],
+            ['bold', 'italic', 'underline', 'strike'],
+            ['table-better'],
+            [{
                     color: []
                 },
-                    {
-                        background: []
-                    }
-                ],
-                [{
+                {
+                    background: []
+                }
+            ],
+            [{
                     script: 'super'
                 },
-                    {
-                        script: 'sub'
-                    }
-                ],
-                [{
+                {
+                    script: 'sub'
+                }
+            ],
+            [{
                     header: '1'
                 },
-                    {
-                        header: '2'
-                    },
-                    'blockquote',
-                    'code-block'
-                ],
-                [{
+                {
+                    header: '2'
+                },
+                'blockquote',
+                'code-block'
+            ],
+            [{
                     list: 'ordered'
                 },
-                    {
-                        indent: '-1'
-                    },
-                    {
-                        indent: '+1'
-                    }
-                ],
-                [{
-                    direction: 'rtl'
-                }, {
-                    align: []
-                }],
-                ['link', 'video', 'formula', 'table'],
+                {
+                    indent: '-1'
+                },
+                {
+                    indent: '+1'
+                }
+            ],
+            [{
+                direction: 'rtl'
+            }, {
+                align: []
+            }],
+            ['link', 'video', 'formula', 'table'],
 
-                ['clean']
-            ];
-        </script>
-    @endpush
+            ['clean']
+        ];
+    </script>
+@endpush

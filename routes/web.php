@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DemoRequestController;
 
 Route::view('/', 'website.index')->name('home');
+// Route::get('/', function () { return redirect()->away('https://www.mindshiksha.com');});
 
 Route::view('/cognitive', 'website.cognitive')
     ->name('cognitive');
